@@ -1,0 +1,253 @@
+village,dimension,score
+kakoi,rs2.1.commons.boundaries,1
+kakoi,rs2.2.commons.boundary.negotiability,2
+kakoi,gs2.1.external.support,1
+kakoi,gs3.2.property.security,1
+kakoi,gs4.1.rules-in-use,1
+kakoi,gs4.2.governance.strictness.trend,3
+kakoi,gs5.1.external.recognition,3
+kakoi,gs5.3.participation.in.rule.making,3
+kakoi,gs5.4.participation.in.zoning,3
+kakoi,gs6.1.actor.group.boundary.clarity,2
+kakoi,gs6.2.outsider.exclusion,2
+kakoi,gs7.1.environmental.monitoring,1
+kakoi,gs7.2.self.sanctions,1
+kakoi,gs7.3.external.sanctions,1
+kakoi,a4.1.leadership.accountability,2
+kakoi,a4.2.leadership.authority,2
+kakoi,a5.1.actor.group.trust,2
+kakoi,a5.2.inter-group.trust,1
+kakoi,i1.1.conflict.resolution,2
+kakoi,o1.1.compliance,1
+kakoi,o2.1.invasives,1
+katikati,rs2.1.commons.boundaries,3
+katikati,rs2.2.commons.boundary.negotiability,3
+katikati,gs2.1.external.support,2
+katikati,gs3.2.property.security,2
+katikati,gs4.1.rules-in-use,2
+katikati,gs4.2.governance.strictness.trend,3
+katikati,gs5.1.external.recognition,3
+katikati,gs5.3.participation.in.rule.making,3
+katikati,gs5.4.participation.in.zoning,3
+katikati,gs6.1.actor.group.boundary.clarity,2
+katikati,gs6.2.outsider.exclusion,2
+katikati,gs7.1.environmental.monitoring,3
+katikati,gs7.2.self.sanctions,1
+katikati,gs7.3.external.sanctions,1
+katikati,a4.1.leadership.accountability,3
+katikati,a4.2.leadership.authority,2
+katikati,a5.1.actor.group.trust,3
+katikati,a5.2.inter-group.trust,2
+katikati,i1.1.conflict.resolution,2
+katikati,o1.1.compliance,3
+katikati,o2.1.invasives,3
+olchoro onyokie,rs2.1.commons.boundaries,3
+olchoro onyokie,rs2.2.commons.boundary.negotiability,3
+olchoro onyokie,gs2.1.external.support,2
+olchoro onyokie,gs3.2.property.security,2
+olchoro onyokie,gs4.1.rules-in-use,2
+olchoro onyokie,gs4.2.governance.strictness.trend,3
+olchoro onyokie,gs5.1.external.recognition,2
+olchoro onyokie,gs5.3.participation.in.rule.making,3
+olchoro onyokie,gs5.4.participation.in.zoning,3
+olchoro onyokie,gs6.1.actor.group.boundary.clarity,2
+olchoro onyokie,gs6.2.outsider.exclusion,2
+olchoro onyokie,gs7.1.environmental.monitoring,3
+olchoro onyokie,gs7.2.self.sanctions,1
+olchoro onyokie,gs7.3.external.sanctions,1
+olchoro onyokie,a4.1.leadership.accountability,2
+olchoro onyokie,a4.2.leadership.authority,2
+olchoro onyokie,a5.1.actor.group.trust,3
+olchoro onyokie,a5.2.inter-group.trust,3
+olchoro onyokie,i1.1.conflict.resolution,2
+olchoro onyokie,o1.1.compliance,3
+olchoro onyokie,o2.1.invasives,3
+eleng'ata,rs2.1.commons.boundaries,3
+eleng'ata,rs2.2.commons.boundary.negotiability,3
+eleng'ata,gs2.1.external.support,2
+eleng'ata,gs3.2.property.security,2
+eleng'ata,gs4.1.rules-in-use,2
+eleng'ata,gs4.2.governance.strictness.trend,2
+eleng'ata,gs5.1.external.recognition,2
+eleng'ata,gs5.3.participation.in.rule.making,1
+eleng'ata,gs5.4.participation.in.zoning,1
+eleng'ata,gs6.1.actor.group.boundary.clarity,2
+eleng'ata,gs6.2.outsider.exclusion,1
+eleng'ata,gs7.1.environmental.monitoring,3
+eleng'ata,gs7.2.self.sanctions,2
+eleng'ata,gs7.3.external.sanctions,1
+eleng'ata,a4.1.leadership.accountability,1
+eleng'ata,a4.2.leadership.authority,1
+eleng'ata,a5.1.actor.group.trust,3
+eleng'ata,a5.2.inter-group.trust,3
+eleng'ata,i1.1.conflict.resolution,2
+eleng'ata,o1.1.compliance,3
+eleng'ata,o2.1.invasives,3
+losirwa,rs2.1.commons.boundaries,3
+losirwa,rs2.2.commons.boundary.negotiability,3
+losirwa,gs2.1.external.support,2
+losirwa,gs3.2.property.security,1
+losirwa,gs4.1.rules-in-use,2
+losirwa,gs4.2.governance.strictness.trend,3
+losirwa,gs5.1.external.recognition,2
+losirwa,gs5.3.participation.in.rule.making,3
+losirwa,gs5.4.participation.in.zoning,3
+losirwa,gs6.1.actor.group.boundary.clarity,2
+losirwa,gs6.2.outsider.exclusion,2
+losirwa,gs7.1.environmental.monitoring,3
+losirwa,gs7.2.self.sanctions,1
+losirwa,gs7.3.external.sanctions,1
+losirwa,a4.1.leadership.accountability,1
+losirwa,a4.2.leadership.authority,1
+losirwa,a5.1.actor.group.trust,3
+losirwa,a5.2.inter-group.trust,3
+losirwa,i1.1.conflict.resolution,2
+losirwa,o1.1.compliance,2
+losirwa,o2.1.invasives,1
+nadonjukin,rs2.1.commons.boundaries,3
+nadonjukin,rs2.2.commons.boundary.negotiability,3
+nadonjukin,gs2.1.external.support,2
+nadonjukin,gs3.2.property.security,3
+nadonjukin,gs4.1.rules-in-use,2
+nadonjukin,gs4.2.governance.strictness.trend,3
+nadonjukin,gs5.1.external.recognition,2
+nadonjukin,gs5.3.participation.in.rule.making,3
+nadonjukin,gs5.4.participation.in.zoning,3
+nadonjukin,gs6.1.actor.group.boundary.clarity,2
+nadonjukin,gs6.2.outsider.exclusion,2
+nadonjukin,gs7.1.environmental.monitoring,3
+nadonjukin,gs7.2.self.sanctions,1
+nadonjukin,gs7.3.external.sanctions,1
+nadonjukin,a4.1.leadership.accountability,3
+nadonjukin,a4.2.leadership.authority,2
+nadonjukin,a5.1.actor.group.trust,3
+nadonjukin,a5.2.inter-group.trust,3
+nadonjukin,i1.1.conflict.resolution,2
+nadonjukin,o1.1.compliance,2
+nadonjukin,o2.1.invasives,3
+sangaiwe,rs2.1.commons.boundaries,1
+sangaiwe,rs2.2.commons.boundary.negotiability,2
+sangaiwe,gs2.1.external.support,1
+sangaiwe,gs3.2.property.security,1
+sangaiwe,gs4.1.rules-in-use,1
+sangaiwe,gs4.2.governance.strictness.trend,2
+sangaiwe,gs5.1.external.recognition,2
+sangaiwe,gs5.3.participation.in.rule.making,3
+sangaiwe,gs5.4.participation.in.zoning,3
+sangaiwe,gs6.1.actor.group.boundary.clarity,1
+sangaiwe,gs6.2.outsider.exclusion,2
+sangaiwe,gs7.1.environmental.monitoring,2
+sangaiwe,gs7.2.self.sanctions,2
+sangaiwe,gs7.3.external.sanctions,1
+sangaiwe,a4.1.leadership.accountability,2
+sangaiwe,a4.2.leadership.authority,3
+sangaiwe,a5.1.actor.group.trust,3
+sangaiwe,a5.2.inter-group.trust,3
+sangaiwe,i1.1.conflict.resolution,2
+sangaiwe,o1.1.compliance,2
+sangaiwe,o2.1.invasives,1
+kimana,rs2.1.commons.boundaries,2
+kimana,rs2.2.commons.boundary.negotiability,3
+kimana,gs2.1.external.support,2
+kimana,gs3.2.property.security,1
+kimana,gs4.1.rules-in-use,1
+kimana,gs4.2.governance.strictness.trend,1
+kimana,gs5.1.external.recognition,1
+kimana,gs5.3.participation.in.rule.making,3
+kimana,gs5.4.participation.in.zoning,3
+kimana,gs6.1.actor.group.boundary.clarity,2
+kimana,gs6.2.outsider.exclusion,1
+kimana,gs7.1.environmental.monitoring,2
+kimana,gs7.2.self.sanctions,1
+kimana,gs7.3.external.sanctions,1
+kimana,a4.1.leadership.accountability,2
+kimana,a4.2.leadership.authority,2
+kimana,a5.1.actor.group.trust,2
+kimana,a5.2.inter-group.trust,3
+kimana,i1.1.conflict.resolution,2
+kimana,o1.1.compliance,1
+kimana,o2.1.invasives,1
+ngoswaki,rs2.1.commons.boundaries,3
+ngoswaki,rs2.2.commons.boundary.negotiability,3
+ngoswaki,gs2.1.external.support,2
+ngoswaki,gs3.2.property.security,3
+ngoswaki,gs4.1.rules-in-use,2
+ngoswaki,gs4.2.governance.strictness.trend,3
+ngoswaki,gs5.1.external.recognition,2
+ngoswaki,gs5.3.participation.in.rule.making,3
+ngoswaki,gs5.4.participation.in.zoning,3
+ngoswaki,gs6.1.actor.group.boundary.clarity,NA
+ngoswaki,gs6.2.outsider.exclusion,2
+ngoswaki,gs7.1.environmental.monitoring,3
+ngoswaki,gs7.2.self.sanctions,2
+ngoswaki,gs7.3.external.sanctions,1
+ngoswaki,a4.1.leadership.accountability,2
+ngoswaki,a4.2.leadership.authority,2
+ngoswaki,a5.1.actor.group.trust,3
+ngoswaki,a5.2.inter-group.trust,3
+ngoswaki,i1.1.conflict.resolution,2
+ngoswaki,o1.1.compliance,3
+ngoswaki,o2.1.invasives,3
+matale a,rs2.1.commons.boundaries,3
+matale a,rs2.2.commons.boundary.negotiability,3
+matale a,gs2.1.external.support,2
+matale a,gs3.2.property.security,3
+matale a,gs4.1.rules-in-use,2
+matale a,gs4.2.governance.strictness.trend,3
+matale a,gs5.1.external.recognition,3
+matale a,gs5.3.participation.in.rule.making,3
+matale a,gs5.4.participation.in.zoning,3
+matale a,gs6.1.actor.group.boundary.clarity,2
+matale a,gs6.2.outsider.exclusion,2
+matale a,gs7.1.environmental.monitoring,3
+matale a,gs7.2.self.sanctions,2
+matale a,gs7.3.external.sanctions,1
+matale a,a4.1.leadership.accountability,3
+matale a,a4.2.leadership.authority,2
+matale a,a5.1.actor.group.trust,3
+matale a,a5.2.inter-group.trust,3
+matale a,i1.1.conflict.resolution,2
+matale a,o1.1.compliance,3
+matale a,o2.1.invasives,3
+engaruka juu,rs2.1.commons.boundaries,3
+engaruka juu,rs2.2.commons.boundary.negotiability,3
+engaruka juu,gs2.1.external.support,3
+engaruka juu,gs3.2.property.security,2
+engaruka juu,gs4.1.rules-in-use,2
+engaruka juu,gs4.2.governance.strictness.trend,3
+engaruka juu,gs5.1.external.recognition,3
+engaruka juu,gs5.3.participation.in.rule.making,3
+engaruka juu,gs5.4.participation.in.zoning,3
+engaruka juu,gs6.1.actor.group.boundary.clarity,2
+engaruka juu,gs6.2.outsider.exclusion,1
+engaruka juu,gs7.1.environmental.monitoring,3
+engaruka juu,gs7.2.self.sanctions,2
+engaruka juu,gs7.3.external.sanctions,1
+engaruka juu,a4.1.leadership.accountability,2
+engaruka juu,a4.2.leadership.authority,2
+engaruka juu,a5.1.actor.group.trust,3
+engaruka juu,a5.2.inter-group.trust,3
+engaruka juu,i1.1.conflict.resolution,2
+engaruka juu,o1.1.compliance,3
+engaruka juu,o2.1.invasives,1
+kitwai a,rs2.1.commons.boundaries,3
+kitwai a,rs2.2.commons.boundary.negotiability,3
+kitwai a,gs2.1.external.support,2
+kitwai a,gs3.2.property.security,3
+kitwai a,gs4.1.rules-in-use,2
+kitwai a,gs4.2.governance.strictness.trend,3
+kitwai a,gs5.1.external.recognition,2
+kitwai a,gs5.3.participation.in.rule.making,3
+kitwai a,gs5.4.participation.in.zoning,3
+kitwai a,gs6.1.actor.group.boundary.clarity,2
+kitwai a,gs6.2.outsider.exclusion,2
+kitwai a,gs7.1.environmental.monitoring,2
+kitwai a,gs7.2.self.sanctions,2
+kitwai a,gs7.3.external.sanctions,1
+kitwai a,a4.1.leadership.accountability,3
+kitwai a,a4.2.leadership.authority,2
+kitwai a,a5.1.actor.group.trust,3
+kitwai a,a5.2.inter-group.trust,2
+kitwai a,i1.1.conflict.resolution,2
+kitwai a,o1.1.compliance,3
+kitwai a,o2.1.invasives,3
