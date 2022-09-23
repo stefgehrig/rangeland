@@ -56,13 +56,13 @@ df2 <- df2 %>%
 #### 3: villages coded scores ####
 ##################################
 df3 <- as_tibble(read.xlsx("data/APPENDIX A4.xlsx"))
-names(df3)[names(df3)=="02.1.Invasives"] <- "O2.1.Invasives"
+names(df3)[names(df3)=="02.1.Invasives"] <- "O2.3.Invasives"
 names(df3)[names(df3)=="A4.2.-.Leadership.authority"] <- "A4.2.Leadership.authority"
 names(df3)[1] <- "village"
 
 # add those that are not yet coded, so that them missing is obvious
 df3 <- df3 %>% 
-  mutate(I2.2.particip.social.monitor = NA)
+  mutate(I2.1.particip.social.monitor = NA)
 
 df3 <- df3 %>% 
   pivot_longer(cols = 2:ncol(.), names_to = "dimension", values_to = "score") %>% 
@@ -217,23 +217,24 @@ df8 <- shp_projvill %>%
 #### 9: population data ####
 ############################
 df9 <- tribble(
-  # from "Populations at Village level 2012 PHC", accessed 2022-08-14 (csv-download defunct)
+  # all 2012 pop census data from "Populations at Village level 2012 PHC", accessed 2022-08-14 (csv-download defunct)
   # https://africaopendata.org/dataset/idadi-ya-watu-kwa-ngazi-ya-vijiji-mtaa-kwa-sensa-ya-mwaka-2012/resource/5713f007-4a4d-4b6e-8eba-60d8984216e1?view_id=65c0bace-2cbd-46f7-9278-c82dce5cd8ee
-  ~village,  ~pop_cens2012, ~pop_leader_postperiod,
   
- "Katikati",         2923, NA,
- "Olchoroonyokie",   2319, NA,
- "Eleng'ata Dapash", 3175, NA,
- "Losirwa",          9360, NA,
- "Ngoswaki",         3692, NA,
- "Kakoi",            3691, NA,
- "Sangaiwe",         3065, NA,
- "Matale A",         3000, NA,
- "Kimana",           7358, NA,
- "Kitwai A",         2037, NA,
- "Nadonjukin",       2598, NA,
- "Engaruka chini",   5336, NA
+  # best estimates based on data from file "TNC_Data_Analysis_file_rv1_pop trends.xlsx", overtaking what Majory tells to be the best estimates
+  ~village,   ~pop_census2012,   ~pop_best_estim2012,   ~pop_best_estim2020,
   
+ "Katikati",         2923,    2923,  3415,
+ "Olchoroonyokie",   2319,    1170,  1661,
+ "Eleng'ata Dapash", 3175,    2040,  5020,
+ "Losirwa",          9360,    NA, NA, # unclear in excel sheet? -> ask majory
+ "Ngoswaki",         3692,    3410,  4635,
+ "Kakoi",            3691,    2553,  2953,
+ "Sangaiwe",         3065,    2886,  3740,
+ "Matale A",         3000,    7600,  9682,
+ "Kimana",           7358,    15000, 17000,
+ "Kitwai A",         2037,    2300,  3018,
+ "Nadonjukin",       2598,    1992,  4005,
+ "Engaruka chini",   5336,    2080,  2800
   
 )
 

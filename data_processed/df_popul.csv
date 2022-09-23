@@ -1,13 +1,13 @@
-village,pop_cens2012,pop_leader_postperiod
-Katikati,2923,NA
-Olchoro Onyokie,2319,NA
-Eleng'ata Dapash,3175,NA
-Losirwa,9360,NA
-Ngoswaki,3692,NA
-Kakoi,3691,NA
-Sangaiwe,3065,NA
-Matale A,3000,NA
-Kimana,7358,NA
-Kitwai A,2037,NA
-Nadonjukin,2598,NA
-Engaruka Chini,5336,NA
+village,pop_census2012,pop_best_estim2012,pop_best_estim2020
+Katikati,2923,2923,3415
+Olchoro Onyokie,2319,1170,1661
+Eleng'ata Dapash,3175,2040,5020
+Losirwa,9360,NA,NA
+Ngoswaki,3692,3410,4635
+Kakoi,3691,2553,2953
+Sangaiwe,3065,2886,3740
+Matale A,3000,7600,9682
+Kimana,7358,15000,17000
+Kitwai A,2037,2300,3018
+Nadonjukin,2598,1992,4005
+Engaruka Chini,5336,2080,2800

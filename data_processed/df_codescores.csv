@@ -19,8 +19,8 @@ Kakoi,a5.1.actor.group.trust,2
 Kakoi,a5.2.inter-group.trust,1
 Kakoi,i1.1.conflict.resolution,2
 Kakoi,o1.1.compliance,1
-Kakoi,o2.1.invasives,1
-Kakoi,i2.2.particip.social.monitor,NA
+Kakoi,o2.3.invasives,1
+Kakoi,i2.1.particip.social.monitor,NA
 Katikati,rs2.1.commons.boundaries,3
 Katikati,rs2.2.commons.boundary.negotiability,3
 Katikati,gs2.1.external.support,2
@@ -41,8 +41,8 @@ Katikati,a5.1.actor.group.trust,3
 Katikati,a5.2.inter-group.trust,2
 Katikati,i1.1.conflict.resolution,2
 Katikati,o1.1.compliance,3
-Katikati,o2.1.invasives,3
-Katikati,i2.2.particip.social.monitor,NA
+Katikati,o2.3.invasives,3
+Katikati,i2.1.particip.social.monitor,NA
 Olchoro Onyokie,rs2.1.commons.boundaries,3
 Olchoro Onyokie,rs2.2.commons.boundary.negotiability,3
 Olchoro Onyokie,gs2.1.external.support,2
@@ -63,8 +63,8 @@ Olchoro Onyokie,a5.1.actor.group.trust,3
 Olchoro Onyokie,a5.2.inter-group.trust,3
 Olchoro Onyokie,i1.1.conflict.resolution,2
 Olchoro Onyokie,o1.1.compliance,3
-Olchoro Onyokie,o2.1.invasives,3
-Olchoro Onyokie,i2.2.particip.social.monitor,NA
+Olchoro Onyokie,o2.3.invasives,3
+Olchoro Onyokie,i2.1.particip.social.monitor,NA
 Eleng'ata Dapash,rs2.1.commons.boundaries,3
 Eleng'ata Dapash,rs2.2.commons.boundary.negotiability,3
 Eleng'ata Dapash,gs2.1.external.support,2
@@ -85,8 +85,8 @@ Eleng'ata Dapash,a5.1.actor.group.trust,3
 Eleng'ata Dapash,a5.2.inter-group.trust,3
 Eleng'ata Dapash,i1.1.conflict.resolution,2
 Eleng'ata Dapash,o1.1.compliance,3
-Eleng'ata Dapash,o2.1.invasives,3
-Eleng'ata Dapash,i2.2.particip.social.monitor,NA
+Eleng'ata Dapash,o2.3.invasives,3
+Eleng'ata Dapash,i2.1.particip.social.monitor,NA
 Losirwa,rs2.1.commons.boundaries,3
 Losirwa,rs2.2.commons.boundary.negotiability,3
 Losirwa,gs2.1.external.support,2
@@ -107,8 +107,8 @@ Losirwa,a5.1.actor.group.trust,3
 Losirwa,a5.2.inter-group.trust,3
 Losirwa,i1.1.conflict.resolution,2
 Losirwa,o1.1.compliance,2
-Losirwa,o2.1.invasives,1
-Losirwa,i2.2.particip.social.monitor,NA
+Losirwa,o2.3.invasives,1
+Losirwa,i2.1.particip.social.monitor,NA
 Nadonjukin,rs2.1.commons.boundaries,3
 Nadonjukin,rs2.2.commons.boundary.negotiability,3
 Nadonjukin,gs2.1.external.support,2
@@ -129,8 +129,8 @@ Nadonjukin,a5.1.actor.group.trust,3
 Nadonjukin,a5.2.inter-group.trust,3
 Nadonjukin,i1.1.conflict.resolution,2
 Nadonjukin,o1.1.compliance,2
-Nadonjukin,o2.1.invasives,3
-Nadonjukin,i2.2.particip.social.monitor,NA
+Nadonjukin,o2.3.invasives,3
+Nadonjukin,i2.1.particip.social.monitor,NA
 Sangaiwe,rs2.1.commons.boundaries,1
 Sangaiwe,rs2.2.commons.boundary.negotiability,2
 Sangaiwe,gs2.1.external.support,1
@@ -151,8 +151,8 @@ Sangaiwe,a5.1.actor.group.trust,3
 Sangaiwe,a5.2.inter-group.trust,3
 Sangaiwe,i1.1.conflict.resolution,2
 Sangaiwe,o1.1.compliance,2
-Sangaiwe,o2.1.invasives,1
-Sangaiwe,i2.2.particip.social.monitor,NA
+Sangaiwe,o2.3.invasives,1
+Sangaiwe,i2.1.particip.social.monitor,NA
 Kimana,rs2.1.commons.boundaries,2
 Kimana,rs2.2.commons.boundary.negotiability,3
 Kimana,gs2.1.external.support,2
@@ -173,8 +173,8 @@ Kimana,a5.1.actor.group.trust,2
 Kimana,a5.2.inter-group.trust,3
 Kimana,i1.1.conflict.resolution,2
 Kimana,o1.1.compliance,1
-Kimana,o2.1.invasives,1
-Kimana,i2.2.particip.social.monitor,NA
+Kimana,o2.3.invasives,1
+Kimana,i2.1.particip.social.monitor,NA
 Ngoswaki,rs2.1.commons.boundaries,3
 Ngoswaki,rs2.2.commons.boundary.negotiability,3
 Ngoswaki,gs2.1.external.support,2
@@ -195,8 +195,8 @@ Ngoswaki,a5.1.actor.group.trust,3
 Ngoswaki,a5.2.inter-group.trust,3
 Ngoswaki,i1.1.conflict.resolution,2
 Ngoswaki,o1.1.compliance,3
-Ngoswaki,o2.1.invasives,3
-Ngoswaki,i2.2.particip.social.monitor,NA
+Ngoswaki,o2.3.invasives,3
+Ngoswaki,i2.1.particip.social.monitor,NA
 Matale A,rs2.1.commons.boundaries,3
 Matale A,rs2.2.commons.boundary.negotiability,3
 Matale A,gs2.1.external.support,2
@@ -217,8 +217,8 @@ Matale A,a5.1.actor.group.trust,3
 Matale A,a5.2.inter-group.trust,3
 Matale A,i1.1.conflict.resolution,2
 Matale A,o1.1.compliance,3
-Matale A,o2.1.invasives,3
-Matale A,i2.2.particip.social.monitor,NA
+Matale A,o2.3.invasives,3
+Matale A,i2.1.particip.social.monitor,NA
 Engaruka Chini,rs2.1.commons.boundaries,3
 Engaruka Chini,rs2.2.commons.boundary.negotiability,3
 Engaruka Chini,gs2.1.external.support,3
@@ -239,8 +239,8 @@ Engaruka Chini,a5.1.actor.group.trust,3
 Engaruka Chini,a5.2.inter-group.trust,3
 Engaruka Chini,i1.1.conflict.resolution,2
 Engaruka Chini,o1.1.compliance,3
-Engaruka Chini,o2.1.invasives,1
-Engaruka Chini,i2.2.particip.social.monitor,NA
+Engaruka Chini,o2.3.invasives,1
+Engaruka Chini,i2.1.particip.social.monitor,NA
 Kitwai A,rs2.1.commons.boundaries,3
 Kitwai A,rs2.2.commons.boundary.negotiability,3
 Kitwai A,gs2.1.external.support,2
@@ -261,5 +261,5 @@ Kitwai A,a5.1.actor.group.trust,3
 Kitwai A,a5.2.inter-group.trust,2
 Kitwai A,i1.1.conflict.resolution,2
 Kitwai A,o1.1.compliance,3
-Kitwai A,o2.1.invasives,3
-Kitwai A,i2.2.particip.social.monitor,NA
+Kitwai A,o2.3.invasives,3
+Kitwai A,i2.1.particip.social.monitor,NA
