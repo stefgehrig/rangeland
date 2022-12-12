@@ -11,12 +11,15 @@ library(tidyverse)
 library(rgeos)
 library(furrr)
 library(sp)
+library(psych)
+library(DescTools)
 
 ######################################
 #### 1: village household surveys ####
 ######################################
 df1 <- as_tibble(read.dta13("data/tnc_cleandataset.dta"))
 df1$village <- str_to_lower(as.character(df1$village))
+attributes(df1)
 
 ##################################
 #### 2: villages coded binary ####
@@ -55,22 +58,103 @@ df2 <- df2 %>%
 ##################################
 #### 3: villages coded scores ####
 ##################################
-df3 <- as_tibble(read.xlsx("data/APPENDIX A4.xlsx"))
+df3 <- as_tibble(read.xlsx("data/APPENDIX A4_rv30.11.2022.xlsx"))
 names(df3)[names(df3)=="02.1.Invasives"] <- "O2.3.Invasives"
-names(df3)[names(df3)=="A4.2.-.Leadership.authority"] <- "A4.2.Leadership.authority"
 names(df3)[1] <- "village"
-
-# add those that are not yet coded, so that them missing is obvious
 df3 <- df3 %>% 
-  mutate(I2.1.particip.social.monitor = NA)
+  mutate(village = case_when(
+    
+    village == "Ngoswak" ~ "ngoswaki",
+    village == "Eleng'ata" ~ "eleng'ata dapash",
+    TRUE ~ str_to_lower(village)
+    
+  ))
 
+# do data cleaning in line with Majory's comments (mail from 2022-12-05)
+# drop variable with missings where reasonable
 df3 <- df3 %>% 
+  select(-`A4.2.-.Leadership.authority`) %>%  # The variable is dropped due to its similarity to "A4.1 Leadership accountability." The question was also not well addressed.
+  select(-`A1.1.Actor.group.size.(#.of.livestock.keepers)`) %>%  # you could probably just use the alternative variable, "A1.1.1 Actor group size (# of cattle)," instead (r = 0.9)
+  select(-`GS6.1.Actor.group.boundary.clarity`)# This variable was not well addressed and not all the intended groups were asked the question. You don't need to worry about it cos it is correlated with other variables - i.e., you can leave it out
+  
+write_csv(as_tibble(names(df3)), "akk.csv")
+
+# replace variables (with and without missings) where better measures are available
+df3$A2.1.Economic.heterogeneity
+df3$ECO1.01.Rainfall.patterns
+df3$`RS3.1.Commons.spatial.extent.(Ha)`
+
+# a) economic heterogeneity as gini from household data,
+# then gini classified in {1,2,3} scale via code manager instruction: 
+# Low: Analogous to a Gini coefficient less than 0.3 
+# Medium: Analogous to a Gini coefficient between 0.3 and 0.5 
+# High: Analogous to a Gini coefficient greater than 0.5
+df1_econ <- df1 %>% 
+  mutate(num_cattle_ordered = as.numeric(cattleowned)) %>% 
+  select(village,
+         # variables where higher values is more wealth
+         numhouses,
+         improvedtoilet,
+         housewalltype,
+         housefloortype,
+         houserooftype,
+         electric_connect,
+         num_cattle_ordered,
+         num_mobile_phone,
+         num_radio,
+         num_bicycle, 
+         num_motorcycle,
+         num_solartorch,
+         num_solarpanel,
+         num_invertersolar,
+         num_solarbattery,
+         num_ploughs,
+         num_modernbed,
+         num_spraypump,
+         num_watertank,
+         num_land) %>%
+  mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
+         across(where(is.numeric), ~scale(.x)))
+
+pca_econ <- principal(df1_econ %>% select(-village))
+pca_econ$loadings
+
+df1 %>% 
+  bind_cols(wealth = pca_econ$scores) %>%
+  mutate(wealth = (wealth-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
+  group_by(village) %>% 
+  summarise(gini = Gini(wealth)) %>% 
+  arrange(desc(gini))
+  mutate(`A2.1.Economic.heterogeneity` = case_when(
+    gini < 0.3 ~ 1,
+    gini < 0.5 ~ 2,
+    gini >= 0.5 ~ 3
+  ))
+
+  #### clarify deviation from majory scoring!
+  
+# b) rainfall patterns
+
+# ....
+
+# replace range of values to be {1,2,3} for all, according to Majory's advise (mail from 2022-12-05)
+# ....
+  
+# reshape
+
+# annotate with source and direction
+
+
+  
   pivot_longer(cols = 2:ncol(.), names_to = "dimension", values_to = "score") %>% 
   mutate(across(where(is.character), ~str_to_lower(.x)))
 
 df3 %>% #... reproduces appendix A4 table
   group_by(village) %>% 
   summarise(mean(score, na.rm = TRUE))
+
+
+
 
 ####################################
 #### 4: village land cover perc ####
@@ -140,6 +224,16 @@ df6 <- map_dfr(list(df6a, df6b), function(x){
   mutate(type = ifelse(grepl("cro", type), "crop", "bare"),
          period = ifelse(grepl("pre", period), "pre", "post")) %>% 
   select(-district, -region_nam, -ward_name)
+
+# add time ninfo from Nathaniel's mail (2022-12-05)
+# The pre-periods were for data pre-2016. And the post is post-206.
+# the case of bare ground,  “pre” uses data from 2010 – 2015 to calculate the metric. While ‘post uses data 2016 – 2021.
+# The crop data comes, “pre” is from a 2015 dataset and “post” is from a 2019 dataset.
+
+# ...
+
+
+
 
 ###################################
 #### 7: rainfall data yearwise ####
