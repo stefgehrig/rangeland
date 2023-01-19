@@ -1,0 +1,65 @@
+/* Whole document: */
+body{
+  font-family: Segoe UI Light;
+  font-size: 12pt;
+}
+/* Headers */
+h1{ /* doc title */
+  font-family: Segoe UI Light;
+  font-size: 24pt;
+  text-align: center
+}
+
+h2{ /* sections */
+  font-family: Segoe UI Light;
+  font-size: 20pt;
+  font-weight: bold
+}
+
+h3{ /* doc version */
+  font-family: Segoe UI Light;
+  font-size: 16pt;
+  font-style: italic;
+  text-align: center;
+  margin: 2em 0em 1em 0em;
+}
+
+h4,h5,h6{ /* subsections */
+  font-family: Segoe UI Light;
+  font-size: 16pt;
+  font-weight: bold
+}
+
+h4.author, h4.date{
+  text-align: center;
+  font-weight: normal;
+}
+
+p.caption, caption{
+  font-family: Segoe UI Light;
+  font-size: 0.95em;
+  font-style: italic;
+  color: grey;
+  margin-right: 0%;
+  margin-left: 0%;  
+  text-align: justify;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: black;
+    background-color: #e6f1fa;
+}
+
+/*----------LOGO above TOC---------*/
+#TOC::before {
+  content: "";
+  display: block;
+  height: 50px;
+  margin: 1em 1em 1em 1em;
+  background-image: url("estimact.png");
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+

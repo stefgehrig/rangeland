@@ -242,7 +242,7 @@ pca_econ$loadings # high correlations consistently with PC1
 
 df1_econ_smry <- df1 %>% 
   bind_cols(wealth = pca_econ$scores) %>%
-  mutate(wealth = (wealth-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
+  mutate(wealth = ((wealth)-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
   group_by(village) %>% 
   summarise(gini = Gini(wealth)) %>% 
   arrange(desc(gini)) %>% 

@@ -1,0 +1,116 @@
+---
+title: "Data analysis support for TNC-NTRI rangeland management project publication"
+author: "Stefan Gehrig, <a href='https://www.estimact.com'>estimact</a>"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+subtitle: "Version 1"
+output: 
+  bookdown::html_document2:
+    toc: TRUE
+    toc_float: TRUE
+    toc_collapsed: TRUE
+    toc_depth: 4
+    number_sections: FALSE
+    css: utils/style.css
+    includes:
+      after_body: utils/footer.html
+bibliography: utils/refs.bib
+---
+
+<!-- START OF -->
+<br>
+
+***
+<!-- DOCUMENT -->
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Approach
+
+...
+
+All data used can be browsed in the most recent version at <https://stefgehrig.shinyapps.io/TNC-NTRI/>.
+
+<!-- END OF -->
+<br>
+
+***
+<!-- SECTION -->
+
+## Diagnostic framework variables
+
+....
+
+<!-- END OF -->
+<br>
+
+***
+<!-- SECTION -->
+
+## Associations of/with outcomes
+
+....
+
+#### Descriptive
+
+....
+
+#### Modelling
+
+....
+
+```{r cars}
+cars %>% 
+  sample_n(10) %>% 
+  kable(
+    format = "html",
+    caption = "Overview of cars.") %>% 
+  kable_styling()
+```
+<br>
+
+Table \@ref(tab:cars) from @vierus_discovery_2018.
+
+```{r pressure-to-go, fig.align='center', fig.cap='This is a caption.'}
+plot(pressure, type = "b")
+```
+<br>
+
+Plot in Figure \@ref(fig:pressure-to-go).
+
+\begin{equation}
+A = (\pi * \lambda \times r^{4}) / \alpha. (\#eq:mean)
+\end{equation}
+<br>
+
+What we saw in equation \@ref(eq:mean) is obvious.
+
+<!-- END OF -->
+<br>
+
+***
+<!-- SECTION -->
+
+## Conclusions / Recommendations
+
+<style>
+div.blue {background-color:#e6f1fa; border-radius: 5px; padding: 15px;}
+</style>
+<div class = "blue">
+
+- This is my first conclusion
+- This is my second conclusion
+
+</div>
+
+<!-- END OF -->
+<br>
+
+***
+<!-- SECTION -->
+
+## References
