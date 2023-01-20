@@ -7,7 +7,8 @@ body{
 h1{ /* doc title */
   font-family: Segoe UI Light;
   font-size: 24pt;
-  text-align: center
+  text-align: center;
+  font-weight: bold
 }
 
 h2{ /* sections */
