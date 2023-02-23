@@ -27,90 +27,149 @@ library(knitr)
 library(kableExtra)
 library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
+
+sd_of_tier2 <- readRDS("outputs/sd_of_tier2.rds")
 ```
 
-## Approach
+## Data processing
 
-...
+All Diagnostic Framework (DF) variables were transformed to be on the same scale from 1 to 3. All variables which had already originally been coded as ordinal with response options 1, 2, 3 were not changed (the data, including the way of coding for each variable can be browsed under <https://stefgehrig.shinyapps.io/TNC-NTRI/>), independent of the distribution of responses. Binary variables (response options 1, 2), however, were set from 1, 2 to 1, 3. Continuous variables (e.g., Number of actors, Change in population size, Economic heterogeneity, Mean annual rainfall, ...) were linearly transformed such that the minimum was 1 and the maximum was 3, **in current absence of any better coding rules**.
 
-All data used can be browsed in the most recent version at <https://stefgehrig.shinyapps.io/TNC-NTRI/>.
+Note that some of the Diagnostic Framework (DF) variables show no variation between villages in the sample. See Table \@ref(tab:sds) with means and standard deviations (SD) for each DF variable. Variables which show no variation are highlighted.
 
-<!-- END OF -->
-<br>
-
-***
-<!-- SECTION -->
-
-## Diagnostic framework variables
-
-....
-
-<!-- END OF -->
-<br>
-
-***
-<!-- SECTION -->
-
-## Associations of/with outcomes
-
-....
-
-#### Descriptive
-
-....
-
-#### Modelling
-
-....
-
-```{r cars}
-cars %>% 
-  sample_n(10) %>% 
+```{r sds}
+color.me <- which(sd_of_tier2$SD == 0)
+sd_of_tier2 %>% 
+  mutate(across(.cols = c(Mean, SD), ~round(.x,2))) %>% 
   kable(
     format = "html",
-    caption = "Overview of cars.") %>% 
-  kable_styling()
+    caption = "Mean and SD for Tier 2 variables.") %>% 
+  kable_styling() %>%
+  row_spec(color.me, background = "coral")
+```
+
+The highlighted variables with zero variation cannot contribute any information in correlational or explanatory analyses (e.g., explaining village-level outcomes).
+
+
+## Villages in the sample
+
+Figure \@ref(fig:map) shows a map of the villages included in the analysis.
+
+```{r map, fig.align='center', fig.cap='Map of villages in the sample and Tanzanian administrative boundaries.', out.width="80%"}
+include_graphics("outputs/vilmap.png")
 ```
 <br>
 
-Table \@ref(tab:cars) from @vierus_discovery_2018.
+## Bivariate associations
 
-```{r pressure-to-go, fig.align='center', fig.cap='This is a caption.'}
-plot(pressure, type = "b")
+For an initial exploration, I only looked at specific bivariate associations between variables, driven by some of previously discussed research questions. A natural conceptual way to summarize the high dimensional data would be to create summary scores on the DF Tier 1 level, e.g., one score per village for `Actors (A)`, one score per village for `Governance Systems (GS)`, etc. However, **this is currently not straightforward and requires some input**. The problem is that all DF variables of one Tier 1 category must have a clear directionality (e.g., "higher values means better"), otherwise an additive summary score like the mean has no meaning. Such clear directionality can rather easily be imposed on the `Governance Systems (GS)` variables and the `Outcomes (O)` variables, for example, but less so on the `Actors (A)` or `Social, Economic, and Political Settings (S)` variables.
+
+Therefore, for now I only created average scores for  `Governance Systems (GS)` and `Outcomes (O)` variables for each village (unweighted average), **after reversing the direction of the variable `GS7.2: Self sanctions`, such that higher values mean more and not less sanctions (as indicated by the code book)**. Higher scores on `Governance Systems (GS)` can then be interpreted as more developed governance systems and higher scores on `Outcomes (O)` can be interpreted as better commons outcomes (as coded from the qualitative data).
+
+Their association is shown in Figure \@ref(fig:scattergso).
+
+```{r scattergso, fig.align='center', fig.cap='Scatter plot of village-level averages of scores in Governance Systems (GS) and Outcomes (O) variables. Pearson correlation coefficient is shown.', out.width="50%"}
+include_graphics("outputs/scatter_gs_o.png")
 ```
 <br>
 
-Plot in Figure \@ref(fig:pressure-to-go).
+A positive association is clearly indicated. We can also look at the correlations of `Governance Systems (GS)` and `Outcomes (O)` variables on a variable-by-variable basis, as in the correlation matrix in Figure \@ref(fig:corrgso).
 
-\begin{equation}
-A = (\pi * \lambda \times r^{4}) / \alpha. (\#eq:mean)
-\end{equation}
+```{r corrgso, fig.align='center', fig.cap='Pearson correlation coefficients between single Governance Systems (GS) and Outcomes (O) variables.', out.width="70%"}
+include_graphics("outputs/corrm_gs_o.png")
+```
 <br>
 
-What we saw in equation \@ref(eq:mean) is obvious.
+The outcome variable `O2.3: Invasives` seems to be least strongly associated with the `Governance Systems (GS)` variables.
 
-<!-- END OF -->
+A natural follow-up question would be to see how these relationships look after adjusting for rainfall. We would probably expect that we gain certainty about the positive relationship between resource governance and commons outcomes when partialling out the effect of natural variation in climate between villages. Therefore, I residualized the three `Outcomes (O)` variables via a linear model with `ECO1.1: Rainfall patterns` (average of mean annual precipitation 2016-2020 in mm) as a predictor before correlating them with the `Governance Systems (GS)` variables again. Technically, this estimates a semi-partial correlation. Interestingly, the relationships get weaker, as shown in Figure \@ref(fig:corrgso2).
+
+```{r corrgso2, fig.align='center', fig.cap='Pearson correlation coefficients between single Governance Systems (GS) and Outcomes (O) variables, with the effect of rainfall on Outcomes (O) variables partialled out.', out.width="70%"}
+include_graphics("outputs/corrm_gs_o_residualizedrain.png")
+```
 <br>
 
-***
-<!-- SECTION -->
+Digging a bit deeper, this seems to be because rainfall is strongly negatively correlated both with the `Governance Systems (GS)` and `Outcomes (O)` variables (see Figure \@ref(fig:allcorrs)). Therefore, it competes with `Governance Systems (GS)` in explaining variation in `Outcomes (O)` variables.
 
-## Conclusions / Recommendations
+In a next step, the GIS-based measurements of land use practices are introduced. We estimate a factor change in bare ground and crop land, such that, for example, a value of 1 means that the proportion of village area which is bare ground/crop land did not change from the pre- to the post-period, whereas a value of 1.5 means that the proportion of village area which is bare ground or crop land increased by 50\%. This ratio is log-transformed, maintaining the interpretation that larger values signify an increase in bare ground or crop land, respectively.
 
-<style>
-div.blue {background-color:#e6f1fa; border-radius: 5px; padding: 15px;}
-</style>
-<div class = "blue">
+There are no clear associations between average score in `Governance Systems (GS)` and the GIS-based outcome measures (Figure \@ref(fig:scattergis)).
 
-- This is my first conclusion
-- This is my second conclusion
+```{r scattergis, fig.align='center', fig.cap='Scatter plot of village-level averages of scores in Governance Systems (GS) and GIS-based outcome measures. Pearson correlation coefficient is shown.', out.width="90%"}
+include_graphics("outputs/scatter_gs_bare_crop.png")
+```
 
-</div>
+How do the GIS-based outcome trend measures relate to the DF variable `O2.1: Commons condition trend`, which is coded from the qualitative data sources? Figure \@ref(fig:boxcommon) shows that there is no obvious association.
 
-<!-- END OF -->
+```{r boxcommon, fig.align='center', fig.cap='Box plot of the GIS-based outcome trend measures, stratified by village score for the variable O2.1: Commons condition trend.', out.width="60%"}
+include_graphics("outputs/boxplots_commen_trend.png")
+```
+
+For completeness, I also show all pairwise correlations among all DF variables and GIS-based outcome trend measures in Figure \@ref(fig:allcorrs).
+
+```{r allcorrs, fig.align='center', fig.cap='Pairwise Pearson correlation coefficients among all DF variables and GIS-based outcome trend measures.', out.width="100%"}
+include_graphics("outputs/corrm_all_lup.png")
+```
 <br>
 
-***
-<!-- SECTION -->
+This analysis so far is, except for the adjustment for rainfall in one of the analyses, purely bivariate, i.e., when looking at one pairwise relationship, we marginalize over the sample distribution in all other variables. Many other types analyses are of course possible where we look at relationships between variables, *conditional on other variables*. So when we get to more sophisticated modelling approaches or multivariate methods, this is exactly what will be done. The exploration so far might, however, give some inspiration in which directions we can or should go in the next steps.
 
-## References
+<!-- ## Diagnostic framework variables -->
+
+<!-- .... -->
+
+<!-- <!-- END OF -->
+<!-- <br> -->
+
+<!-- *** -->
+<!-- <!-- SECTION --> 
+
+<!-- - self sactions richtung !? -->
+<!-- - wie bei anderen richtungen harminieren? also zB average über alle actor scores macht das SInn ?=!=!=! -->
+<!-- - those with no variation -->
+
+<!-- - dimensions withuot variation! -->
+
+<!-- ## Associations of/with outcomes -->
+
+<!-- .... -->
+
+<!-- #### Descriptive -->
+
+<!-- .... -->
+
+<!-- Table \@ref(tab:cars) from @vierus_discovery_2018. -->
+
+
+<!-- \begin{equation} -->
+<!-- A = (\pi * \lambda \times r^{4}) / \alpha. (\#eq:mean) -->
+<!-- \end{equation} -->
+<!-- <br> -->
+
+<!-- What we saw in equation \@ref(eq:mean) is obvious. -->
+
+<!-- <!-- END OF --> 
+<!-- <br> -->
+
+<!-- *** -->
+<!-- <!-- SECTION --> 
+
+<!-- ## Conclusions / Recommendations -->
+
+<!-- <style> -->
+<!-- div.blue {background-color:#e6f1fa; border-radius: 5px; padding: 15px;} -->
+<!-- </style> -->
+<!-- <div class = "blue"> -->
+
+<!-- - This is my first conclusion -->
+<!-- - This is my second conclusion -->
+
+<!-- </div> -->
+
+<!-- <!-- END OF --> 
+<!-- <br> -->
+
+<!-- *** -->
+<!-- <!-- SECTION --> 
+
+<!-- ## References -->
