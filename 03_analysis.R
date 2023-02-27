@@ -5,8 +5,12 @@ library(extrafont)
 library(patchwork)
 library(ggrepel)
 library(ggcorrplot)
+library(ggiraphExtra)
+library(RColorBrewer)
 loadfonts()
+source("00_functions.R")
 fontfam <- "Segoe UI"
+palcolors <- colorRampPalette(brewer.pal(11, "Spectral"))(12)
 
 ###################
 #### load data ####
@@ -33,7 +37,7 @@ df_codescores <- df_codescores %>%
 
 # create tier 2 names
 df_codescores <- df_codescores %>% 
-  mutate(tier2 = case_when(
+  mutate(tier3 = case_when(
            dimension == "a1.1.1.actor.group.size.(#.of.cattle)"       ~ "A1.1: Number of relevant actors (# Cattle)",
            dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"  ~ "A1.1: Number of relevant actors (# Sheep/goats)",
            dimension == "a2.1.economic.heterogeneity"                 ~ "A2.1: Economic heterogeneity",
@@ -78,9 +82,9 @@ df_codescores <- df_codescores %>%
 
 # check data
 stopifnot(sum(is.na(df_codescores$tier1))==0)
-stopifnot(sum(is.na(df_codescores$tier2))==0)
+stopifnot(sum(is.na(df_codescores$tier3))==0)
 
-# for continuous and binary tier2 variables, scale them in range [1,3]
+# for continuous and binary tier3 variables, scale them in range [1,3]
 df_codescores <- df_codescores %>% 
   group_by(dimension) %>% 
   mutate(score_scl = case_when(
@@ -96,19 +100,86 @@ df_codescores <- df_codescores %>%
 
   )) %>% ungroup
 
-#############################################
-#### which dimensions have no variation? ####
-#############################################
-sd_of_tier2 <- df_codescores %>% 
+#######################################
+#### means and SDs per DF variable ####
+#######################################
+summary_tier3 <- df_codescores %>% 
   group_by(`1st Tier` = tier1,
-           `DF variable` = tier2
+           `DF variable` = tier3
            
            ) %>% 
   summarise(Mean = mean(score_scl),
-            SD = round(sd(score_scl),2)) %>% 
+            SD = round(sd(score_scl),2),
+            `Original Coding` = unique(dimension_coding),
+            .groups = "drop") %>% 
   arrange(`DF variable`)
 
-saveRDS(sd_of_tier2, file = "outputs/sd_of_tier2.rds")
+saveRDS(summary_tier3, file = "outputs/summary_tier3.rds")
+
+#################################
+#### spider plots by village ####
+#################################
+input_spec <- expand_grid(
+  village=unique(df_codescores$village),
+  tier1=unique(df_codescores$tier1)
+)
+
+spiderplots <- map(split(input_spec, seq(nrow(input_spec))),
+                   function(x){
+
+                     d <- df_codescores %>%
+                       filter(tier1 == x$tier1,
+                              village == x$village) %>%
+                       select(score_scl, tier3) %>%
+                       mutate(tier3 = str_replace(tier3, ": ", ":\n"),
+                              tier3 = str_replace(tier3, " ", "\n"))
+                     
+                     x <- x %>% mutate(tier1 = ifelse(tier1 == "Social, Economic, and Political Settings (S)",
+                                            "Social, Economic,\nand Political Settings (S)",
+                                            tier1)) # with line break in long name
+                     
+                     p <- d  %>% 
+                       pivot_wider(names_from = tier3, values_from = score_scl) %>% 
+    
+                       ggRadar(rescale = FALSE,
+                               alpha = 0.1,
+                               color = "slateblue") +
+                       theme_minimal(14) +
+                       theme(
+                         text = element_text(family = fontfam),
+                         axis.text.y = element_blank(),
+                         axis.text.x = element_text(size = 9),
+                         panel.grid.minor = element_blank(),
+                         legend.position = "right"
+                       ) +
+                       scale_y_continuous(
+                         limits = c(1, 3),
+                         breaks = c(1, 2, 3),
+                         expand = c(0, 0)
+                       ) +
+                       
+                       labs(title = x$tier1,
+                            subtitle = x$village) +
+                       coord_radar()
+                     
+                     # label also when there is only one variable in the category,
+                     # as for Related Ecosystems (ECO)
+                     if(x$tier1 == "Related Ecosystems (ECO)"){
+                       
+                       p<-p + 
+                         geom_text(data = d,aes(x = tier3, y = score_scl, label = tier3),
+                                   family = fontfam,
+                                   size = 4)
+                       
+                     }
+                     return(p)
+                  })
+
+png("outputs/spiders_separate.png", width = 10000, height = 20000, res = 400)
+wrap_plots(spiderplots,
+           ncol = length(unique(df_codescores$tier1)),
+           nrow = length(unique(df_codescores$village)))
+dev.off()
 
 #########################
 #### anaylze GS vs O ####
@@ -180,8 +251,8 @@ dev.off()
 # on tier3 level correlation matrix
 cor_gso <- df_codescores %>% 
   filter(tier1 %in% c("Outcomes (O)", "Governance Systems (GS)")) %>% 
-  select(village, tier2, score_scl) %>% 
-  pivot_wider(names_from = tier2, values_from = score_scl) %>% 
+  select(village, tier3, score_scl) %>% 
+  pivot_wider(names_from = tier3, values_from = score_scl) %>% 
   select(-village) %>% 
   cor() 
 
@@ -200,9 +271,9 @@ dev.off()
 
 # same again, but with semi-partial correlations (remove linear effect of average rainfall from outcome)
 df_codescores_outc_resid <- df_codescores %>% 
-  filter(tier1 %in% c("Outcomes (O)") |tier2 == "ECO1.1: Rainfall patterns") %>% 
-  select(village, tier2, score_scl) %>% 
-  pivot_wider(names_from = tier2, values_from = score_scl) %>% 
+  filter(tier1 %in% c("Outcomes (O)") |tier3 == "ECO1.1: Rainfall patterns") %>% 
+  select(village, tier3, score_scl) %>% 
+  pivot_wider(names_from = tier3, values_from = score_scl) %>% 
   mutate(across(.cols = c(`O1.1: Compliance`, `O2.1: Commons condition trend`, `O2.3: Invasives`),
                 function(x){
                   # residualize outcomes
@@ -211,18 +282,18 @@ df_codescores_outc_resid <- df_codescores %>%
                 })) %>% 
   select(-"ECO1.1: Rainfall patterns") %>% 
   pivot_longer(cols = c(`O1.1: Compliance`, `O2.1: Commons condition trend`, `O2.3: Invasives`),
-               names_to = "tier2",
+               names_to = "tier3",
                values_to = "score_scl") %>% 
   mutate(tier1 = "Outcomes (O)")
 
 df_codescores_outc_resid <- df_codescores %>% 
-  filter(!tier2 %in% c("O1.1: Compliance", "O2.1: Commons condition trend", "O2.3: Invasives")) %>% 
+  filter(!tier3 %in% c("O1.1: Compliance", "O2.1: Commons condition trend", "O2.3: Invasives")) %>% 
   bind_rows(df_codescores_outc_resid)
 
 cor_gso_outc_resid <- df_codescores_outc_resid %>% 
   filter(tier1 %in% c("Outcomes (O)", "Governance Systems (GS)")) %>% 
-  select(village, tier2, score_scl) %>% 
-  pivot_wider(names_from = tier2, values_from = score_scl) %>% 
+  select(village, tier3, score_scl) %>% 
+  pivot_wider(names_from = tier3, values_from = score_scl) %>% 
   select(-village) %>% 
   cor() 
 
@@ -297,8 +368,8 @@ dev.off()
 
 # cor matrix factor LUP changes with all DF!
 df_codescores_wide_lup <- df_codescores %>% 
-  select(village, tier2, score_scl) %>% 
-  pivot_wider(names_from = tier2, values_from = score_scl) %>% 
+  select(village, tier3, score_scl) %>% 
+  pivot_wider(names_from = tier3, values_from = score_scl) %>% 
   left_join(lup_ratios)
 
 names(df_codescores_wide_lup)[names(df_codescores_wide_lup)=="ratio_bare"] <- "Log(Factor change in bare ground)"
