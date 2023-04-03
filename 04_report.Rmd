@@ -52,7 +52,7 @@ summary_tier3 %>%
   mutate(across(.cols = c(Mean, SD), ~round(.x,2))) %>% 
   kable(
     format = "html",
-    caption = "Mean and SD for Tier 3 variables and their original coding (before rescaling continuous and binary variables to also be in the range [1,3], see text).") %>% 
+    caption = "Mean and SD for Tier 3 variables and their originally employed coding (before rescaling continuous and binary variables to also be in the range [1,3], see text).") %>% 
   kable_styling() %>%
   row_spec(color.me, background = "coral")
 ```
@@ -163,45 +163,24 @@ include_graphics("outputs/corrm_all_lup.png")
 
 This analysis so far is, except for the adjustment for rainfall in one of the analyses, purely bivariate, i.e., when looking at one pairwise relationship, we marginalize over the sample distribution in all other variables. Many other types analyses are of course possible where we look at relationships between variables, *conditional on other variables*. So when we get to more sophisticated modelling approaches or multivariate methods, this is exactly what will be done. The exploration so far might, however, give some inspiration in which directions we can or should go in the next steps.
 
-<!-- ## Diagnostic framework variables -->
+<!-- ## Governance Systems (GS) dimensions -->
 
-<!-- .... -->
+<!-- The `Governance Systems (GS)` category is among those for which there are (i) most DF variables, (ii) most between-village variation (see Figure \@ref(fig:radar) and (iii) most straightforward to aggregate, because for all DF variables a rather clear directionality from "worse" to "better" commons governance can be devised. It is also probably the most interesting predictor category of commons outcome variables and central to the possible research questions. Therefore, here I add further analyses on its internal structure with multivariate methods. That will also provide a basis for a decision how to aggregate the DF variables into one `Governance Systems (GS)` score. In the previous sections, this was simply done with an unweighted average, i.e., under the rule that each DF variables should contribute independently and equally to the score. -->
 
-<!-- <!-- END OF -->
-<!-- <br> -->
+<!-- ### PCA -->
 
-<!-- *** -->
-<!-- <!-- SECTION --> 
-
-<!-- - self sactions richtung !? -->
-<!-- - wie bei anderen richtungen harminieren? also zB average über alle actor scores macht das SInn ?=!=!=! -->
-<!-- - those with no variation -->
-
-<!-- - dimensions withuot variation! -->
-
-<!-- ## Associations of/with outcomes -->
-
-<!-- .... -->
-
-<!-- #### Descriptive -->
-
-<!-- .... -->
-
-<!-- Table \@ref(tab:cars) from @vierus_discovery_2018. -->
+<!-- Table X and Figure Y report results from Principal Component Analysis (PCA) -->
 
 
-<!-- \begin{equation} -->
-<!-- A = (\pi * \lambda \times r^{4}) / \alpha. (\#eq:mean) -->
-<!-- \end{equation} -->
-<!-- <br> -->
+<!-- We see that ... -->
 
-<!-- What we saw in equation \@ref(eq:mean) is obvious. -->
+<!-- ### Discriminant Analysis -->
 
-<!-- <!-- END OF --> 
-<!-- <br> -->
 
-<!-- *** -->
-<!-- <!-- SECTION --> 
+<!-- - a word on the proposed Item Response Theory (IRT) model: not really suitable maybe? what is latent here and what is not - ie assumption? -->
+<!-- - Then:   Clustering of villages according to avereage score (ie.. on a one-dimensional line) vs multivariately! Are tehre governance "types"`? rather than just high and low  -->
+<!-- - correlation with rainfall is weird wa? confounding... -->
+
 
 <!-- ## Conclusions / Recommendations -->
 
