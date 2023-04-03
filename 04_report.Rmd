@@ -2,7 +2,7 @@
 title: "Data analysis support for TNC-NTRI rangeland management project publication"
 author: "Stefan Gehrig, <a href='https://www.estimact.com'>estimact</a>"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-subtitle: "Version 2"
+subtitle: "Version 3"
 output: 
   bookdown::html_document2:
     toc: TRUE
@@ -44,7 +44,7 @@ include_graphics("outputs/vilmap.png")
 
 All Diagnostic Framework (DF) variables were transformed to be on the same scale from 1 to 3. All variables which had already originally been coded as ordinal with response options 1, 2, 3 were not changed (the raw data can be browsed under <https://stefgehrig.shinyapps.io/TNC-NTRI/>), independent of the distribution of responses. Binary variables (response options 1, 2), however, were set from 1, 2 to 1, 3. Continuous variables (e.g., Number of actors, Change in population size, Economic heterogeneity, Mean annual rainfall, ...) were linearly transformed such that the minimum was 1 and the maximum was 3, **in current absence of any better coding rules**.
 
-Note that some of the Diagnostic Framework (DF) variables show no variation between villages in the sample. See Table \@ref(tab:sds) with means and standard deviations (SD) for each DF variable. Variables which show no variation are highlighted.
+<p>Note that some of the Diagnostic Framework (DF) variables show no variation between villages in the sample. See Table \@ref(tab:sds) with means and standard deviations (SD) for each DF variable. Variables which show no variation are highlighted in <span style="color:#FF7F50">orange</span>.</p>
 
 ```{r sds}
 color.me <- which(summary_tier3$SD == 0)
@@ -64,6 +64,50 @@ In Figure \@ref(fig:radar), one radar plot per category of the diagnostic framew
 ```{r radar, fig.align='center', fig.cap='Radar plots of scores for all DF variables. Columns are Tier-1 framework categories, rows are villages.', out.width="100%"}
 include_graphics("outputs/spiders_separate.png")
 ```
+
+### Follow-up on coding issues
+
+For clarification, I will lay out the coding of some variables for which there have been questions or discussion in more detail.
+
+- `GS7.2: Self sanctions`
+
+    In the Code Group Manager table, the following coding scheme is described: 
+    
+        - 4.7.2.1 Self Sanctions: Graduated sanctions
+        - 4.7.2.2 Self Sanctions: Non-graduated sanctions
+        - 4.7.2.3 Self Sanctions: No sanctions
+        
+    The above coding was confirmed by Marjoy in an e-mail (2022-12-13, CC: Monique, Susan). This is equivalent to *higher* values meaning *less* sanctions and inconsistent with all other DF variables in `Governance Systems (GS)`. The coding will therefore be reversed before running analyses which summarise multiple DF variables or estimating associations with outcomes (see following sections). The original coding is, for now, however kept for descriptive analyses like in Table \@ref(tab:sds), Figure \@ref(fig:radar), or in the database stored at <https://stefgehrig.shinyapps.io/TNC-NTRI/>.
+
+- `GS4.1: Rules-in-use`
+
+    In the Code Group Manager table, the following coding scheme is described: 
+    
+        - 4.4.1.1 Grazing rules: Yes
+        - 4.4.1.2 Grazing rules: No
+        
+    However, I was advised by Marjoy in an e-mail (2022-12-13, CC: Monique, Susan) that this is wrong had to be reversed, such that, contrary to the original documentation that was shared in the project team, a *higher* value instead means that rules are *in place*. So the corrected coding, mentioned by Majory, appears in the database, all analyses and also Table \@ref(tab:sds).
+
+
+- `GS7.3: External sanctions`
+
+    In the Code Group Manager table, the following coding scheme is described: 
+    
+        - 4.7.3.1 External sanctions: Yes
+        - 4.7.3.2 External sanctions: No
+        
+    However, I was advised by Marjoy in an e-mail (2022-12-13, CC: Monique, Susan) that this is wrong had to be reversed, such that, contrary to the original documentation that was shared in the project team, a *higher* values instead means that sanctions are *in place*. So the corrected coding, mentioned by Majory, appears in the database, all analyses and also Table \@ref(tab:sds).
+
+
+- `O2.3: Invasives`
+
+    In the Code Group Manager table, the following coding scheme is described: 
+
+        - 7.2.3.1 Invasives: Worsened
+        - 7.2.3.2 Invasives: Remained the same
+        - 7.2.3.3 Invasives: Improved
+        
+    The above coding was confirmed by Marjoy in an e-mail (2022-12-13, CC: Monique, Susan). Since here *higher* values mean *better* outcomes, this DF variable can be combined with the other DF outcome variables (`O1.1: Compliance`, `O2.1: Commons condition trend`) without any need for recoding.
 
 ## Bivariate associations
 

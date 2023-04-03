@@ -110,7 +110,7 @@ summary_tier3 <- df_codescores %>%
            ) %>% 
   summarise(Mean = mean(score_scl),
             SD = round(sd(score_scl),2),
-            `Original Coding` = unique(dimension_coding),
+            `Original coding)` = unique(dimension_coding),
             .groups = "drop") %>% 
   arrange(`DF variable`)
 
@@ -380,7 +380,7 @@ corrm_all <- df_codescores_wide_lup %>%
   cor()
 
 p6 <- corrm_all %>% 
-  ggcorrplot(type = "upper",
+  ggcorrplot(type = "lower",
              lab = TRUE,
              digits = 1,
              outline.color = "black",

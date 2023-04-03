@@ -345,7 +345,7 @@ df3_long <- df3_long %>%
       dimension == "rs5.1.productivity"                                       ~ "ordinal: more productive",                                      
       dimension == "gs2.1.external.support"                                   ~ "ordinal: more external support",                                  
       dimension == "gs3.2.property.security"                                  ~ "ordinal: more property security",                                 
-      dimension == "gs4.1.rules-in-use"                                       ~ "binary: in place (2) or not (1)",                                      
+      dimension == "gs4.1.rules-in-use"                                       ~ "binary: in place (2) or not (1)",  # different from code group manager (majory email 2022-12-13)                                   
       dimension == "gs4.2.governance.strictness.trend"                        ~ "ordinal: trend towards more strictness",                       
       dimension == "gs5.1.external.recognition"                               ~ "ordinal: more recognition",                              
       dimension == "gs5.3.participation.in.rule.making"                       ~ "ordinal: more participation in rules",                     
@@ -354,7 +354,7 @@ df3_long <- df3_long %>%
       dimension == "gs6.2.outsider.exclusion"                                 ~ "ordinal: more exclsion",                                
       dimension == "gs7.1.environmental.monitoring"                           ~ "ordinal: more environmental monitoring",                         
       dimension == "gs7.2.self.sanctions"                                     ~ "ordinal: less severe sanctions",                                    
-      dimension == "gs7.3.external.sanctions"                                 ~ "binary: in place (2) or not (1)",                       
+      dimension == "gs7.3.external.sanctions"                                 ~ "binary: in place (2) or not (1)", # different from code group manager (majory email 2022-12-13)                          
       dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                    ~ "continuous: number of cattle",                  
       dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"               ~ "continuous: number of sheep/goats",             
       dimension == "a2.2.interest.heterogeneity"                              ~ "ordinal: more heterogeneity",                             
