@@ -108,7 +108,7 @@ include_graphics("outputs/corrm_gs_o_residualizedrain.png")
 
 Digging a bit deeper, this seems to be because rainfall is strongly negatively correlated both with the `Governance Systems (GS)` and `Outcomes (O)` variables (see Figure \@ref(fig:allcorrs)). Therefore, it competes with `Governance Systems (GS)` in explaining variation in `Outcomes (O)` variables.
 
-In a next step, the GIS-based measurements of land use practices are introduced. First, Figure \@ref(fig:gisbased) just shows a scatter plot of the two GIS-based outcome trend measures and two reference lines, which indicate zero change. We see that (i) crop land has increased in all villages (all values $>0$) and that there is generally a negative association, in line with what should be expected: Villages that have experienced stronger increases in crop land have also experienced a stronger reduction in bare ground.
+In a next step, the GIS-based measurements of land use practices are introduced. First, Figure \@ref(fig:gisbased) just shows a scatter plot of the two GIS-based outcome trend measures and two reference lines, which indicate zero change. We see that (i) crop land has increased in all villages (all values $>0$) and that there is generally a negative association: Villages that have experienced stronger increases in crop land have also experienced a stronger reduction in bare ground.
 
 ```{r gisbased, fig.align='center', fig.cap='Scatter plot of the two GIS-based outcome trend measures, along with reference lines which indidate no change. Pearson correlation coefficient is shown.', out.width="50%"}
 include_graphics("outputs/scatter_gis.png")
@@ -120,6 +120,12 @@ There are no clear associations between average score in `Governance Systems (GS
 
 ```{r scattergis, fig.align='center', fig.cap='Scatter plot of village-level averages of scores in Governance Systems (GS) and GIS-based outcome measures. Pearson correlation coefficient is shown.', out.width="90%"}
 include_graphics("outputs/scatter_gs_bare_crop.png")
+```
+
+Via a simple linear model, I residualize the GIS-based outcome measure on rainfall, therefore adjusting it for differences in average precipitation between villages. The associations become stronger, as can be seen in Figure \@ref(fig:scattergisres)
+
+```{r scattergisres, fig.align='center', fig.cap='Scatter plot of village-level averages of scores in Governance Systems (GS) and GIS-based outcome measures, adjusted for precipitation. Pearson correlation coefficient is shown.', out.width="90%"}
+include_graphics("outputs/scatter_gs_bare_crop_resid.png")
 ```
 
 How do the GIS-based outcome trend measures relate to the DF variable `O2.1: Commons condition trend`, which is coded from the qualitative data sources? Figure \@ref(fig:boxcommon) shows that there is no obvious association.
@@ -135,7 +141,7 @@ include_graphics("outputs/corrm_all_lup.png")
 ```
 <br>
 
-This analysis so far is, except for the adjustment for rainfall in one of the analyses, purely bivariate, i.e., when looking at one pairwise relationship, we marginalize over the sample distribution in all other variables. Many other types analyses are of course possible where we look at relationships between variables, *conditional on other variables*. So when we get to more sophisticated modelling approaches or multivariate methods, this is exactly what will be done. The exploration so far might, however, give some inspiration in which directions we can or should go in the next steps.
+<!-- This analysis so far is, except for the adjustment for rainfall in one of the analyses, purely bivariate, i.e., when looking at one pairwise relationship, we marginalize over the sample distribution in all other variables. Many other types analyses are of course possible where we look at relationships between variables, *conditional on other variables*. So when we get to more sophisticated modelling approaches or multivariate methods, this is exactly what will be done. The exploration so far might, however, give some inspiration in which directions we can or should go in the next steps. -->
 
 <!-- ## Governance Systems (GS) dimensions -->
 

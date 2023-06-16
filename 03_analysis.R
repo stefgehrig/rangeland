@@ -492,3 +492,59 @@ p7+p8
 dev.off()
 # 
 # boxplot(df_codescores_wide_lup$`Log(Factor change in crop land)` ~ df_codescores_wide_lup$`O1.1: Compliance`)
+
+## scatter plots GSystem vs GIS-outcomes
+## after adjusting for average rainfall
+df_gso_lup <- df_gso_lup %>% 
+  left_join(df_codescores %>% filter(grepl("rainfall", dimension)) %>% 
+              select(village, rainfall = score))
+
+df_gso_lup <- df_gso_lup %>% 
+  mutate(
+    ratio_bare_res =  lm(ratio_bare ~ rainfall, data = df_gso_lup )$residuals,
+    ratio_crop_res =  lm(ratio_crop ~ rainfall, data = df_gso_lup )$residuals
+  )
+
+p4res <- df_gso_lup %>% 
+  ggplot(aes(x = `Avg. Governance Systems (GS)`,
+             y = ratio_bare_res)) + 
+  geom_point(size = 2) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam)) + 
+  scale_x_continuous() + 
+  #scale_y_continuous(breaks = 1:3, limits = c(1,3)) +
+  geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
+  geom_text(x = -Inf, y = Inf, label = glue("r = {format(round(
+                                            cor(df_gso_lup$`Avg. Governance Systems (GS)`,
+                                            df_gso_lup$ratio_bare_res), 2), nsmall = 2)}"),
+            family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1) +
+  labs(y = "Log(Factor change in bare ground)\n(residualized on rainfall)") + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_gso_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1)
+
+p5res <- df_gso_lup %>% 
+  ggplot(aes(x = `Avg. Governance Systems (GS)`,
+             y = ratio_crop_res)) + 
+  geom_point(size = 2) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam)) + 
+  scale_x_continuous() + 
+  #scale_y_continuous(breaks = 1:3, limits = c(1,3)) +
+  geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
+  geom_text(x = -Inf, y = Inf, label = glue("r = {format(round(
+                                            cor(df_gso_lup$`Avg. Governance Systems (GS)`,
+                                            df_gso_lup$ratio_crop_res), 2), nsmall = 2)}"),
+            family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1) +
+  labs(y = "Log(Factor change in crop land)\n(residualized on rainfall)") + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_gso_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1)
+
+png("outputs/scatter_gs_bare_crop_resid.png", width = 3000, height = 1500, res = 310)
+p4res+p5res
+dev.off()
