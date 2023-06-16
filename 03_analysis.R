@@ -504,6 +504,8 @@ df_gso_lup <- df_gso_lup %>%
     ratio_bare_res =  lm(ratio_bare ~ rainfall, data = df_gso_lup )$residuals,
     ratio_crop_res =  lm(ratio_crop ~ rainfall, data = df_gso_lup )$residuals
   )
+summary(lm(ratio_bare ~ rainfall, data = df_gso_lup)) # more rainfall, less increase in bare ground (rainfall helping vegetation)
+summary(lm(ratio_crop ~ rainfall, data = df_gso_lup )) # more rainfall, more increase in crop land
 
 p4res <- df_gso_lup %>% 
   ggplot(aes(x = `Avg. Governance Systems (GS)`,
@@ -523,7 +525,8 @@ p4res <- df_gso_lup %>%
   geom_point(
     data = df_gso_lup %>% 
       filter(village %in% c("Kakoi", "Sangaiwe")),
-    col = "red", size = 7, pch = 1)
+    col = "red", size = 7, pch = 1) + 
+  scale_y_continuous(limits = c(NA, 0.2))
 
 p5res <- df_gso_lup %>% 
   ggplot(aes(x = `Avg. Governance Systems (GS)`,

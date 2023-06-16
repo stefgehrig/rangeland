@@ -122,7 +122,7 @@ There are no clear associations between average score in `Governance Systems (GS
 include_graphics("outputs/scatter_gs_bare_crop.png")
 ```
 
-Via a simple linear model, I residualize the GIS-based outcome measure on rainfall, therefore adjusting it for differences in average precipitation between villages. The associations become stronger, as can be seen in Figure \@ref(fig:scattergisres)
+Via a simple linear model, I residualize the GIS-based outcome measure on rainfall, therefore adjusting it for differences in average precipitation between villages. The associations become stronger, as can be seen in Figure \@ref(fig:scattergisres). Increases in bare ground were on average more successfully prevented in village with high scores, controlling for rainfall.
 
 ```{r scattergisres, fig.align='center', fig.cap='Scatter plot of village-level averages of scores in Governance Systems (GS) and GIS-based outcome measures, adjusted for precipitation. Pearson correlation coefficient is shown.', out.width="90%"}
 include_graphics("outputs/scatter_gs_bare_crop_resid.png")
