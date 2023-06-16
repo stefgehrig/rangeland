@@ -10,6 +10,7 @@ library(patchwork)
 library(tidyverse)
 library(rgeos)
 library(furrr)
+library(janitor)
 library(sp)
 library(psych)
 library(DescTools)
@@ -144,118 +145,128 @@ df1$village <- str_to_lower(as.character(df1$village))
 attributes(df1)
 df1$village[df1$village=="engaruka juu"] <- "engaruka chini"
 
-##################################
-#### 2: villages coded binary ####
-##################################
-df2 <- as_tibble(read.xlsx("data/TNC_RangelandMGT_codesbyvillage.xlsx"))
-names(df2) <- str_replace(names(df2), "\\.Gr=.*","")
-names(df2) <- str_replace_all(names(df2), "[^[:alnum:]]", " ")
-names(df2) <- str_replace_all(names(df2), "    ", " ")
-names(df2) <- str_replace_all(names(df2), "   ", " ")
-names(df2) <- str_replace_all(names(df2), "  ", " ")
-names(df2) <- trimws(names(df2))
-names(df2)[1] <- "village"
 
-df2$village <- trimws(str_replace_all(df2$village, "[^[:alnum:]]", " "))
-df2$village <- str_replace(df2$village," Village.*","")
-df2 <- df2 %>% filter(village != "Totals") %>% select(-Totals)
-df2 <- df2 %>% 
-  pivot_longer(cols = 2:ncol(.), names_to = "code", values_to = "val_binary")
-
-
-#### code manager
-df_cods <- as_tibble(read.xlsx("data/TNC_Rangeland MGT_Code Manager.xlsx"))
-
-names(df_cods) <- str_to_lower(names(df_cods))
-df_cods$code <- trimws(str_replace_all(df_cods$code, "[^[:alnum:]]", " "))
-df_cods$code <- str_replace_all(df_cods$code, "   ", " ")
-df_cods$code <- str_replace_all(df_cods$code, "  ", " ")
-df_cods$comment <- str_remove_all(df_cods$comment, "\u2029")
-df_cods <- df_cods %>% select(-x1)
-
-#### merge them ####
-df2 <- df2 %>% 
-  left_join(df_cods, by = "code")  %>% 
-  mutate(across(where(is.character), ~str_to_lower(.x)))
+# ##################################
+# #### 2: villages coded binary ####
+# ##################################
+# df2 <- as_tibble(read.xlsx("data/TNC_RangelandMGT_codesbyvillage.xlsx"))
+# names(df2) <- str_replace(names(df2), "\\.Gr=.*","")
+# names(df2) <- str_replace_all(names(df2), "[^[:alnum:]]", " ")
+# names(df2) <- str_replace_all(names(df2), "    ", " ")
+# names(df2) <- str_replace_all(names(df2), "   ", " ")
+# names(df2) <- str_replace_all(names(df2), "  ", " ")
+# names(df2) <- trimws(names(df2))
+# names(df2)[1] <- "village"
+# 
+# df2$village <- trimws(str_replace_all(df2$village, "[^[:alnum:]]", " "))
+# df2$village <- str_replace(df2$village," Village.*","")
+# df2 <- df2 %>% filter(village != "Totals") %>% select(-Totals)
+# df2 <- df2 %>% 
+#   pivot_longer(cols = 2:ncol(.), names_to = "code", values_to = "val_binary")
+# 
+# 
+# #### code manager
+# df_cods <- as_tibble(read.xlsx("data/TNC_Rangeland MGT_Code Manager.xlsx"))
+# 
+# names(df_cods) <- str_to_lower(names(df_cods))
+# df_cods$code <- trimws(str_replace_all(df_cods$code, "[^[:alnum:]]", " "))
+# df_cods$code <- str_replace_all(df_cods$code, "   ", " ")
+# df_cods$code <- str_replace_all(df_cods$code, "  ", " ")
+# df_cods$comment <- str_remove_all(df_cods$comment, "\u2029")
+# df_cods <- df_cods %>% select(-x1)
+# 
+# #### merge them ####
+# df2 <- df2 %>% 
+#   left_join(df_cods, by = "code")  %>% 
+#   mutate(across(where(is.character), ~str_to_lower(.x)))
 
 ##################################
 #### 3: villages coded scores ####
 ##################################
-df3 <- as_tibble(read.xlsx("data/APPENDIX A4_rv30.11.2022.xlsx"))
-names(df3)[names(df3)=="02.1.Invasives"] <- "O2.3.Invasives"
-names(df3)[1] <- "village"
-df3 <- df3 %>% 
-  mutate(village = case_when(
-    village == "Engaruka Juu" ~ "engaruka chini",
-    village == "Ngoswak" ~ "ngoswaki",
-    village == "Eleng'ata" ~ "eleng'ata dapash",
-    TRUE ~ str_to_lower(village)
-  ))
+# ------ revised codes, 2023-06-16 -------
+df3 <- as_tibble(read.xlsx("data/refined_data_2023/template1_2023-05-05_mks.xlsx"))
+df3 <- df3 %>% mutate(village = str_to_lower(village))
 
-# do data cleaning in line with Majory's comments (mail from 2022-12-05)
-# drop variable with missings where reasonable
-df3 <- df3 %>% 
-  select(-`A4.2.-.Leadership.authority`) %>%  # The variable is dropped due to its similarity to "A4.1 Leadership accountability." The question was also not well addressed.
-  select(-`A1.1.Actor.group.size.(#.of.livestock.keepers)`) %>%  # you could probably just use the alternative variable, "A1.1.1 Actor group size (# of cattle)," instead (r = 0.9)
-  select(-`GS6.1.Actor.group.boundary.clarity`)# This variable was not well addressed and not all the intended groups were asked the question. You don't need to worry about it cos it is correlated with other variables - i.e., you can leave it out
+# # do data cleaning in line with Majory's comments (mail from 2022-12-05)
+# # drop variable with missings where reasonable
+# df3 <- df3 %>% 
+#   select(-`A4.2.-.Leadership.authority`) %>%  # The variable is dropped due to its similarity to "A4.1 Leadership accountability." The question was also not well addressed.
+#   select(-`A1.1.Actor.group.size.(#.of.livestock.keepers)`) %>%  # you could probably just use the alternative variable, "A1.1.1 Actor group size (# of cattle)," instead (r = 0.9)
+#   select(-`GS6.1.Actor.group.boundary.clarity`)# This variable was not well addressed and not all the intended groups were asked the question. You don't need to worry about it cos it is correlated with other variables - i.e., you can leave it out
 
 # replace variables (with and without missings) where better measures are available
-df3$A2.1.Economic.heterogeneity
-df3$ECO1.01.Rainfall.patterns
-df3$`RS3.1.Commons.spatial.extent.(Ha)`
-df3$`S1.1.Human.population.size.change.(Annual.increase)`
+df3$a2.1.economic.heterogeneity
+df3$eco1.01.rainfall.patterns
+df3$`rs3.1.commons.spatial.extent.(ha)`
+df3$`s1.1.human.population.size.change.(annual.increase)`
 
-# a) economic heterogeneity as gini from household data,
-# then gini classified in {1,2,3} scale via code manager instruction: 
-# Low: Analogous to a Gini coefficient less than 0.3 
-# Medium: Analogous to a Gini coefficient between 0.3 and 0.5 
-# High: Analogous to a Gini coefficient greater than 0.5
-df1_econ <- df1 %>% 
-  mutate(num_cattle_ordered = as.numeric(cattleowned)) %>% 
-  select(village,
-         # variables where higher values is more wealth
-         numhouses,
-         improvedtoilet,
-         housewalltype,
-         housefloortype,
-         houserooftype,
-         electric_connect,
-         num_cattle_ordered,
-         num_mobile_phone,
-         num_radio,
-         num_bicycle, 
-         num_motorcycle,
-         num_solartorch,
-         num_solarpanel,
-         num_invertersolar,
-         num_solarbattery,
-         num_ploughs,
-         num_modernbed,
-         num_spraypump,
-         num_watertank,
-         num_land) %>%
-  mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
-         across(where(is.numeric), ~scale(.x)))
-
-pca_econ <- principal(df1_econ %>% select(-village))
-pca_econ$loadings # high correlations consistently with PC1
+# a) economic heterogeneity as wealth index
+# "Given our sites are pretty homogenous, a better indicator of inequality might simply 
+#  be the proportion of homes with a tin/aluminum/bati roof, or the proportion of homes with a pikipiki."
+df1 %>% tabyl(village, houserooftype)
+df1 %>% tabyl(village, motorcycle) %>% 
+  adorn_percentages()
+cor(df1$houserooftype, df1$motorcycle=="Yes") # 0.2953421
 
 df1_econ_smry <- df1 %>% 
-  bind_cols(wealth = pca_econ$scores) %>%
-  mutate(wealth = ((wealth)-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
   group_by(village) %>% 
-  summarise(gini = Gini(wealth)) %>% 
-  arrange(desc(gini)) %>% 
-  # mutate(`A2.1.Economic.heterogeneity` = case_when(
-  #   gini < 0.3 ~ 1,
-  #   gini < 0.5 ~ 2,
-  #   gini >= 0.5 ~ 3
-  # ))
-  rename(`A2.1.Economic.heterogeneity` = gini)
+  summarise(a2.1.economic.heterogeneity= mean(motorcycle=="No")) # higher values, less heterogeneity
 
 df3 <- df3 %>% 
-  select(-`A2.1.Economic.heterogeneity`) %>% 
+  select(-a2.1.economic.heterogeneity) %>% 
   left_join(df1_econ_smry)
+
+# # a) economic heterogeneity as gini from household data,
+# # then gini classified in {1,2,3} scale via code manager instruction: 
+# # Low: Analogous to a Gini coefficient less than 0.3 
+# # Medium: Analogous to a Gini coefficient between 0.3 and 0.5 
+# # High: Analogous to a Gini coefficient greater than 0.5
+# df1_econ <- df1 %>%
+#   mutate(num_cattle_ordered = as.numeric(cattleowned)) %>% 
+#   select(village,
+#          # variables where higher values is more wealth
+#          numhouses,
+#          improvedtoilet,
+#          housewalltype,
+#          housefloortype,
+#          houserooftype,
+#          electric_connect,
+#          num_cattle_ordered,
+#          num_mobile_phone,
+#          num_radio,
+#          num_bicycle, 
+#          num_motorcycle,
+#          num_solartorch,
+#          num_solarpanel,
+#          num_invertersolar,
+#          num_solarbattery,
+#          num_ploughs,
+#          num_modernbed,
+#          num_spraypump,
+#          num_watertank,
+#          num_land) %>%
+#   mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
+#          across(where(is.numeric), ~scale(.x)))
+# 
+# pca_econ <- principal(df1_econ %>% select(-village))
+# pca_econ$loadings # high correlations consistently with PC1
+# 
+# df1_econ_smry <- df1 %>% 
+#   bind_cols(wealth = pca_econ$scores) %>%
+#   mutate(wealth = ((wealth)-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
+#   group_by(village) %>% 
+#   summarise(gini = Gini(wealth)) %>% 
+#   arrange(desc(gini)) %>% 
+#   # mutate(`A2.1.Economic.heterogeneity` = case_when(
+#   #   gini < 0.3 ~ 1,
+#   #   gini < 0.5 ~ 2,
+#   #   gini >= 0.5 ~ 3
+#   # ))
+#   rename(`A2.1.Economic.heterogeneity` = gini)
+# 
+# df3 <- df3 %>% 
+#   select(-`A2.1.Economic.heterogeneity`) %>% 
+#   left_join(df1_econ_smry)
   
 # b) rainfall patterns
 df7_rain_smry <- df7 %>% 
@@ -267,15 +278,13 @@ df7_rain_smry <- df7 %>%
   )) %>% 
   filter(year >= 2016) %>% # post period only
   group_by(village) %>% 
-  summarise(`ECO1.01.Rainfall.patterns` = mean(mean_annual_precip))
+  summarise(eco1.01.rainfall.patterns = mean(mean_annual_precip)) # higher values, more rainfall
 
 df3 <- df3 %>% 
-  select(-`ECO1.01.Rainfall.patterns`) %>% 
+  select(-eco1.01.rainfall.patterns) %>% 
   left_join(df7_rain_smry)
 
 # c) commons spatial extent
-df3$`RS3.1.Commons.spatial.extent.(Ha)`
-
 df6 <- df6 %>% 
   mutate(village = case_when(
     village == "Ngoswak" ~ "ngoswaki",
@@ -288,10 +297,10 @@ df6 <- df6 %>%
 df6_area_smry <- df6 %>% 
   filter(type == "bare", period == "pre") %>% 
   select(village, total_area) %>% 
-  rename(`RS3.1.Commons.spatial.extent.(Ha)` = total_area)
+  rename(`rs3.1.commons.spatial.extent.(ha)` = total_area) # higher values, more space
   
 df3 <- df3 %>% 
-  select(-`RS3.1.Commons.spatial.extent.(Ha)`) %>% 
+  select(-`rs3.1.commons.spatial.extent.(ha)`) %>% 
   left_join(df6_area_smry)
 
 # d) population size increase
@@ -303,102 +312,119 @@ df9_pop_smry <- df9 %>%
     village == "Engaruka Juu" ~ "engaruka chini",
     TRUE ~ str_to_lower(village)
   )) %>% 
-  mutate(pop_increase = (`2020`-`2012`) / `2012`) %>% 
-  select(village, `S1.1.Human.population.size.change.(Annual.increase)` = pop_increase)
+  mutate(total_rel_increase = 1+(`2020`-`2012`) / `2012`) %>% 
+  mutate(growth_factor = (total_rel_increase)^(1/8)-1) %>%
+  mutate(growth_factor = -growth_factor) %>% # reverse coding
+  select(village, `s1.1.human.population.size.change.(annual.increase)` = growth_factor) # higher values, more annual increase
 
 df3 <- df3 %>% 
-  select(-`S1.1.Human.population.size.change.(Annual.increase)`) %>% 
+  select(-`s1.1.human.population.size.change.(annual.increase)`) %>% 
   left_join(df9_pop_smry)
 
-# replace range of values to be {1,2,3} for social monitoring, according to Majory's advise (mail from 2022-12-05)
-df3 <- df3 %>% 
-  mutate(`I2.1.Participation.in.social.monitoring.(enforcement)` = 
-           case_when(
-             `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(1,2) ~ 1,
-             `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(3)   ~ 2,
-             `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(4)   ~ 3
-           ))
-
+# # replace range of values to be {1,2,3} for social monitoring, according to Majory's advise (mail from 2022-12-05)
+# df3 <- df3 %>% 
+#   mutate(`I2.1.Participation.in.social.monitoring.(enforcement)` = 
+#            case_when(
+#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(1,2) ~ 1,
+#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(3)   ~ 2,
+#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(4)   ~ 3
+#            ))
 
 # reshape
 df3_long <- df3 %>%   
-  pivot_longer(cols = 2:ncol(.), names_to = "dimension", values_to = "score") %>% 
-  mutate(across(where(is.character), ~str_to_lower(.x)))
+  pivot_longer(cols = 2:ncol(.), names_to = "dimension", values_to = "score")
 
-# annotate with source and direction, as discussed with Majory and written in her response (mail from 2022-12-13)
-df3_long <- df3_long %>% 
+# annotate with updated source and direction
+df3_info <- as_tibble(read.xlsx("data/refined_data_2023/template2_2023-05-05_mks.xlsx"))
+df3_info <- df3_info %>% 
+  # add in my own new definitions from above
   mutate(
-    dimension_source = case_when(
-      dimension == "rs3.1.commons.spatial.extent.(ha)"                   ~ "total village area estimate from GIS-based land use analysis",
-      dimension == "eco1.01.rainfall.patterns"                           ~ "extracted from PERSIANN-CCS database",
-      dimension == "a2.1.economic.heterogeneity"                         ~ "household items elicited in household survey",
-      dimension == "s1.1.human.population.size.change.(annual.increase)" ~ "combination of censuses and officials' estimates",
-      dimension == "a1.1.1.actor.group.size.(#.of.cattle)"               ~ "estimates from interviews with grazing-related committees and district",
-      dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"          ~ "estimates from interviews with grazing-related committees and district",
-      TRUE ~ "coded from qualitative interviews and focus groups" 
-    ),
     dimension_coding = case_when(
-      dimension == "s1.2.changes.in.ethnic.composition.(village.leader.data)" ~ "ordinal: more rapid change in ethnic composition",
-      dimension == "s1.3.changes.in.livelihood.activities"                    ~ "ordinal: more changes in livelihoods",                   
-      dimension == "rs2.1.commons.boundaries"                                 ~ "ordinal: clearer boundaries",                                
-      dimension == "rs2.2.commons.boundary.negotiability"                     ~ "ordinal: more negotiability",                    
-      dimension == "rs5.1.productivity"                                       ~ "ordinal: more productive",                                      
-      dimension == "gs2.1.external.support"                                   ~ "ordinal: more external support",                                  
-      dimension == "gs3.2.property.security"                                  ~ "ordinal: more property security",                                 
-      dimension == "gs4.1.rules-in-use"                                       ~ "binary: in place (2) or not (1)",  # different from code group manager (majory email 2022-12-13)                                   
-      dimension == "gs4.2.governance.strictness.trend"                        ~ "ordinal: trend towards more strictness",                       
-      dimension == "gs5.1.external.recognition"                               ~ "ordinal: more recognition",                              
-      dimension == "gs5.3.participation.in.rule.making"                       ~ "ordinal: more participation in rules",                     
-      dimension == "gs5.4.participation.in.zoning"                            ~ "ordinal: more participation in zoning",                           
-      dimension == "gs5.5.commons.political.power"                            ~ "ordinal: more power",                          
-      dimension == "gs6.2.outsider.exclusion"                                 ~ "ordinal: more exclsion",                                
-      dimension == "gs7.1.environmental.monitoring"                           ~ "ordinal: more environmental monitoring",                         
-      dimension == "gs7.2.self.sanctions"                                     ~ "ordinal: less severe sanctions",                                    
-      dimension == "gs7.3.external.sanctions"                                 ~ "binary: in place (2) or not (1)", # different from code group manager (majory email 2022-12-13)                          
-      dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                    ~ "continuous: number of cattle",                  
-      dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"               ~ "continuous: number of sheep/goats",             
-      dimension == "a2.2.interest.heterogeneity"                              ~ "ordinal: more heterogeneity",                             
-      dimension == "a4.1.leadership.accountability"                           ~ "ordinal: more accountability",                         
-      dimension == "a5.1.actor.group.trust"                                   ~ "ordinal: more intra-trust",                                  
-      dimension == "a5.2.inter-group.trust"                                   ~ "ordinal: more inter-trust",                                 
-      dimension == "a7.1.economic.dependence"                                 ~ "ordinal: more dependence",                                
-      dimension == "a7.2.commons.alternatives"                                ~ "less alternatives",                             
-      dimension == "i1.1.conflict.resolution"                                 ~ "binary: in place (2) or not (1)",                                   
-      dimension == "i2.1.participation.in.social.monitoring.(enforcement)"    ~ "ordinal: more monitoring participation",  
-      dimension == "o1.1.compliance"                                          ~ "ordinal: more compliance",                                         
-      dimension == "o2.1.commons.condition.trend"                             ~ "ordinal: more improvement",                           
-      dimension == "o2.3.invasives"                                           ~ "ordinal: less problems due to invasives",                                          
-      dimension == "a2.1.economic.heterogeneity"                              ~ "continuous: gini coefficient estimated from PCA scores on household items",                            
-      dimension == "eco1.01.rainfall.patterns"                                ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",                              
-      dimension == "rs3.1.commons.spatial.extent.(ha)"                        ~ "continuous: area (ha)",                    
-      dimension == "s1.1.human.population.size.change.(annual.increase)"      ~ "continuous: proportion increase from 2012 to 2022"
+      dimension == "a2.1.economic.heterogeneity" ~ "continuous: proportion without pikipiki (i.e., more homogeneity)",
+      dimension == "eco1.01.rainfall.patterns"   ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",
+      dimension == "rs3.1.commons.spatial.extent.(ha)"   ~ "continuous: area bare land (ha)",
+      dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)",
+      TRUE ~ dimension_coding
     )
   )
+
+df3_long <- df3_long %>% 
+  left_join(df3_info)
+
+# # annotate with source and direction, as discussed with Majory and written in her response (mail from 2022-12-13)
+# df3_long <- df3_long %>% 
+#   mutate(
+#     dimension_source = case_when(
+#       dimension == "rs3.1.commons.spatial.extent.(ha)"                   ~ "total village area estimate from GIS-based land use analysis",
+#       dimension == "eco1.01.rainfall.patterns"                           ~ "extracted from PERSIANN-CCS database",
+#       dimension == "a2.1.economic.heterogeneity"                         ~ "household items elicited in household survey",
+#       dimension == "s1.1.human.population.size.change.(annual.increase)" ~ "combination of censuses and officials' estimates",
+#       dimension == "a1.1.1.actor.group.size.(#.of.cattle)"               ~ "estimates from interviews with grazing-related committees and district",
+#       dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"          ~ "estimates from interviews with grazing-related committees and district",
+#       TRUE ~ "coded from qualitative interviews and focus groups" 
+#     ),
+#     dimension_coding = case_when(
+#       dimension == "s1.2.changes.in.ethnic.composition.(village.leader.data)" ~ "ordinal: more rapid change in ethnic composition",
+#       dimension == "s1.3.changes.in.livelihood.activities"                    ~ "ordinal: more changes in livelihoods",                   
+#       dimension == "rs2.1.commons.boundaries"                                 ~ "ordinal: clearer boundaries",                                
+#       dimension == "rs2.2.commons.boundary.negotiability"                     ~ "ordinal: more negotiability",                    
+#       dimension == "rs5.1.productivity"                                       ~ "ordinal: more productive",                                      
+#       dimension == "gs2.1.external.support"                                   ~ "ordinal: more external support",                                  
+#       dimension == "gs3.2.property.security"                                  ~ "ordinal: more property security",                                 
+#       dimension == "gs4.1.rules-in-use"                                       ~ "binary: in place (2) or not (1)",  # different from code group manager (majory email 2022-12-13)                                   
+#       dimension == "gs4.2.governance.strictness.trend"                        ~ "ordinal: trend towards more strictness",                       
+#       dimension == "gs5.1.external.recognition"                               ~ "ordinal: more recognition",                              
+#       dimension == "gs5.3.participation.in.rule.making"                       ~ "ordinal: more participation in rules",                     
+#       dimension == "gs5.4.participation.in.zoning"                            ~ "ordinal: more participation in zoning",                           
+#       dimension == "gs5.5.commons.political.power"                            ~ "ordinal: more power",                          
+#       dimension == "gs6.2.outsider.exclusion"                                 ~ "ordinal: more exclsion",                                
+#       dimension == "gs7.1.environmental.monitoring"                           ~ "ordinal: more environmental monitoring",                         
+#       dimension == "gs7.2.self.sanctions"                                     ~ "ordinal: less severe sanctions",                                    
+#       dimension == "gs7.3.external.sanctions"                                 ~ "binary: in place (2) or not (1)", # different from code group manager (majory email 2022-12-13)                          
+#       dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                    ~ "continuous: number of cattle",                  
+#       dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"               ~ "continuous: number of sheep/goats",             
+#       dimension == "a2.2.interest.heterogeneity"                              ~ "ordinal: more heterogeneity",                             
+#       dimension == "a4.1.leadership.accountability"                           ~ "ordinal: more accountability",                         
+#       dimension == "a5.1.actor.group.trust"                                   ~ "ordinal: more intra-trust",                                  
+#       dimension == "a5.2.inter-group.trust"                                   ~ "ordinal: more inter-trust",                                 
+#       dimension == "a7.1.economic.dependence"                                 ~ "ordinal: more dependence",                                
+#       dimension == "a7.2.commons.alternatives"                                ~ "less alternatives",                             
+#       dimension == "i1.1.conflict.resolution"                                 ~ "binary: in place (2) or not (1)",                                   
+#       dimension == "i2.1.participation.in.social.monitoring.(enforcement)"    ~ "ordinal: more monitoring participation",  
+#       dimension == "o1.1.compliance"                                          ~ "ordinal: more compliance",                                         
+#       dimension == "o2.1.commons.condition.trend"                             ~ "ordinal: more improvement",                           
+#       dimension == "o2.3.invasives"                                           ~ "ordinal: less problems due to invasives",                                          
+#       dimension == "a2.1.economic.heterogeneity"                              ~ "continuous: gini coefficient estimated from PCA scores on household items",                            
+#       dimension == "eco1.01.rainfall.patterns"                                ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",                              
+#       dimension == "rs3.1.commons.spatial.extent.(ha)"                        ~ "continuous: area (ha)",                    
+#       dimension == "s1.1.human.population.size.change.(annual.increase)"      ~ "continuous: proportion increase from 2012 to 2022"
+#     )
+#   )
 
 # df3_long %>% #... reproduces appendix A4 table
 #   group_by(village) %>% 
 #   summarise(mean(score, na.rm = TRUE))
 
-####################################
-#### 4: village land cover perc ####
-####################################
-df4 <- read_csv2("data/geodata.csv") %>%
-  rbind(
-    tibble(
-      Village = "Katikati",
-      `% bare 2010-15` = NA,
-      `% bare 2015-20` = NA,
-      `% agriculture 2015` = NA,
-      `% agriculture 2020` = NA,
-      Notes = NA,
-      `SFTZ 2021 info` = NA
-    )
-  )
-
-df4 <- df4 %>% dplyr::select(village = Village, contains("%")) %>%
-  pivot_longer(cols = contains("%"), names_to = "var", values_to = "cover_percent") %>%
-  mutate(var = str_sub(var, 3,100)) %>%
-  separate(var, " ", into = c("land_type", "period"))
+# ####################################
+# #### 4: village land cover perc ####
+# ####################################
+# df4 <- read_csv2("data/geodata.csv") #%>%
+#   rbind(
+#     tibble(
+#       Village = "Katikati",
+#       `% bare 2010-15` = NA,
+#       `% bare 2015-20` = NA,
+#       `% agriculture 2015` = NA,
+#       `% agriculture 2020` = NA,
+#       Notes = NA,
+#       `SFTZ 2021 info` = NA
+#     )
+#   )
+# 
+# df4 <- df4 %>% dplyr::select(village = Village, contains("%")) %>%
+#   pivot_longer(cols = contains("%"), names_to = "var", values_to = "cover_percent") %>%
+#   mutate(var = str_sub(var, 3,100)) %>%
+#   separate(var, " ", into = c("land_type", "period"))
 
 #############################################################
 #### 5: village land use plan (VLUP) indicator variables ####
@@ -433,11 +459,28 @@ df8 <- shp_projvill %>%
          district = District_N, 
          region = Region_Nam)
 
+##############################
+#### 10: external threats ####
+##############################
+df10 <- read_csv2("data/refined_data_2023/external_threats_mks.csv")
+df10_long <- df10 %>% 
+  pivot_longer(cols = !contains("threat"), names_to = "village", values_to = "present") %>% 
+  mutate(present = ifelse(is.na(present), 0, 1),
+         village = str_to_lower(village))
+
 #################################################
 #### harmonize village names and export data ####
 #################################################
-dflist <- map(list(df1, df2, df3_long, df4, 
-                   df5, df6, df7, df8, df9), function(x){
+dflist <- map(list(df1, 
+                   # df2, 
+                   df3_long, 
+                   # df4, 
+                   df5, 
+                   df6, 
+                   df7, 
+                   df8, 
+                   df9, 
+                   df10_long), function(x){
   
   names(x) <- str_to_lower(names(x))
   
@@ -471,26 +514,15 @@ dflist <- map(list(df1, df2, df3_long, df4,
   return(dat)
 })
 
-df1 <- dflist[[1]]
-df2 <- dflist[[2]]
-df3 <- dflist[[3]]
-df4 <- dflist[[4]]
-df5 <- dflist[[5]]
-df6 <- dflist[[6]]
-df7 <- dflist[[7]]
-df8 <- dflist[[8]]
-df9 <- dflist[[9]]
-
-write_csv(df1, "data_processed/df_hhsurv.csv")
-write_csv(df2, "data_processed/df_codelists.csv")
-write_csv(df3, "data_processed/df_codescores.csv")
-write_csv(df4, "data_processed/df_landuse_perc.csv")
-write_csv(df5, "data_processed/df_landuse_vlup.csv")
-write_csv(df6, "data_processed/df_landuse_area.csv")
-write_csv(df7, "data_processed/df_rainfall.csv")
-write_csv(df8, "data_processed/df_admlevels.csv")
-write_csv(df9, "data_processed/df_popul.csv")
-# 
+write_csv(dflist[[1]], "data_processed/df_hhsurv.csv")
+write_csv(dflist[[2]], "data_processed/df_codescores.csv")
+write_csv(dflist[[3]], "data_processed/df_landuse_vlup.csv")
+write_csv(dflist[[4]], "data_processed/df_landuse_area.csv")
+write_csv(dflist[[5]], "data_processed/df_rainfall.csv")
+write_csv(dflist[[6]], "data_processed/df_admlevels.csv")
+write_csv(dflist[[7]], "data_processed/df_popul.csv")
+write_csv(dflist[[8]], "data_processed/df_threats.csv")
+ 
 # ################################################################
 # #### afrobarometer data Round 5 [2012] + 6 [2015] +7 [2018] ####
 # ################################################################

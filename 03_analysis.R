@@ -51,7 +51,7 @@ df_codescores <- df_codescores %>%
            dimension == "eco1.01.rainfall.patterns"                   ~ "ECO1.1: Rainfall patterns",
            
            dimension == "gs2.1.external.support"                      ~ "GS2.1: External support",
-           dimension == "gs3.2.property.security"                     ~ "GS3.2: Property security", # should be 3.1, not 3.2 (see code group manager)?
+           dimension == "gs3.2.property.security"                     ~ "GS3.2: Property security",
            dimension == "gs4.1.rules-in-use"                          ~ "GS4.1: Rules-in-use",
            dimension == "gs4.2.governance.strictness.trend"           ~ "GS4.2: Governance strictness trend",
            dimension == "gs5.1.external.recognition"                               ~ "GS5.1: External recognition",
@@ -70,8 +70,8 @@ df_codescores <- df_codescores %>%
            dimension == "o2.1.commons.condition.trend"                             ~ "O2.1: Commons condition trend",
            dimension == "o2.3.invasives"                                           ~ "O2.3: Invasives",
            
-           dimension == "rs2.1.commons.boundaries"                                 ~ "RS2.1: Commons boundaries", # should be 1.1, not 2.1?
-           dimension == "rs2.2.commons.boundary.negotiability"                     ~ "RS2.2: Commons boundaries negotiability", # should be 1.2, not 2.2?
+           dimension == "rs2.1.commons.boundaries"                                 ~ "RS2.1: Commons boundaries",
+           dimension == "rs2.2.commons.boundary.negotiability"                     ~ "RS2.2: Commons boundaries negotiability",
            dimension == "rs3.1.commons.spatial.extent.(ha)"                        ~ "RS3.1: Commons spatial extent",
            dimension == "rs5.1.productivity"                                       ~ "RS5.1: Productivity",
            
@@ -84,19 +84,14 @@ df_codescores <- df_codescores %>%
 stopifnot(sum(is.na(df_codescores$tier1))==0)
 stopifnot(sum(is.na(df_codescores$tier3))==0)
 
-# for continuous and binary tier3 variables, scale them in range [1,3]
+# for continuous and binary tier3 variables, scale them in range [1,3] and round
 df_codescores <- df_codescores %>% 
   group_by(dimension) %>% 
   mutate(score_scl = case_when(
 
-    grepl("continuous", dimension_coding)           ~ (score-min(score))/(max(score)-min(score)) * 2 + 1,
+    grepl("continuous", dimension_coding)           ~ round((score-min(score))/(max(score)-min(score)) * 2 + 1,0),
     grepl("binary", dimension_coding) &  score == 2 ~ 3,
     TRUE ~ score
-    
-    # # gini cutoffs
-    # dimension == "a2.1.economic.heterogeneity" & score <= 0.3, 1,
-    # dimension == "a2.1.economic.heterogeneity" & score <= 0.5, 2,
-    # dimension == "a2.1.economic.heterogeneity" & score >  0.5, 3,
 
   )) %>% ungroup
 
@@ -108,9 +103,9 @@ summary_tier3 <- df_codescores %>%
            `DF variable` = tier3
            
            ) %>% 
-  summarise(Mean = mean(score_scl),
-            SD = round(sd(score_scl),2),
-            `Original coding)` = unique(dimension_coding),
+  summarise(`Mean (rescaled)` = mean(score_scl),
+            `SD (rescaled)` = round(sd(score_scl),2),
+            `Coding direction` = unique(dimension_coding),
             .groups = "drop") %>% 
   arrange(`DF variable`)
 
@@ -184,17 +179,13 @@ dev.off()
 #########################
 #### anaylze GS vs O ####
 #########################
-# code such for the GS group: that HIGHER scores mean BETTER resource governance conditions
-# code such for the O group: that HIGHER scores mean BETTER outcomes
-df_codescores %>% 
-  filter(!duplicated(dimension), tier1 %in% c("Outcomes (O)", "Governance Systems (GS)")) %>% 
-  select(dimension, dimension_coding) %>% arrange(dimension) # only gs7.2.self.sanctions needs to be reversed
-
-df_codescores <- df_codescores %>% 
-  mutate(score_scl = ifelse(dimension == "gs7.2.self.sanctions", 4 - score_scl, score_scl))
-
+# no more changing in directions necessary, higher values means always BETETR governance, and BETTER outcomes
 # (all dimensions are on integer scale)
 # gs vs o
+# df_codescores %>% 
+#   filter(tier1 %in% c("Outcomes (O)", "Governance Systems (GS)")) %>% 
+#   select(dimension, dimension_coding) %>% 
+#   distinct
 df_gso <- df_codescores %>% 
   filter(tier1 %in% c("Outcomes (O)", "Governance Systems (GS)")) %>% 
   group_by(village, tier1) %>% 
@@ -214,39 +205,54 @@ p1 <- df_gso %>%
   geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
   geom_text(x = -Inf, y = Inf, label = glue("r = {format(round(
                                             cor(df_gso$`Avg. Governance Systems (GS)`,
-                                            df_gso$`Avg. Outcomes (O)`), 2), nsmall = 2)}"),
-            family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1)
+                                            df_gso$`Avg. Outcomes (O)`), 3), nsmall = 3)}"),
+            family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1) + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_gso %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1
+  )
 
 png("outputs/scatter_gs_o.png", width = 1750, height = 1500, res = 350)
 p1
 dev.off()
 
-# # i vs o
-# df_io <- df_codescores %>% 
+# i vs o
+# df_codescores %>% 
 #   filter(tier1 %in% c("Outcomes (O)", "Interactions (I)")) %>% 
-#   group_by(village, tier1) %>% 
-#   summarise(mean = mean(score),
-#             .groups = "drop") %>% 
-#   pivot_wider(names_from = tier1, values_from = mean, names_prefix = "Avg. ")
-# 
-# # scatter plot
-# p2 <- df_io %>% 
-#   ggplot(aes(x = `Avg. Interactions (I)`,
-#              y = `Avg. Outcomes (O)`)) + 
-#   geom_point(size = 2) +
-#   theme_classic(14) +
-#   theme(text = element_text(family = fontfam)) + 
-#   scale_x_continuous() + 
-#   scale_y_continuous(breaks = 1:3, limits = c(1,3)) +
-#   geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
-#   geom_text(x = -Inf, y = Inf, label = glue("r = {format(round(
-#                                             cor(df_io$`Avg. Interactions (I)`,
-#                                             df_io$`Avg. Outcomes (O)`), 2), nsmall = 2)}"),
-#             family = fontfam, col = "grey20", size = 4.5)
-# 
-# png("outputs/scatter_gs_i_o.png", width = 2500, height = 1500, res = 320)
-# p1+p2
-# dev.off()
+#   select(dimension, dimension_coding) %>% 
+#   distinct
+df_io <- df_codescores %>%
+  filter(tier1 %in% c("Outcomes (O)", "Interactions (I)")) %>%
+  group_by(village, tier1) %>%
+  summarise(mean = mean(score),
+            .groups = "drop") %>%
+  pivot_wider(names_from = tier1, values_from = mean, names_prefix = "Avg. ")
+
+# scatter plot
+p2 <- df_io %>%
+  ggplot(aes(x = `Avg. Interactions (I)`,
+             y = `Avg. Outcomes (O)`)) +
+  geom_point(size = 2) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam)) +
+  scale_x_continuous() +
+  scale_y_continuous(breaks = 1:3, limits = c(1,3)) +
+  geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
+  geom_text(x = 1.15, y = 3.05, label = glue("r = {format(round(
+                                            cor(df_io$`Avg. Interactions (I)`,
+                                            df_io$`Avg. Outcomes (O)`), 3), nsmall = 3)}"),
+            family = fontfam, col = "grey20", size = 4.5) + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_io %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1)
+
+png("outputs/scatter_gs_i_o.png", width = 3000, height = 1500, res = 320)
+p1+p2
+dev.off()
 
 # on tier3 level correlation matrix
 cor_gso <- df_codescores %>% 
@@ -315,6 +321,23 @@ dev.off()
 ##################################
 #### O soft / GS vs. GIS data ####
 ##################################
+# data explore scale
+df_landuse_area %>% 
+  mutate(period = factor(period, ordered = TRUE, levels = c("pre", "post"))) %>% 
+  filter(type == "bare") %>% 
+  ggplot() + 
+  geom_bar(aes( x= period, y = area_ha), stat = "identity") +
+  facet_wrap(~ village) + 
+  labs(subtitle = "bare")
+df_landuse_area %>% 
+  mutate(period = factor(period, ordered = TRUE, levels = c("pre", "post"))) %>% 
+  filter(type == "crop") %>% 
+  ggplot() + 
+  geom_bar(aes( x= period, y = area_ha), stat = "identity") +
+  facet_wrap(~ village) + 
+  labs(subtitle = "crop")
+
+# compute relative differences and log-transform them
 lup_ratios <- df_landuse_area %>% 
   group_by(village, type, period) %>% 
   summarise(landprop = area_ha/total_area,
@@ -325,6 +348,27 @@ lup_ratios <- df_landuse_area %>%
   mutate(ratio = log(post_landprop/pre_landprop)) %>%  # more crop or bare than previously is higher value
   select(-contains("landprop")) %>% 
   pivot_wider(names_from = type, values_from = ratio, names_prefix = "ratio_")
+
+# scatter among changes
+p35 <- lup_ratios %>% 
+  ggplot(aes(x = ratio_bare,
+             y = ratio_crop)) + 
+  geom_point(size = 2) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam)) +
+  geom_vline(xintercept = 0,lty = 2)+
+  geom_hline(yintercept = 0,lty = 2) +
+  labs(x = "Log(Factor change in bare ground)",
+       y = "Log(Factor change in crop land)")+
+  geom_text_repel(aes(label = village), size = 3, family = fontfam, seed = 3, col = "grey20") +
+  geom_text(x = -Inf, y = Inf, label = glue("r = {format(round(
+                                            cor(lup_ratios$ratio_bare,
+                                            lup_ratios$ratio_crop), 2), nsmall = 2)}"),
+            family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1)
+
+png("outputs/scatter_gis.png", width = 1750, height = 1500, res = 350)
+p35
+dev.off()
 
 # scatter plots
 df_gso_lup <- left_join(df_gso,lup_ratios, by = join_by(village))
@@ -341,8 +385,13 @@ p4 <- df_gso_lup %>%
                                             cor(df_gso_lup$`Avg. Governance Systems (GS)`,
                                             df_gso_lup$ratio_bare), 2), nsmall = 2)}"),
             family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1) +
-  labs(y = "Log(Factor change in bare ground)")
-# 
+  labs(y = "Log(Factor change in bare ground)") + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_gso_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1)
+
 # png("outputs/scatter_gs_bare.png", width = 1750, height = 1500, res = 350)
 # p4
 # dev.off()
@@ -360,7 +409,12 @@ p5 <- df_gso_lup %>%
                                             cor(df_gso_lup$`Avg. Governance Systems (GS)`,
                                             df_gso_lup$ratio_crop), 2), nsmall = 2)}"),
             family = fontfam, col = "grey20", size = 4.5, hjust = -0.25, vjust = 1) +
-  labs(y = "Log(Factor change in crop land)")
+  labs(y = "Log(Factor change in crop land)") + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_gso_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    col = "red", size = 7, pch = 1)
 
 png("outputs/scatter_gs_bare_crop.png", width = 3000, height = 1500, res = 310)
 p4+p5
@@ -393,24 +447,48 @@ p6
 dev.off()
 
 # factor change boxplots for levels of commons condition trend
-p7 <- df_codescores_wide_lup %>% 
-  mutate(`O2.1: Commons condition trend` = factor(`O2.1: Commons condition trend`)) %>% 
-  ggplot() +
+df_codescores_wide_lup <- df_codescores_wide_lup %>% 
+  mutate(`O2.1: Commons condition trend_jit` = `O2.1: Commons condition trend` + rnorm(nrow(.),0,0.2),
+         `O2.1: Commons condition trend` = factor(`O2.1: Commons condition trend`, levels = 1:3))
+
+p7 <- ggplot(df_codescores_wide_lup ) +
   geom_boxplot(aes(x = `O2.1: Commons condition trend`, y =
+                     `Log(Factor change in bare ground)`),
+               fill = "grey95",
+               outlier.color = NA)  +
+  geom_point(aes(x = `O2.1: Commons condition trend_jit`, y =
                      `Log(Factor change in bare ground)`)) +
   theme_classic(14) +
-  theme(text = element_text(family = fontfam))
+  theme(text = element_text(family = fontfam)) + 
+    scale_x_discrete(drop = FALSE)  + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_codescores_wide_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    aes(x = `O2.1: Commons condition trend_jit`, y =
+          `Log(Factor change in bare ground)`),
+    col = "red", size = 7, pch = 1)
 
-p8 <- df_codescores_wide_lup %>% 
-  mutate(`O2.1: Commons condition trend` = factor(`O2.1: Commons condition trend`)) %>% 
-  ggplot() +
+p8 <- ggplot(df_codescores_wide_lup ) +
   geom_boxplot(aes(x = `O2.1: Commons condition trend`, y =
-                     `Log(Factor change in crop land)`)) +
+                     `Log(Factor change in crop land)`),
+               fill = "grey95",
+               outlier.color = NA) +
+  geom_point(aes(x = `O2.1: Commons condition trend_jit`, y =
+                   `Log(Factor change in crop land)`)) +
   theme_classic(14) +
-  theme(text = element_text(family = fontfam))
+  theme(text = element_text(family = fontfam)) + 
+  scale_x_discrete(drop = FALSE)  + 
+  # mark potential outliers (email may 2023)
+  geom_point(
+    data = df_codescores_wide_lup %>% 
+      filter(village %in% c("Kakoi", "Sangaiwe")),
+    aes(x = `O2.1: Commons condition trend_jit`, y =
+          `Log(Factor change in crop land)`),
+    col = "red", size = 7, pch = 1)
 
 png("outputs/boxplots_commen_trend.png", width = 2250, height = 1500, res = 300)
 p7+p8  
 dev.off()
-
-boxplot(df_codescores_wide_lup$`Log(Factor change in crop land)` ~ df_codescores_wide_lup$`O1.1: Compliance`)
+# 
+# boxplot(df_codescores_wide_lup$`Log(Factor change in crop land)` ~ df_codescores_wide_lup$`O1.1: Compliance`)
