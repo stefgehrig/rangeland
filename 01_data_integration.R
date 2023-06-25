@@ -312,14 +312,10 @@ df3 <- df3 %>%
   select(-`s1.1.human.population.size.change.(annual.increase)`) %>% # take negative, such that higher values, less annual increase
   left_join(df9_pop_smry)
 
-# # replace range of values to be {1,2,3} for social monitoring, according to Majory's advise (mail from 2022-12-05)
-# df3 <- df3 %>% 
-#   mutate(`I2.1.Participation.in.social.monitoring.(enforcement)` = 
-#            case_when(
-#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(1,2) ~ 1,
-#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(3)   ~ 2,
-#              `I2.1.Participation.in.social.monitoring.(enforcement)` %in% c(4)   ~ 3
-#            ))
+# d) cattle and sheep continuous; direction
+df3 <- df3 %>% 
+  mutate(`a1.1.1.actor.group.size.(#.of.cattle)` = -`a1.1.1.actor.group.size.(#.of.cattle)`,
+         `a1.1.1.actor.group.size.(#.of.sheep/goats)` = -`a1.1.1.actor.group.size.(#.of.sheep/goats)`)
 
 # reshape
 df3_long <- df3 %>%   
@@ -328,13 +324,15 @@ df3_long <- df3 %>%
 # annotate with updated source and direction
 df3_info <- as_tibble(read.xlsx("data/refined_data_2023/template2_2023-05-05_mks.xlsx"))
 df3_info <- df3_info %>% 
-  # add in my own new definitions from above
+  # add in my own new definitions from above (all continuous variables com from me, all others from majory's coding)
   mutate(
     dimension_coding = case_when(
-      dimension == "a2.1.economic.heterogeneity" ~ "continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)",
-      dimension == "eco1.01.rainfall.patterns"   ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",
-      dimension == "rs3.1.commons.spatial.extent.(ha)"   ~ "continuous: area bare land (ha)",
-      dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)",
+      dimension == "a2.1.economic.heterogeneity"                           ~ "continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones",
+      dimension == "eco1.01.rainfall.patterns"                             ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",
+      dimension == "rs3.1.commons.spatial.extent.(ha)"                     ~ "continuous: area bare land (ha)",
+      dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)",
+      dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                 ~ "continuous: (-1) * number of cattle",
+      dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"            ~ "continuous: (-1) * number of sheep/goats",
       TRUE ~ dimension_coding
     )
   )

@@ -16,8 +16,8 @@ Kakoi,gs6.2.outsider.exclusion,3,coded from qualitative interviews and focus gro
 Kakoi,gs7.1.environmental.monitoring,1,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Kakoi,gs7.2.self.sanctions,2,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Kakoi,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Kakoi,a1.1.1.actor.group.size.(#.of.cattle),6150,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Kakoi,a1.1.1.actor.group.size.(#.of.sheep/goats),8652,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Kakoi,a1.1.1.actor.group.size.(#.of.cattle),-6150,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Kakoi,a1.1.1.actor.group.size.(#.of.sheep/goats),-8652,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Kakoi,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Kakoi,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Kakoi,a5.1.actor.group.trust,2,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -29,10 +29,10 @@ Kakoi,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qualita
 Kakoi,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kakoi,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kakoi,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kakoi,a2.1.economic.heterogeneity,0.7099473155620596,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Kakoi,a2.1.economic.heterogeneity,0.7099473155620596,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Kakoi,eco1.01.rainfall.patterns,693,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kakoi,rs3.1.commons.spatial.extent.(ha),5050.077434,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Kakoi,s1.1.human.population.size.change.(annual.increase),-0.01836057829711324,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Kakoi,s1.1.human.population.size.change.(annual.increase),-0.01836057829711324,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Katikati,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Katikati,s1.3.changes.in.livelihood.activities,3,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Katikati,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -50,8 +50,8 @@ Katikati,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focus 
 Katikati,gs7.1.environmental.monitoring,2,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Katikati,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Katikati,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Katikati,a1.1.1.actor.group.size.(#.of.cattle),7119,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Katikati,a1.1.1.actor.group.size.(#.of.sheep/goats),8341,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Katikati,a1.1.1.actor.group.size.(#.of.cattle),-7119,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Katikati,a1.1.1.actor.group.size.(#.of.sheep/goats),-8341,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Katikati,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Katikati,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Katikati,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -63,10 +63,10 @@ Katikati,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Katikati,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Katikati,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Katikati,o2.3.invasives,3,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Katikati,a2.1.economic.heterogeneity,1.5831412003222265,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Katikati,a2.1.economic.heterogeneity,1.5831412003222265,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Katikati,eco1.01.rainfall.patterns,641.1571428571428,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Katikati,rs3.1.commons.spatial.extent.(ha),28065.7717,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Katikati,s1.1.human.population.size.change.(annual.increase),-0.028891184318206697,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Katikati,s1.1.human.population.size.change.(annual.increase),-0.028891184318206697,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Olchoro Onyokie,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Olchoro Onyokie,s1.3.changes.in.livelihood.activities,3,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Olchoro Onyokie,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -84,8 +84,8 @@ Olchoro Onyokie,gs6.2.outsider.exclusion,2,coded from qualitative interviews and
 Olchoro Onyokie,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Olchoro Onyokie,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Olchoro Onyokie,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Olchoro Onyokie,a1.1.1.actor.group.size.(#.of.cattle),663,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Olchoro Onyokie,a1.1.1.actor.group.size.(#.of.sheep/goats),1768,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Olchoro Onyokie,a1.1.1.actor.group.size.(#.of.cattle),-663,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Olchoro Onyokie,a1.1.1.actor.group.size.(#.of.sheep/goats),-1768,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Olchoro Onyokie,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Olchoro Onyokie,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Olchoro Onyokie,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -97,10 +97,10 @@ Olchoro Onyokie,i2.1.participation.in.social.monitoring.(enforcement),3,coded fr
 Olchoro Onyokie,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Olchoro Onyokie,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Olchoro Onyokie,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Olchoro Onyokie,a2.1.economic.heterogeneity,3.067643590384868,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Olchoro Onyokie,a2.1.economic.heterogeneity,3.067643590384868,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Olchoro Onyokie,eco1.01.rainfall.patterns,524.9333333333333,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Olchoro Onyokie,rs3.1.commons.spatial.extent.(ha),4644.339906,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Olchoro Onyokie,s1.1.human.population.size.change.(annual.increase),-0.04477547955020422,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Olchoro Onyokie,s1.1.human.population.size.change.(annual.increase),-0.04477547955020422,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Eleng'ata Dapash,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Eleng'ata Dapash,s1.3.changes.in.livelihood.activities,3,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Eleng'ata Dapash,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -118,8 +118,8 @@ Eleng'ata Dapash,gs6.2.outsider.exclusion,2,coded from qualitative interviews an
 Eleng'ata Dapash,gs7.1.environmental.monitoring,2,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Eleng'ata Dapash,gs7.2.self.sanctions,2,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Eleng'ata Dapash,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Eleng'ata Dapash,a1.1.1.actor.group.size.(#.of.cattle),493,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Eleng'ata Dapash,a1.1.1.actor.group.size.(#.of.sheep/goats),1000,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Eleng'ata Dapash,a1.1.1.actor.group.size.(#.of.cattle),-493,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Eleng'ata Dapash,a1.1.1.actor.group.size.(#.of.sheep/goats),-1000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Eleng'ata Dapash,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Eleng'ata Dapash,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Eleng'ata Dapash,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -131,10 +131,10 @@ Eleng'ata Dapash,i2.1.participation.in.social.monitoring.(enforcement),3,coded f
 Eleng'ata Dapash,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Eleng'ata Dapash,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Eleng'ata Dapash,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Eleng'ata Dapash,a2.1.economic.heterogeneity,2.131367864426159,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Eleng'ata Dapash,a2.1.economic.heterogeneity,2.131367864426159,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Eleng'ata Dapash,eco1.01.rainfall.patterns,515.95,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Eleng'ata Dapash,rs3.1.commons.spatial.extent.(ha),8357.438925,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Eleng'ata Dapash,s1.1.human.population.size.change.(annual.increase),-0.058936695984731724,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Eleng'ata Dapash,s1.1.human.population.size.change.(annual.increase),-0.058936695984731724,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Losirwa,s1.2.changes.in.ethnic.composition.(village.leader.data),2,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Losirwa,s1.3.changes.in.livelihood.activities,2,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Losirwa,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -152,8 +152,8 @@ Losirwa,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focus g
 Losirwa,gs7.1.environmental.monitoring,2,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Losirwa,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Losirwa,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Losirwa,a1.1.1.actor.group.size.(#.of.cattle),16700,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Losirwa,a1.1.1.actor.group.size.(#.of.sheep/goats),41750,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Losirwa,a1.1.1.actor.group.size.(#.of.cattle),-16700,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Losirwa,a1.1.1.actor.group.size.(#.of.sheep/goats),-41750,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Losirwa,a2.2.interest.heterogeneity,1,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Losirwa,a4.1.leadership.accountability,2,coded from qualitative interviews and focus groups,ordinal: more accountability
 Losirwa,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -165,10 +165,10 @@ Losirwa,i2.1.participation.in.social.monitoring.(enforcement),3,coded from quali
 Losirwa,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Losirwa,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Losirwa,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Losirwa,a2.1.economic.heterogeneity,0.7346959538361549,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Losirwa,a2.1.economic.heterogeneity,0.7346959538361549,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Losirwa,eco1.01.rainfall.patterns,763.1333333333333,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Losirwa,rs3.1.commons.spatial.extent.(ha),21501.06605,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Losirwa,s1.1.human.population.size.change.(annual.increase),-0.0484526424187437,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Losirwa,s1.1.human.population.size.change.(annual.increase),-0.0484526424187437,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Nadonjukin,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Nadonjukin,s1.3.changes.in.livelihood.activities,1,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Nadonjukin,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -186,8 +186,8 @@ Nadonjukin,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focu
 Nadonjukin,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Nadonjukin,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Nadonjukin,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Nadonjukin,a1.1.1.actor.group.size.(#.of.cattle),15000,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Nadonjukin,a1.1.1.actor.group.size.(#.of.sheep/goats),25000,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Nadonjukin,a1.1.1.actor.group.size.(#.of.cattle),-15000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Nadonjukin,a1.1.1.actor.group.size.(#.of.sheep/goats),-25000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Nadonjukin,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Nadonjukin,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Nadonjukin,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -199,10 +199,10 @@ Nadonjukin,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qu
 Nadonjukin,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Nadonjukin,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Nadonjukin,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Nadonjukin,a2.1.economic.heterogeneity,0.8728757072453109,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Nadonjukin,a2.1.economic.heterogeneity,0.8728757072453109,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Nadonjukin,eco1.01.rainfall.patterns,577.8266666666667,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Nadonjukin,rs3.1.commons.spatial.extent.(ha),27678.98409,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Nadonjukin,s1.1.human.population.size.change.(annual.increase),-0.07989562238061265,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Nadonjukin,s1.1.human.population.size.change.(annual.increase),-0.07989562238061265,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Sangaiwe,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Sangaiwe,s1.3.changes.in.livelihood.activities,3,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Sangaiwe,rs2.1.commons.boundaries,1,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -220,8 +220,8 @@ Sangaiwe,gs6.2.outsider.exclusion,1,coded from qualitative interviews and focus 
 Sangaiwe,gs7.1.environmental.monitoring,1,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Sangaiwe,gs7.2.self.sanctions,2,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Sangaiwe,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Sangaiwe,a1.1.1.actor.group.size.(#.of.cattle),5970,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Sangaiwe,a1.1.1.actor.group.size.(#.of.sheep/goats),9204,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Sangaiwe,a1.1.1.actor.group.size.(#.of.cattle),-5970,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Sangaiwe,a1.1.1.actor.group.size.(#.of.sheep/goats),-9204,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Sangaiwe,a2.2.interest.heterogeneity,1,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Sangaiwe,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Sangaiwe,a5.1.actor.group.trust,2,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -233,10 +233,10 @@ Sangaiwe,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qual
 Sangaiwe,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Sangaiwe,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Sangaiwe,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Sangaiwe,a2.1.economic.heterogeneity,1.1687889983014375,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Sangaiwe,a2.1.economic.heterogeneity,1.1687889983014375,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Sangaiwe,eco1.01.rainfall.patterns,731.44,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Sangaiwe,rs3.1.commons.spatial.extent.(ha),7694.564114,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Sangaiwe,s1.1.human.population.size.change.(annual.increase),-0.03293242205603053,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Sangaiwe,s1.1.human.population.size.change.(annual.increase),-0.03293242205603053,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Kimana,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Kimana,s1.3.changes.in.livelihood.activities,2,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Kimana,rs2.1.commons.boundaries,2,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -254,8 +254,8 @@ Kimana,gs6.2.outsider.exclusion,1,coded from qualitative interviews and focus gr
 Kimana,gs7.1.environmental.monitoring,2,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Kimana,gs7.2.self.sanctions,1,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Kimana,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Kimana,a1.1.1.actor.group.size.(#.of.cattle),26000,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Kimana,a1.1.1.actor.group.size.(#.of.sheep/goats),12000,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Kimana,a1.1.1.actor.group.size.(#.of.cattle),-26000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Kimana,a1.1.1.actor.group.size.(#.of.sheep/goats),-12000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Kimana,a2.2.interest.heterogeneity,1,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Kimana,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Kimana,a5.1.actor.group.trust,2,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -267,10 +267,10 @@ Kimana,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qualit
 Kimana,o1.1.compliance,1,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kimana,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kimana,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kimana,a2.1.economic.heterogeneity,0.8987047307317604,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Kimana,a2.1.economic.heterogeneity,0.8987047307317604,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Kimana,eco1.01.rainfall.patterns,786.2214285714285,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kimana,rs3.1.commons.spatial.extent.(ha),54784.45736,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Kimana,s1.1.human.population.size.change.(annual.increase),-0.028906172462727087,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Kimana,s1.1.human.population.size.change.(annual.increase),-0.028906172462727087,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Ngoswaki,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Ngoswaki,s1.3.changes.in.livelihood.activities,3,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Ngoswaki,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -288,8 +288,8 @@ Ngoswaki,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focus 
 Ngoswaki,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Ngoswaki,gs7.2.self.sanctions,2,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Ngoswaki,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Ngoswaki,a1.1.1.actor.group.size.(#.of.cattle),5010,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Ngoswaki,a1.1.1.actor.group.size.(#.of.sheep/goats),16730,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Ngoswaki,a1.1.1.actor.group.size.(#.of.cattle),-5010,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Ngoswaki,a1.1.1.actor.group.size.(#.of.sheep/goats),-16730,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Ngoswaki,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Ngoswaki,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Ngoswaki,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -301,10 +301,10 @@ Ngoswaki,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Ngoswaki,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Ngoswaki,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Ngoswaki,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Ngoswaki,a2.1.economic.heterogeneity,1.6813715442065913,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Ngoswaki,a2.1.economic.heterogeneity,1.6813715442065913,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Ngoswaki,eco1.01.rainfall.patterns,427.77777777777777,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Ngoswaki,rs3.1.commons.spatial.extent.(ha),17677.63375,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Ngoswaki,s1.1.human.population.size.change.(annual.increase),-0.039110946548917225,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Ngoswaki,s1.1.human.population.size.change.(annual.increase),-0.039110946548917225,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Matale A,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Matale A,s1.3.changes.in.livelihood.activities,1,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Matale A,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -322,8 +322,8 @@ Matale A,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focus 
 Matale A,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Matale A,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Matale A,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Matale A,a1.1.1.actor.group.size.(#.of.cattle),13000,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Matale A,a1.1.1.actor.group.size.(#.of.sheep/goats),27000,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Matale A,a1.1.1.actor.group.size.(#.of.cattle),-13000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Matale A,a1.1.1.actor.group.size.(#.of.sheep/goats),-27000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Matale A,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Matale A,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Matale A,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -335,10 +335,10 @@ Matale A,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Matale A,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Matale A,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Matale A,o2.3.invasives,2,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Matale A,a2.1.economic.heterogeneity,1.9748190251428563,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Matale A,a2.1.economic.heterogeneity,1.9748190251428563,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Matale A,eco1.01.rainfall.patterns,455.46666666666664,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Matale A,rs3.1.commons.spatial.extent.(ha),13442.26501,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Matale A,s1.1.human.population.size.change.(annual.increase),-0.030727672056256372,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Matale A,s1.1.human.population.size.change.(annual.increase),-0.030727672056256372,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Engaruka Chini,s1.2.changes.in.ethnic.composition.(village.leader.data),2,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Engaruka Chini,s1.3.changes.in.livelihood.activities,2,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Engaruka Chini,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -356,8 +356,8 @@ Engaruka Chini,gs6.2.outsider.exclusion,1,coded from qualitative interviews and 
 Engaruka Chini,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Engaruka Chini,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Engaruka Chini,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Engaruka Chini,a1.1.1.actor.group.size.(#.of.cattle),2746,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Engaruka Chini,a1.1.1.actor.group.size.(#.of.sheep/goats),7168,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Engaruka Chini,a1.1.1.actor.group.size.(#.of.cattle),-2746,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Engaruka Chini,a1.1.1.actor.group.size.(#.of.sheep/goats),-7168,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Engaruka Chini,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Engaruka Chini,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Engaruka Chini,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -369,10 +369,10 @@ Engaruka Chini,i2.1.participation.in.social.monitoring.(enforcement),3,coded fro
 Engaruka Chini,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Engaruka Chini,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Engaruka Chini,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Engaruka Chini,a2.1.economic.heterogeneity,1.1220862749399507,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Engaruka Chini,a2.1.economic.heterogeneity,1.1220862749399507,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Engaruka Chini,eco1.01.rainfall.patterns,529.6285714285714,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Engaruka Chini,rs3.1.commons.spatial.extent.(ha),37582.02451,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Engaruka Chini,s1.1.human.population.size.change.(annual.increase),-0.03785537068287703,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Engaruka Chini,s1.1.human.population.size.change.(annual.increase),-0.03785537068287703,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Kitwai A,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
 Kitwai A,s1.3.changes.in.livelihood.activities,1,coded from qualitative interviews (village leader data),ordinal: less changes in livelihoods
 Kitwai A,rs2.1.commons.boundaries,3,coded from qualitative interviews and focus groups,ordinal: clearer boundaries
@@ -390,8 +390,8 @@ Kitwai A,gs6.2.outsider.exclusion,2,coded from qualitative interviews and focus 
 Kitwai A,gs7.1.environmental.monitoring,3,coded from qualitative interviews and focus groups,ordinal: more environmental monitoring
 Kitwai A,gs7.2.self.sanctions,3,coded from qualitative interviews and focus groups,ordinal: more severe sanctions
 Kitwai A,gs7.3.external.sanctions,1,coded from qualitative interviews and focus groups,binary: in place (2) or not (1)
-Kitwai A,a1.1.1.actor.group.size.(#.of.cattle),12000,estimates from interviews with grazing-related committees and district,continuous: number of cattle
-Kitwai A,a1.1.1.actor.group.size.(#.of.sheep/goats),10000,estimates from interviews with grazing-related committees and district,continuous: number of sheep/goats
+Kitwai A,a1.1.1.actor.group.size.(#.of.cattle),-12000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of cattle
+Kitwai A,a1.1.1.actor.group.size.(#.of.sheep/goats),-10000,estimates from interviews with grazing-related committees and district,continuous: (-1) * number of sheep/goats
 Kitwai A,a2.2.interest.heterogeneity,3,coded from qualitative interviews and focus groups,ordinal: less heterogeneity
 Kitwai A,a4.1.leadership.accountability,3,coded from qualitative interviews and focus groups,ordinal: more accountability
 Kitwai A,a5.1.actor.group.trust,3,coded from qualitative interviews and focus groups,ordinal: more intra-trust
@@ -403,7 +403,7 @@ Kitwai A,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Kitwai A,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kitwai A,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kitwai A,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kitwai A,a2.1.economic.heterogeneity,2.10188519801998,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
+Kitwai A,a2.1.economic.heterogeneity,2.10188519801998,household items elicited in household survey,"continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
 Kitwai A,eco1.01.rainfall.patterns,594.0246153846153,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kitwai A,rs3.1.commons.spatial.extent.(ha),123677.9361,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
-Kitwai A,s1.1.human.population.size.change.(annual.increase),-0.03454390146267716,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
+Kitwai A,s1.1.human.population.size.change.(annual.increase),-0.03454390146267716,combination of censuses and officials' estimates,"continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)"
