@@ -200,73 +200,64 @@ df3$eco1.01.rainfall.patterns
 df3$`rs3.1.commons.spatial.extent.(ha)`
 df3$`s1.1.human.population.size.change.(annual.increase)`
 
-# a) economic heterogeneity as wealth index
-# "Given our sites are pretty homogenous, a better indicator of inequality might simply 
-#  be the proportion of homes with a tin/aluminum/bati roof, or the proportion of homes with a pikipiki."
-df1 %>% tabyl(village, houserooftype)
-df1 %>% tabyl(village, motorcycle) %>% 
-  adorn_percentages()
-cor(df1$houserooftype, df1$motorcycle=="Yes") # 0.2953421
-
-df1_econ_smry <- df1 %>% 
-  group_by(village) %>% 
-  summarise(a2.1.economic.heterogeneity= mean(motorcycle=="No")) # higher values, less heterogeneity
-
-df3 <- df3 %>% 
-  select(-a2.1.economic.heterogeneity) %>% 
-  left_join(df1_econ_smry)
-
-# # a) economic heterogeneity as gini from household data,
-# # then gini classified in {1,2,3} scale via code manager instruction: 
-# # Low: Analogous to a Gini coefficient less than 0.3 
-# # Medium: Analogous to a Gini coefficient between 0.3 and 0.5 
-# # High: Analogous to a Gini coefficient greater than 0.5
-# df1_econ <- df1 %>%
-#   mutate(num_cattle_ordered = as.numeric(cattleowned)) %>% 
-#   select(village,
-#          # variables where higher values is more wealth
-#          numhouses,
-#          improvedtoilet,
-#          housewalltype,
-#          housefloortype,
-#          houserooftype,
-#          electric_connect,
-#          num_cattle_ordered,
-#          num_mobile_phone,
-#          num_radio,
-#          num_bicycle, 
-#          num_motorcycle,
-#          num_solartorch,
-#          num_solarpanel,
-#          num_invertersolar,
-#          num_solarbattery,
-#          num_ploughs,
-#          num_modernbed,
-#          num_spraypump,
-#          num_watertank,
-#          num_land) %>%
-#   mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
-#          across(where(is.numeric), ~scale(.x)))
+# # a) economic heterogeneity as wealth index
+# # "Given our sites are pretty homogenous, a better indicator of inequality might simply
+# #  be the proportion of homes with a tin/aluminum/bati roof, or the proportion of homes with a pikipiki."
+# df1 %>% tabyl(village, houserooftype)
+# df1 %>% tabyl(village, motorcycle) %>%
+#   adorn_percentages()
+# cor(df1$houserooftype, df1$motorcycle=="Yes") # 0.2953421
 # 
-# pca_econ <- principal(df1_econ %>% select(-village))
-# pca_econ$loadings # high correlations consistently with PC1
+# df1_econ_smryB <- df1 %>%
+#   group_by(village) %>%
+#   summarise(a2.1.economic.heterogeneity= mean(motorcycle=="No")) # higher values, less heterogeneity
 # 
-# df1_econ_smry <- df1 %>% 
-#   bind_cols(wealth = pca_econ$scores) %>%
-#   mutate(wealth = ((wealth)-min(wealth)) / (max(wealth)-min(wealth))) %>%  # scale individual wealth between 0 and 1
-#   group_by(village) %>% 
-#   summarise(gini = Gini(wealth)) %>% 
-#   arrange(desc(gini)) %>% 
-#   # mutate(`A2.1.Economic.heterogeneity` = case_when(
-#   #   gini < 0.3 ~ 1,
-#   #   gini < 0.5 ~ 2,
-#   #   gini >= 0.5 ~ 3
-#   # ))
-#   rename(`A2.1.Economic.heterogeneity` = gini)
-# 
-# df3 <- df3 %>% 
-#   select(-`A2.1.Economic.heterogeneity`) %>% 
+# df3 <- df3 %>%
+#   select(-a2.1.economic.heterogeneity) %>%
 #   left_join(df1_econ_smry)
+
+# a) economic heterogeneity from household PCA data like
+# https://academic.oup.com/ooec/article/doi/10.1093/ooec/odad001/7010722
+df1_econ <- df1 %>%
+  mutate(num_cattle_ordered = as.numeric(cattleowned)) %>%
+  select(village,
+         # variables where higher values is more wealth
+         # numhouses,
+         improvedtoilet,
+         housewalltype,
+         housefloortype,
+         houserooftype,
+         # electric_connect,
+         # num_cattle_ordered,
+         num_mobile_phone,
+         # num_radio,
+         # num_bicycle,
+         num_motorcycle,
+         # num_solartorch,
+         # num_solarpanel,
+         # num_invertersolar,
+         # num_solarbattery,
+         # num_ploughs,
+         num_modernbed,
+         # num_spraypump,
+         # num_watertank,
+         #num_land
+         ) %>% #View
+  mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
+         across(where(is.numeric), ~scale(.x)))
+
+pca_econ <- principal(df1_econ %>% select(-village), nfactors = 1)
+pca_econ$loadings # high correlations consistently with PC1
+
+df1_econ_smry <- df1 %>%
+  bind_cols(wealth = pca_econ$scores) %>%
+  group_by(village) %>% 
+  summarise(`a2.1.economic.heterogeneity` = 1/sd(wealth)) # HOMOGENEITY we need; higher values --> more homogeneity;
+# correlates well with above out-commented approach by Monique (r = 0.7)
+  
+df3 <- df3 %>%
+  select(-`a2.1.economic.heterogeneity`) %>%
+  left_join(df1_econ_smry)
   
 # b) rainfall patterns
 df7_rain_smry <- df7 %>% 
@@ -318,7 +309,7 @@ df9_pop_smry <- df9 %>%
   select(village, `s1.1.human.population.size.change.(annual.increase)` = growth_factor) # higher values, more annual increase
 
 df3 <- df3 %>% 
-  select(-`s1.1.human.population.size.change.(annual.increase)`) %>% 
+  select(-`s1.1.human.population.size.change.(annual.increase)`) %>% # take negative, such that higher values, less annual increase
   left_join(df9_pop_smry)
 
 # # replace range of values to be {1,2,3} for social monitoring, according to Majory's advise (mail from 2022-12-05)
@@ -340,7 +331,7 @@ df3_info <- df3_info %>%
   # add in my own new definitions from above
   mutate(
     dimension_coding = case_when(
-      dimension == "a2.1.economic.heterogeneity" ~ "continuous: proportion without pikipiki (i.e., more homogeneity)",
+      dimension == "a2.1.economic.heterogeneity" ~ "continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)",
       dimension == "eco1.01.rainfall.patterns"   ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",
       dimension == "rs3.1.commons.spatial.extent.(ha)"   ~ "continuous: area bare land (ha)",
       dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)",

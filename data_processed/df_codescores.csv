@@ -29,7 +29,7 @@ Kakoi,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qualita
 Kakoi,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kakoi,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kakoi,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kakoi,a2.1.economic.heterogeneity,0.6666666666666666,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Kakoi,a2.1.economic.heterogeneity,0.7099473155620596,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Kakoi,eco1.01.rainfall.patterns,693,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kakoi,rs3.1.commons.spatial.extent.(ha),5050.077434,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Kakoi,s1.1.human.population.size.change.(annual.increase),-0.01836057829711324,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -63,7 +63,7 @@ Katikati,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Katikati,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Katikati,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Katikati,o2.3.invasives,3,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Katikati,a2.1.economic.heterogeneity,0.8452380952380952,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Katikati,a2.1.economic.heterogeneity,1.5831412003222265,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Katikati,eco1.01.rainfall.patterns,641.1571428571428,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Katikati,rs3.1.commons.spatial.extent.(ha),28065.7717,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Katikati,s1.1.human.population.size.change.(annual.increase),-0.028891184318206697,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -97,7 +97,7 @@ Olchoro Onyokie,i2.1.participation.in.social.monitoring.(enforcement),3,coded fr
 Olchoro Onyokie,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Olchoro Onyokie,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Olchoro Onyokie,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Olchoro Onyokie,a2.1.economic.heterogeneity,0.9404761904761905,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Olchoro Onyokie,a2.1.economic.heterogeneity,3.067643590384868,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Olchoro Onyokie,eco1.01.rainfall.patterns,524.9333333333333,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Olchoro Onyokie,rs3.1.commons.spatial.extent.(ha),4644.339906,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Olchoro Onyokie,s1.1.human.population.size.change.(annual.increase),-0.04477547955020422,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -131,7 +131,7 @@ Eleng'ata Dapash,i2.1.participation.in.social.monitoring.(enforcement),3,coded f
 Eleng'ata Dapash,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Eleng'ata Dapash,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Eleng'ata Dapash,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Eleng'ata Dapash,a2.1.economic.heterogeneity,0.9166666666666666,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Eleng'ata Dapash,a2.1.economic.heterogeneity,2.131367864426159,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Eleng'ata Dapash,eco1.01.rainfall.patterns,515.95,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Eleng'ata Dapash,rs3.1.commons.spatial.extent.(ha),8357.438925,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Eleng'ata Dapash,s1.1.human.population.size.change.(annual.increase),-0.058936695984731724,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -165,7 +165,7 @@ Losirwa,i2.1.participation.in.social.monitoring.(enforcement),3,coded from quali
 Losirwa,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Losirwa,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Losirwa,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Losirwa,a2.1.economic.heterogeneity,0.6547619047619048,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Losirwa,a2.1.economic.heterogeneity,0.7346959538361549,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Losirwa,eco1.01.rainfall.patterns,763.1333333333333,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Losirwa,rs3.1.commons.spatial.extent.(ha),21501.06605,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Losirwa,s1.1.human.population.size.change.(annual.increase),-0.0484526424187437,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -199,7 +199,7 @@ Nadonjukin,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qu
 Nadonjukin,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordinal: more compliance
 Nadonjukin,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Nadonjukin,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Nadonjukin,a2.1.economic.heterogeneity,0.7738095238095238,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Nadonjukin,a2.1.economic.heterogeneity,0.8728757072453109,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Nadonjukin,eco1.01.rainfall.patterns,577.8266666666667,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Nadonjukin,rs3.1.commons.spatial.extent.(ha),27678.98409,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Nadonjukin,s1.1.human.population.size.change.(annual.increase),-0.07989562238061265,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -233,7 +233,7 @@ Sangaiwe,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qual
 Sangaiwe,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Sangaiwe,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Sangaiwe,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Sangaiwe,a2.1.economic.heterogeneity,0.7857142857142857,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Sangaiwe,a2.1.economic.heterogeneity,1.1687889983014375,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Sangaiwe,eco1.01.rainfall.patterns,731.44,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Sangaiwe,rs3.1.commons.spatial.extent.(ha),7694.564114,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Sangaiwe,s1.1.human.population.size.change.(annual.increase),-0.03293242205603053,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -267,7 +267,7 @@ Kimana,i2.1.participation.in.social.monitoring.(enforcement),1,coded from qualit
 Kimana,o1.1.compliance,1,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kimana,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kimana,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kimana,a2.1.economic.heterogeneity,0.7590361445783133,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Kimana,a2.1.economic.heterogeneity,0.8987047307317604,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Kimana,eco1.01.rainfall.patterns,786.2214285714285,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kimana,rs3.1.commons.spatial.extent.(ha),54784.45736,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Kimana,s1.1.human.population.size.change.(annual.increase),-0.028906172462727087,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -301,7 +301,7 @@ Ngoswaki,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Ngoswaki,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Ngoswaki,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Ngoswaki,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Ngoswaki,a2.1.economic.heterogeneity,0.8095238095238095,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Ngoswaki,a2.1.economic.heterogeneity,1.6813715442065913,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Ngoswaki,eco1.01.rainfall.patterns,427.77777777777777,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Ngoswaki,rs3.1.commons.spatial.extent.(ha),17677.63375,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Ngoswaki,s1.1.human.population.size.change.(annual.increase),-0.039110946548917225,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -335,7 +335,7 @@ Matale A,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Matale A,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Matale A,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Matale A,o2.3.invasives,2,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Matale A,a2.1.economic.heterogeneity,0.8452380952380952,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Matale A,a2.1.economic.heterogeneity,1.9748190251428563,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Matale A,eco1.01.rainfall.patterns,455.46666666666664,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Matale A,rs3.1.commons.spatial.extent.(ha),13442.26501,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Matale A,s1.1.human.population.size.change.(annual.increase),-0.030727672056256372,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -369,7 +369,7 @@ Engaruka Chini,i2.1.participation.in.social.monitoring.(enforcement),3,coded fro
 Engaruka Chini,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Engaruka Chini,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Engaruka Chini,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Engaruka Chini,a2.1.economic.heterogeneity,0.8333333333333334,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Engaruka Chini,a2.1.economic.heterogeneity,1.1220862749399507,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Engaruka Chini,eco1.01.rainfall.patterns,529.6285714285714,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Engaruka Chini,rs3.1.commons.spatial.extent.(ha),37582.02451,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Engaruka Chini,s1.1.human.population.size.change.(annual.increase),-0.03785537068287703,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
@@ -403,7 +403,7 @@ Kitwai A,i2.1.participation.in.social.monitoring.(enforcement),3,coded from qual
 Kitwai A,o1.1.compliance,3,coded from qualitative interviews and focus groups,ordinal: more compliance
 Kitwai A,o2.1.commons.condition.trend,3,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kitwai A,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
-Kitwai A,a2.1.economic.heterogeneity,0.6666666666666666,household items elicited in household survey,"continuous: proportion without pikipiki (i.e., more homogeneity)"
+Kitwai A,a2.1.economic.heterogeneity,2.10188519801998,household items elicited in household survey,"continuous: 1/(SD of first PCA for toilet, wall, floor, roof, pikipiki, phones)"
 Kitwai A,eco1.01.rainfall.patterns,594.0246153846153,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kitwai A,rs3.1.commons.spatial.extent.(ha),123677.9361,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Kitwai A,s1.1.human.population.size.change.(annual.increase),-0.03454390146267716,combination of censuses and officials' estimates,"continuous: -annual relative increase from 2012 to 2020 (i.e., less strong increase)"
