@@ -70,9 +70,9 @@ spiderplots <- map(split(input_spec, seq(nrow(input_spec))),
                        mutate(tier3 = str_replace(tier3, ": ", ":\n"),
                               tier3 = str_replace(tier3, " ", "\n"))
                      
-                     x <- x %>% mutate(tier1 = ifelse(tier1 == "Social, Economic, and Political Settings (S)",
-                                            "Social, Economic,\nand Political Settings (S)",
-                                            tier1)) # with line break in long name
+                     # x <- x %>% mutate(tier1 = ifelse(tier1 == "Social, Econ., and Polit. Settings (S)",
+                     #                        "Social, Econ., and Polit. Settings (S) (S)",
+                     #                        tier1)) # with line break in long name
                      
                      p <- d  %>% 
                        pivot_wider(names_from = tier3, values_from = score_scl) %>% 
