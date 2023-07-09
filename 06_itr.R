@@ -187,6 +187,14 @@ dev.off()
 # #####################################################
 # ### GIS outcome, now also moderation & adjustment ###
 # #####################################################
+# add moderator to data
+covariable = df_codescores %>%
+  filter(dimension == "a2.1.economic.heterogeneity") %>%
+  select(village, het = score)
+df <- df %>%
+  left_join(covariable)
+
+
 # df <- name_the_tiers(df_codescores)
 # df <- df %>% 
 #   mutate(score = ifelse(grepl("binary", dimension_coding) & score == 2, 3, score)) %>% 
