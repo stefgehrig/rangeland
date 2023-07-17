@@ -125,7 +125,7 @@ We can see in Figure \@ref(fig:pca) that ...
 
 The latter is a peculiarity that should be recognized and *might* be due to confounding by factors directly or indirectly related to geography: The more Northern villages, close to the Kenyan border (e.g., Matale A or Ngoswaki, see Figure \@ref(fig:map)) experience less rainfall, as shown in Figure \@ref(fig:vilrain) below. These are also the villages which tend to achieve higher scores in DF variables related to governance compared to villages more in the interior of the country like Kimana (as can be seen in the Biplot in Figure \@ref(fig:pca)), where rainfall is more abundant (Figure \@ref(fig:vilrain)). It is currently unclear how we can best explain this.
 
-```{r vilrain, fig.align='center', fig.cap='Average annual rainfall over time for all study villages.', out.width="60%"}
+```{r vilrain, fig.align='center', fig.cap='Average annual rainfall over time for all study villages.', out.width="80%"}
 include_graphics("outputs/vilrain.png")
 ```
 
@@ -162,7 +162,7 @@ include_graphics("outputs/corrm_all_lup.png")
 ```
 <br>
 
-## Item Response Models
+## Item Response Model
 
 The previous analyses were ad hoc to describe some tendencies in the data. We now follow a more stringent approach with better theoretical justification, more accounting for uncertainty, and more targeted research question(s). The workhorse of the analysis will be a Bayesian Item Response Model (IRM) fit with `brms` [@bürkner2020bayesian]. In what follows, we call the Tier-3 DF variables based on qualitative data collection "items".
 
@@ -170,20 +170,20 @@ In brief, the model assumes that there is underlying latent variable which affec
 
 The model is hierarchical in the sense that is uses adaptive priors and partial pooling for both item effects and village effects. Given the relative abundance of parameters and only few independently observed villages, weakly informative Bayesian priors are used which shrink item and village effects towards zero. This ensures model convergence and stability of estimates, thereby also being generally conservative.
 
-Note that the approach allows us to keep the items with no variability (in the sample!) in the analysis. We use a cumulative logit link, assuming common slopes (i.e., proportional odds).  
+Note that the approach allows us to keep the items with no variability (in the sample!) in the analysis. We use a cumulative logit link, assuming common slopes (i.e., proportional odds).  Hence, in the framework of IRM, the model could be called a **2PL graded responses model** [@bürkner2020bayesian].
 
 The central feature that makes this model type attractive is that it allows to obtain a posterior for the correlation of different groups of items. By specifying two item groups *Governance* and *Outcomes*, it is possible to estimate the correlation of the two underlying latent variables for Governance conditions/processes and Commons outcomes **without falling back on ad hoc methods like averaging**, which discards uncertainty and assumes interval scaling of the ordinal variables. Of course, we should only model variables obtained in qualitative data collection as items (and not, for example, rainfall). Therefore, the first model presented below does not include any variables measured *not* via ordinal or binary responses in interviews or focus groups.
 
-As items going into the *Governance* items group, we choose all DF variables in the `Governance Systems (GS)` category, but also others (based on suggestions made by Monique in the document "Paper Structure building on the ideas we discussed earlier" in "Part 4. Further use of data", from March 2023). So the item group *Governance* is made up of 18 items. The item group *Outcomes* is made up of the three items in the `Outcomes (O)` category. Table \@ref(tab:itemstab) shows all items going into the IRM.
+As items going into the *Governance* items group, we choose all DF variables in the `Governance Systems (GS)` category, but also others (based on suggestions made by Monique in the document "Paper Structure building on the ideas we discussed earlier" in "Part 4. Further use of data", from March 2023). So the item group *Governance* is made up of 19 items. The item group *Outcomes* is made up of the three items in the `Outcomes (O)` category. Table \@ref(tab:itemstab) shows all items going into the IRM.
 
 ```{r itemstab}
 irm_items %>% 
-  select(item = dimension)%>% 
+  select(item = dimension, tier1)%>% 
   mutate(
-         itemtype = c(rep("Governance", 18), rep("Outcome",3))) %>% 
+         itemtype = c(rep("Governance", 19), rep("Outcome",3))) %>% 
   kable(
     format = "html",
-    caption = "Items in the IRM and their item type.") %>% 
+    caption = "Items in the IRM, their original Tier 1 DF category, and their item type, as defined in the model.") %>% 
   kable_styling()
 ```
 
@@ -215,25 +215,31 @@ The model summary is:
 summary(fit)
 ```
 
-Convergence was satisfactory, but might be improved further with other configurations of the MCMC sampler of stronger priors. Posterior predictive checks look fine, though, as expected, extreme response distributions (e.g., all 12 villages scoring the same on an item) are not reproduced by the estimated model with the same sharpness -- this is due to the regularization induced by the priors and is desirable in our spare data context.
+Convergence was satisfactory (judging from R hat values and trace plots), but might be improved further with other configurations of the MCMC sampler of stronger priors. Posterior predictive checks look fine. As expected, extreme response distributions (e.g., all 12 villages scoring the same on an item) are not reproduced by the estimated model with the same sharpness -- this is due to the regularization induced by the priors and is desirable in our spare data context. An example are the posterior predictive checks in Figure \@ref(fig:ppc).
 
-Figures \@ref(fig:res1) and \@ref(fig:res2) visualize posteriors for model parameters.
+```{r ppc, fig.align='center', fig.cap='Predicted vs observed counts of responses grouped by item (left) and village (right).', out.width="100%"}
+include_graphics("outputs/ppcs.png")
+```
 
-```{r res1, fig.align='center', fig.cap='Posteriors with median and quantile-based credible intervals for (a) village effects on rating, (b) item effects on rating and (c) item effects on discrimination (have to be read as inverse). All parameters are on the log-odds scale.', out.width="100%"}
+Coming to the estimated model parameters, Figures \@ref(fig:res1) and \@ref(fig:res2) visualize posteriors for the decomposition into "item effects" and "village effects" by the item response model, as well as posteriors for the discrimination parameter of each item.
+
+```{r res1, fig.align='center', fig.cap='Posteriors with median and quantile-based credible intervals for (a) village effects on rating, (b) item effects on rating and (c) item effects on (inverse) discrimination. All parameters are on the log-odds scale.', out.width="90%"}
 include_graphics("outputs/param_posts.png")
 ```
 
-The model broadly reproduces what we knew from initial data analyses. For example, Kimana village scores low on governance and outcomes (Figure \@ref(fig:res1)a), ratings on external sanctions are very low (Figure \@ref(fig:res1)b) and of low discriminatory value (Figure \@ref(fig:res1)c) - which is of course because they are $1$ for all villages (see Table \@ref(tab:sds)).
+The model broadly reproduces what we knew from initial data analyses. For example, Kimana village scores low on governance and outcomes (Figure \@ref(fig:res1)a), ratings on external sanctions are very low (Figure \@ref(fig:res1)b) and of low discriminatory value (Figure \@ref(fig:res1)c) - both is of course a consequenceof them being $1$ for all villages (see Table \@ref(tab:sds)).
 
 ```{r res2, fig.align='center', fig.cap='The posterior correlation of Governance and Outcomes based on the IRM.', out.width="100%"}
 include_graphics("outputs/cor_itm.png")
 ```
 
-Figure \@ref(fig:res2) constitutes a first major result from item response modeling. \@ref(fig:res2)a shows that we can be quite certain that there is positive correlation between Governance and Outcomes across villages. In Figure \@ref(fig:res2)b, 50 posterior draws for the latent Governance and Outcome variable are drawn for each village. Draws from the same villages are marked by color and ellipses. We can see that (i) there is a positive association between the two latent traits, but that (ii) there is also a lot of uncertainty about the villages' positions in the multivariate space, (iii) especially for the Outcomes dimension (ellipses are "higher" than they are "wide"), which makes sense, since it is only based on 3 items (compared to > 10 items for the Governance dimension).
+Figure \@ref(fig:res2) constitutes a first major result from item response modeling. \@ref(fig:res2)a shows that we can be quite certain that there is positive correlation between Governance and Outcomes across villages. In Figure \@ref(fig:res2)b, 100 posterior draws for the latent Governance and Outcome variable are drawn for each village. Draws from the same villages are marked by color and ellipses. We can see that (i) there is a positive association between the two latent traits, but that (ii) there is also a lot of uncertainty about the villages' positions in the multivariate space, (iii) especially for the Outcomes dimension (ellipses are "higher" than they are "wide"), which makes sense, since it is only based on 3 items (compared to > 10 items for the Governance dimension).
 
-Note that the related association presented in Figure \@ref(fig:scattergso) during initial data analysis was stronger and more certain, which is (among other things) because we threw away variability by only looking at averaged scores and assuming these as known rather than following a distribution based on unknown parameters.
+Of course, since all variables included in this model are from reports by the villagers themselves, there could be other (e.g., cognitive, social) reasons for the positive association of *Governance* and *Outcomes*. But this does not mean that the association is not relevant.
 
-Potential ways forward:
+Note that the related association presented in Figure \@ref(fig:scattergso) during initial data analysis was stronger and more certain, which is (among other things) because we threw away variability by only looking at averaged scores and assuming these as known rather than as following a distribution based on unknown parameters.
+
+*Potential ways forward:*
 
 - Note this model does not condition on any potential confounders, but merely describes an association. One could think about deriving adjustment sets with a principled approach like DAGs.
 
@@ -242,6 +248,22 @@ Potential ways forward:
 - We will also involve GIS-based outcome measures in a Bayesian modeling approach, where those will be not modeled as item responses. (It could be interesting to also relate interview/focus group responses on livelihood change with GIS data on crop land change; and to relate responses specifically to invasive species control with bare ground change.)
 
 - There is also the question "Was NTRI a Success?", which would involve looking at GIS-based outcome measures for other villages / areas that were not part of the program. The feasibility and validity needs to be checked.
+
+## Model bare ground change (GIS)
+
+
+
+
+
+<!-- ### Moderation of the Governance - Outcome association -->
+
+<!-- We can check whether the positive relationship between the village-level *Governance* and *Outcome* latent traits, as defined any analyzed in the previous section, is affected by different types of *Disturbances*. We use following measured variables to proxy for different types of disturbances on the village level: -->
+
+<!-- - Rainfall (average of mean annual precipitation 2016-2020) -->
+<!-- - Population growth (annual relative increase from 2012 to 2020) -->
+<!-- - Economic heterogeneity (SD of first PCA for toilet, wall, floor, roof, pikipiki, phones) -->
+
+<!-- We fit almost the same model as in the previous section once for each disturbance covariate, but allow that the covariate can shift the mean responses differently for both item types, i.e., we add an interaction term.  -->
 
 <!-- ## Conclusions / Recommendations -->
 
