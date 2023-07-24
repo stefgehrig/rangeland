@@ -2,7 +2,7 @@
 title: "Data analysis support for TNC-NTRI rangeland management project publication"
 author: "Stefan Gehrig, <a href='https://www.estimact.com'>estimact</a>"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-subtitle: "Version 5"
+subtitle: "Version 6"
 output: 
   bookdown::html_document2:
     toc: TRUE
@@ -33,12 +33,15 @@ library(knitr)
 library(kableExtra)
 library(tidyverse)
 library(brms)
+library(dagitty)
+library(ggdag)
 knitr::opts_chunk$set(echo = FALSE)
 
 summary_tier3 <- readRDS("outputs/summary_tier3.rds")
 irm_items = readRDS("outputs/irm_items.rds")
 irm_items_dist = readRDS("outputs/irm_items_dist.rds")
 fit = readRDS("outputs/fit_ord_cum_2pl.rds")
+fit2 = readRDS("outputs/fit_bare.rds")
 ```
 
 ## Villages in the sample
@@ -233,27 +236,126 @@ The model broadly reproduces what we knew from initial data analyses. For exampl
 include_graphics("outputs/cor_itm.png")
 ```
 
-Figure \@ref(fig:res2) constitutes a first major result from item response modeling. \@ref(fig:res2)a shows that we can be quite certain that there is positive correlation between Governance and Outcomes across villages. In Figure \@ref(fig:res2)b, 100 posterior draws for the latent Governance and Outcome variable are drawn for each village. Draws from the same villages are marked by color and ellipses. We can see that (i) there is a positive association between the two latent traits, but that (ii) there is also a lot of uncertainty about the villages' positions in the multivariate space, (iii) especially for the Outcomes dimension (ellipses are "higher" than they are "wide"), which makes sense, since it is only based on 3 items (compared to > 10 items for the Governance dimension).
+Figure \@ref(fig:res2) constitutes a first major result from item response modeling. \@ref(fig:res2)a shows that we can be quite certain that there is positive correlation between Governance and Outcomes across villages. In Figure \@ref(fig:res2)b, 500 posterior draws for the latent Governance and Outcome variable are drawn for each village and plotted as scatter. The lines show 90\% contours of the bivariate posterior for each village. We can see that (i) there is a positive association between the two latent traits, but that (ii) there is also a lot of uncertainty about the villages' positions in the multivariate space, (iii) especially for the Outcomes dimension (ellipses are "higher" than they are "wide"), which makes sense, since it is only based on 3 items (compared to > 10 items for the Governance dimension).
 
-Of course, since all variables included in this model are from reports by the villagers themselves, there could be other (e.g., cognitive, social) reasons for the positive association of *Governance* and *Outcomes*. But this does not mean that the association is not relevant.
+Of course, since all variables included in this model are from reports by the villagers themselves, partially from focus groups, there could be other (e.g., cognitive, social) reasons for the positive association of *Governance* and *Outcomes* items.
 
 Note that the related association presented in Figure \@ref(fig:scattergso) during initial data analysis was stronger and more certain, which is (among other things) because we threw away variability by only looking at averaged scores and assuming these as known rather than as following a distribution based on unknown parameters.
 
-*Potential ways forward:*
+*Potential ways forward after this section:*
 
 - Note this model does not condition on any potential confounders, but merely describes an association. One could think about deriving adjustment sets with a principled approach like DAGs.
 
-- Next steps will include analyses on the role of disturbances in the effectiveness of governance (rainfall; ethnic and economic heterogeneity; population growth), staying within above modeling framework
+- Next steps might include analyses on the role of disturbances in the effectiveness of governance (rainfall; ethnic and economic heterogeneity; population growth), staying within above modeling framework
 
 - We will also involve GIS-based outcome measures in a Bayesian modeling approach, where those will be not modeled as item responses. (It could be interesting to also relate interview/focus group responses on livelihood change with GIS data on crop land change; and to relate responses specifically to invasive species control with bare ground change.)
 
 - There is also the question "Was NTRI a Success?", which would involve looking at GIS-based outcome measures for other villages / areas that were not part of the program. The feasibility and validity needs to be checked.
 
-## Model bare ground change (GIS)
+## Model bare ground change
+
+We have "objective" outcome data, namely the GIS-based bare ground estimates for the village areas. There is one estimate for the average bare ground cover in "pre" intervention period (2010-2015), and one for the intervention period (2016-2021). A *high* amount in bare ground can be viewed as *unfavorable* commons outcome, limiting the available collective rangeland. Increases (or decreases) in bare ground can therefore be an indicator for commons governance quality and ultimately the success of the NTRI's project which had the goal to maintain health and connectivity of rangelands. Therefore, we want to analyze its relation to the latent *Governance* scores, for which we obtained posterior distributions in the previous section. However, it is important that a physical indicator like the amount of bare ground is also influenced by other factors rather than governance alone and is therefore a less direct (though more objective) indicator of governance outcomes than the self-reports by villagers which were summarized in the *Outcomes* items (e.g., the compliance with rules they observe). 
+
+The DAG in Figure \@ref(fig:dag) visualizes our working causal assumptions.
+
+```{r dag, fig.align='center', fig.cap='DAG for the effect of governance on bare ground cover.', out.width="85%"}
+dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
+              cropPost ~ cropPre + gov + rain,
+              inv      ~ gov,
+              rain     ~ u1,
+              gov      ~ u1,
+              inv      ~ u2,
+              gov      ~ u2,
+              barePre  ~ u3 + cropPre,
+              gov      ~ u3,
+              cropPre  ~ u4,
+              gov      ~ u4,
+              exposure = "gov",
+              outcome = "barePost",
+              latent = c("u1","u2","u3","u4"),
+              labels = c("inv" = "invasives",
+                         "barePost"="barePost",
+                         "cropPost"="cropPost",
+                         "barePre"="barePre",
+                         "cropPre"="cropPre",
+                         "rain"="rainfallPost",
+                         "gov"="governance",
+                         "u1"="U1",
+                         "u2"="U2",
+                         "u3"="U3",
+                         "u4"="U4")
+)
+ggdag(dag, layout = "circle",
+      text = FALSE, use_labels = "label",
+      edge_type = "diagonal") + 
+  theme_dag_blank(14)
+```
+
+We are interested in the direct effect of the latent governance trait of a village (*governance*) on bare ground cover after the intervention (*barePost*), but, given this DAG, a marginal measure of association will not estimate such an effect. Instead, what we encode in and learn from this DAG can be summarized as follows:
+
+- Besides the direct effect of *governance* on *barePost*, there are two indirect effects, one via *invasives* (since good commons governance would limit prevalence of invasives, and less invasives could mean more bare ground), and one via *cropPost* (since good commons governance would limit agricultural conversion, and less crop land could mean more bare ground; this is also a variable based on GIS measurements). Both of these indirect paths hence work **against** the direct governance effect for this GIS-based outcome measure and need to be blocked
+
+- The crop land cover (*cropPost*) and bare ground cover (*barePost*) in the intervention period are both affected by the cover in in the previous period (*cropPre* and *barePre*), as, e.g., more bare ground pre intervention likely also means more bare ground after intervention
+
+- Given the largely uncontrolled design of the project, we can expect a host of unmeasured confounding influences (*U1* to *U4*), between governance quality and factors relevant for land use measurements. Of course, the quality of governance cannot be assigned randomly. For example, data explorations as in Figure \@ref(fig:pca) already showed that rainfall in the post intervention period and DF variables on `Governance Systems (GS)`, `Interactions (I)` and `Actors (A)` are negatively associated, which is likely due to influences of unobserved third variables related to geography (such influences would fall into node *U1*). Another example would be factors captured by node *U3*, which are village-level characteristics that can affect both how much bare ground there is in general (i.e., at baseline) and how well resource governance functions. Again, one can think of geography and all that comes with it (landscape, biodiversity, local politics, ethnicity, ...). Such unobserved confounders should be controlled for by using the observed variables they run through on their path to the outcome.^[These considerations would provide also a plausible explanation why there was no clear association found between average `Governance Systems (GS)` score and bare ground change in Figure \@ref(fig:scattergis) in the absence of any adjustment (for example, The "outlying" observation for the village Matale A in Figure \@ref(fig:scattergis), which has a "too bad" bare ground outcome for its high average `Governance Systems (GS)` score is among the villages with least rainfall, see Figrue \@ref(fig:vilrain); after residualizing on rainfall, the negative association emerges and the degree to which Matale A is an outlier is reduced, as is seen in Figure \@ref(fig:scattergisres)).]
+
+Using the DAG to arrive at an adjustment set, we get the following variables to adjust for:
+
+- *rainfallPost*
+- *invasives*
+- *barePre*
+- *cropPost*
+
+Note that this is based on the assumption that there are no further variables which directly or indirectly influence both governance quality and bare ground cover in our setting and whose influence is not yet blocked by above adjustment set. This assumption is likely false and hence we should understand the result as a principled attempt to arrive at an approximate estimate in an imperfect study design rather than definitive truth. **In any case, it would be worthwhile to think of additional factors that we should try to adjust for.**
+
+The Gaussian model we fit is formulated as follows (only in terms computer code for now):
+
+```{r}
+fit2$formula
+```
+
+... with priors:
+
+```{r}
+prior_summary(fit2)
+```
+
+Importantly, we supply the posterior distributions for the village-level governance latent traits that were estimated in the IRM above (i.e., the distributions visualized along the **horizontal axis** in Figure \@ref(fig:res2)b), rather than discarding the uncertainty about the governance quality in the villages, for example by only using the posterior mean as predictor. This is done via a measurement error model using `brms::me()`, assuming Normal distributions. Note that in our special case we know that the true village *Governance* scores (i.e., if there was no measurement error of the latent trait, measured via the item responses) have mean = 0 and SD = 1, which we supply to the model via constant priors. We know this since this were parametrizing assumptions that went into the initial IRM (see above).
+
+The model summary is:
+
+```{r}
+summary(fit2)
+```
+
+We see a plausible estimate for average rainfall (standardized to have SD = 1) in the post period: The more rain, the less bare ground. For the latent governance quality parameter in the model, we get a largely negative posterior, indicating that better governance leads to less bare ground, though we cannot be fully certain about the direction of this effect (see Figure \@ref(fig:scattergis)).
+
+```{r megov, fig.align='center', fig.cap='Posterior for the effect of Governance quality, as measured via the DF variables, on GIS-measured bare ground during and after the programme.', out.width="65%"}
+include_graphics("outputs/megov.png")
+```
+
+We can summarize our two models' results from the previous and the current section:
+
+<style>
+div.blue {background-color:#e6f1fa; border-radius: 5px; padding: 15px;}
+</style>
+<div class = "blue">
+
+- Using a multivariate item response model, we find that there is likely a positive association between commons governance processes as measured with Ostrom's Diagnostic Framework (DF) variables and commons outcomes as measured with DF variables among the NTRI villages.
+- The village-level latent trait of commons governance quality estimated in the item response model is negatively associated with bare ground cover change in the years during and after the NTRI prject (2016-2021), indicating better rangeland conditions. This is conditional on rainfall and two other potentially positive effects of rangeland governance that could however have the potential to negatively affect bare ground cover: control of invasives (as measured in the respective DF variable `O2.3: Invasives`) and control of agricultural conversion (measured as crop land via GIS).
+
+</div>
+
+<br>
 
 
+*Potential ways forward after this section:*
 
+- Is the DAG plausible? Should some arrows be added or removed? Should any more variables from the many data sources absolutely be accounted for (e.g., the external threats data table, the household survey data, ...). To see which we data we have, remember you can look here: <https://stefgehrig.shinyapps.io/TNC-NTRI/>
 
+- Next steps might include analyses on the role of disturbances in the effectiveness of governance (e.g., ethnic and economic heterogeneity or population growth) -- if possible in a valid way -- staying within above modeling framework
+
+- There is also the question "Was NTRI a Success?", which would involve looking at GIS-based outcome measures for other villages / areas that were not part of the program. The feasibility and validity needs to be checked.
 
 <!-- ### Moderation of the Governance - Outcome association -->
 

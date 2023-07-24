@@ -92,29 +92,29 @@ df %>%
 # "cumulative" type with common slope, i.e. proportional odds ("graded response" ITM)
 family_2pl <- brmsfamily("cumulative", "logit")
 prior_2pl <-
-  prior("constant(1)",  class = "sd", group = "village") + # like burkner, p. 37
+  prior("constant(1)",  class = "sd", group = "village") + # like buerkner, p. 37
   prior("exponential(2)", class = "sd") +
   prior("exponential(2)", class = "sd", dpar = "disc") + # folded normal(0,1) by burkner, p. 37, and is also default; has mean 0.8, just like expon(1.25)
-  prior("normal(0, 2.5)", class = "Intercept") # default: student(df = 3, scale 2.5)
+  prior("student_t(3, 0, 2.5)", class = "Intercept") # default: student(df = 3, 0, scale 2.5). coudl also go Normal(0,2.5)
 formula_2pl <- bf(
   score ~ 1 + (1 | tier3) + (0 + itemtype | village),
   disc  ~ 1 + (1 | tier3))
 
-# fit_ord_cum_2pl <- brm(
-#   formula = formula_2pl,
-#   data = df,
-#   family = family_2pl,
-#   prior = prior_2pl,
-#   control   = list(adapt_delta = 0.999, max_treedepth = 15),
-#   warmup    = 1e3,
-#   iter      = 4e3,
-#   thin      = 1,
-#   chains    = 2,
-#   cores     = 2,
-#   seed      = 123,
-#   backend = "cmdstanr"
-# )
-#saveRDS(fit_ord_cum_2pl, file = "outputs/fit_ord_cum_2pl.rds")
+fit_ord_cum_2pl <- brm(
+  formula = formula_2pl,
+  data = df,
+  family = family_2pl,
+  prior = prior_2pl,
+  control   = list(adapt_delta = 0.999, max_treedepth = 15),
+  warmup    = 1e3,
+  iter      = 6e3,
+  thin      = 1,
+  chains    = 2,
+  cores     = 10,
+  seed      = 1234,
+  backend = "cmdstanr"
+)
+saveRDS(fit_ord_cum_2pl, file = "outputs/fit_ord_cum_2pl.rds")
 fit_ord_cum_2pl <- readRDS("outputs/fit_ord_cum_2pl.rds")
 
 # all evaluations finite? (could not be achieved with adjacent categories and continuation ratio models)
@@ -133,8 +133,14 @@ mcmc_intervals(fit_ord_cum_2pl, regex_pars = "r_tier3__disc") +  # DF variable t
 mcmc_trace(fit_ord_cum_2pl, regex_pars = "sd_")
 
 # we get a correlation parameter :D
-p1 = mcmc_areas_ridges(fit_ord_cum_2pl, regex_pars = "cor_village") + 
-  geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(10)
+corvarname <- get_variables(fit_ord_cum_2pl)[grepl("cor_village", get_variables(fit_ord_cum_2pl))]
+p1 = mcmc_areas_ridges(fit_ord_cum_2pl, 
+                       corvarname) + 
+  geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
+  theme(axis.text.y = element_blank(),
+        text = element_text(family = fontfam)) + 
+  labs(subtitle = corvarname)
+  
 cor_post = as_draws(fit_ord_cum_2pl, variable = "cor_village", regex = TRUE) %>% 
   unlist %>% as.numeric
 mean(cor_post>0) # 0.95
@@ -164,37 +170,87 @@ png("outputs/ppcs.png", width = 6000, height = 3000, res = 375)
 ppc1+ppc2
 dev.off()
 
-# scatter plot with some draws of latent traits for each village
-get_variables(fit_ord_cum_2pl)
-veff = gather_draws(fit_ord_cum_2pl, r_village[village,dimension], ndraws = 100, seed = 123)
+# # posterior scatter plot (version ellipses)
+# get_variables(fit_ord_cum_2pl)
+# veff = gather_draws(fit_ord_cum_2pl, r_village[village,dimension], ndraws = 50, seed = 123)
+# p2 = veff %>% 
+#   pivot_wider(names_from = dimension, values_from = .value) %>% 
+#   ggplot(aes(x = itemtypeGovernance, y = itemtypeOutcome, color = village)) +
+#   geom_point(alpha = 3/4) +
+#   geom_mark_ellipse(aes(fill = village),
+#                     alpha = 1/10,
+#                     show.legend = FALSE,
+#                     col = NA,
+#                     expand = unit(1, "mm")) +
+#   theme_classic(14) +
+#   theme(text = element_text(family = fontfam)) +
+#   scale_color_manual(values = palcolors) + 
+#   scale_fill_manual(values = palcolors) + 
+#   coord_cartesian(xlim = c(-4,4), ylim = c(-4,4))
 
-p2 = veff %>% 
-  pivot_wider(names_from = dimension, values_from = .value) %>% 
-  ggplot(aes(x = itemtypeGovernance, y = itemtypeOutcome, color = village)) +
-  geom_point(alpha = 3/4) +
-  geom_mark_ellipse(aes(fill = village),
-                    alpha = 1/10,
-                    show.legend = FALSE,
-                    col = NA,
-                    expand = unit(1, "mm")) +
+
+# posterior scatter plot (version contours)
+p2 = gather_draws(fit_ord_cum_2pl, r_village[village,dimension]) %>%
+  pivot_wider(values_from = .value, names_from = dimension)%>% 
+  ggplot(aes(x = itemtypeGovernance, y = itemtypeOutcome, color = village, group = village, fill = village)) +
+  geom_density_2d(lwd = 0.75, contour_var = "ndensity", breaks = c(0.1)) +
+  geom_point(data = gather_draws(fit_ord_cum_2pl, r_village[village,dimension], ndraws = 5e2, seed = 123) %>% 
+               pivot_wider(names_from = dimension, values_from = .value), alpha = 1/4) +
   theme_classic(14) +
   theme(text = element_text(family = fontfam)) +
   scale_color_manual(values = palcolors) + 
-  scale_fill_manual(values = palcolors) + 
-  coord_cartesian(xlim = c(-4,4), ylim = c(-4,4))
+  coord_cartesian(xlim = c(-3,3), ylim = c(-3,3))
 
 png("outputs/param_posts.png", width = 3000, height = 6000, res = 400)
 p0
 dev.off()
 
 png("outputs/cor_itm.png", width = 5000, height = 2500, res = 320)
-p1+p2+plot_layout(widths = c(1,3))+
+p1+p2+plot_layout(widths = c(1,1.5))+
   plot_annotation(tag_levels = "a")
 dev.off()
 
-###################################
-#### GIS vs. Items on Outcomes ####
-###################################
+############################
+############################
+#### GIS vs. Governance ####
+############################
+############################
+# DAG
+library(dagitty)
+library(ggdag)
+dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
+              cropPost ~ cropPre + gov + rain,
+              inv      ~ gov,
+              rain     ~ u1,
+              gov      ~ u1,
+              inv      ~ u2,
+              gov      ~ u2,
+              barePre  ~ u3 + cropPre,
+              gov      ~ u3,
+              cropPre  ~ u4,
+              gov      ~ u4,
+              exposure = "gov",
+              outcome = "barePost",
+              latent = c("u1","u2","u3","u4"),
+              labels = c("inv" = "invasives",
+                         "barePost"="barePost",
+                         "cropPost"="cropPost",
+                         "barePre"="barePre",
+                         "cropPre"="cropPre",
+                         "rain"="rainfall",
+                         "gov"="governance",
+                         "u1"="U1",
+                         "u2"="U2",
+                         "u3"="U3",
+                         "u4"="U4")
+)
+ggdag(dag, layout = "circle",
+      text = FALSE, use_labels = "label",
+      edge_type = "diagonal") + 
+  theme_dag_blank(14)
+
+dag %>% ggdag_adjustment_set(effect = "direct")
+
 # get log factor change in gis
 lup_ratios <- df_landuse_area %>%
   group_by(village, type, period) %>%
@@ -204,7 +260,7 @@ lup_ratios <- df_landuse_area %>%
             post_landprop = landprop[period == "post"],
             .groups = "drop") %>%
   mutate(logratio = log(post_landprop/pre_landprop)) %>%  # more crop or bare than previously is higher value
-  select(-contains("landprop")) %>%
+  dplyr::select(-contains("landprop")) %>%
   pivot_wider(names_from = type, values_from = logratio, names_prefix = "logratio_")
 
 # # posterior Outcome latent trait vs bareground change
@@ -218,25 +274,24 @@ lup_ratios <- df_landuse_area %>%
   
 # rainfall and GIS and governance into one data frame
 dfbare <- df_landuse_area %>% filter(type == "bare") %>%
-  select(-measurement_time, -total_area, -type) %>%
+  dplyr::select(-measurement_time, -total_area, -type) %>%
   pivot_wider(names_from = period, values_from = area_ha) %>% 
   rename(post_bare = post,
          pre_bare = pre)
 dfcrop <- df_landuse_area %>% filter(type == "crop") %>%
-  select(-measurement_time, -total_area, -type) %>%
+  dplyr::select(-measurement_time, -type) %>%
   pivot_wider(names_from = period, values_from = area_ha) %>% 
   rename(post_crop = post,
          pre_crop = pre)
-df_threats
+
 dfgis <- df_rainfall %>%
   filter(year >= 2016) %>%
   group_by(village) %>%
   summarise(rain = mean(mean_annual_precip)) %>%
   left_join(dfbare) %>% 
   left_join(dfcrop) %>% 
-  left_join(df_threats %>% filter(threat == "Invasive species") %>% select(village, invasives = present)) %>% 
+  left_join(df_threats %>% filter(threat == "Invasive species") %>% dplyr::select(village, invasives = present)) %>% 
   left_join(lup_ratios) %>% 
-  mutate(rain = as.numeric(scale(rain))) %>% 
   left_join(
     df %>% 
       filter(!grepl("compliance", dimension)) %>% 
@@ -245,24 +300,38 @@ dfgis <- df_rainfall %>%
       group_by(village) %>% 
       summarise(gov = mean(as.numeric(as.character(score))))
   ) %>% 
-  mutate(change_crop = post_crop - pre_crop)
+  left_join(df %>% filter(grepl("invasives", dimension)) %>% 
+              mutate(score = as.numeric(as.character(score))) %>% 
+              dplyr::select(village, invasives_score = score)) %>% 
+  mutate(change_crop = post_crop - pre_crop,
+         rain = scale(rain))
+
+cor(as.numeric(as.character(dfgis$invasives_score)), as.numeric(dfgis$invasives))
 
 # exploratory model
+dfgis$change_crop
+post_bare
 m1 <- lm(
-  post_bare ~ pre_bare + rain + gov,
+  post_bare ~ pre_bare + rain + gov + invasives_score + change_crop,
   data = dfgis
 )
+summary(m1)
 m2 <- lm(
-  log(post_bare) ~ log(pre_bare) + rain + gov,
+  log(post_bare) ~ log(pre_bare) + rain + invasives_score + gov + log(post_crop),
   data = dfgis
 )
+summary(m2)
 summary(m1)$r.squared # 0.9923702
 summary(m2)$r.squared # 0.9956928; multiplicative model seems to fit better
-summary(m2)
+
+with(dfgis, log((post_crop-pre_crop)/total_area))
 # ... which should give approximately the same as this model
 m3 <- lm(
-  logratio_bare ~ rain + gov, data = dfgis
+  logratio_bare ~ rain + gov + invasives_score + logratio_crop, 
+  data = dfgis
 )
+plot(dfgis$logratio_bare, dfgis$logratio_crop)
+##
 summary(m3) # -0.23, SE: 0.11, OK !
 # note: summarizes the indirect effect via cropland (if it's there) and invasives (if it's there)
 # [BUT CAREFUL: their effectiveness HINDERS the effectiveness as measured by bare ground change]
@@ -285,56 +354,49 @@ gov_post <- gather_draws(fit_ord_cum_2pl, r_village[village,dimension]) %>%
 dfgis <- dfgis %>% 
   left_join(gov_post)
 
-# model without error in predictors, only posterior mean
+# model with measurement error
+# .. but could do some more regularizing priors. Maybe simply normal ones for coefficients.
 family_bare <- brmsfamily("gaussian", "identity")
-formula_bare <- bf(
-  logratio_bare ~ rain + gov_mean # + me(gov_mean, gov_sd)
+formula_bare_ <- bf(
+  log(post_bare) ~ log(pre_bare) + rain + invasives_score + me(gov_mean, gov_sd) # assumes normal
+  + log(post_crop)
 )
 
+prior_bare <-
+  # prior("normal(0,2.5)",  class = "b") +
+  prior("constant(0)", class = "meanme") + # by parametrization summary(fit_ord_cum_2pl)
+  prior("constant(1)", class = "sdme") # by parametrizatino of summary(fit_ord_cum_2pl)
+
 fit_bare <- brm(
-  formula = formula_bare,
+  formula = formula_bare_,
   data = dfgis,
   family = family_bare,
-  #prior = ,
-  control   = list(adapt_delta = 0.99, max_treedepth = 15),
+  prior = prior_bare,
+  control   = list(adapt_delta = 0.999, max_treedepth = 15),
   warmup    = 1e3,
-  iter      = 6e3,
+  iter      = 5e3,
   thin      = 1,
   chains    = 2,
-  cores     = 2,
-  seed      = 1,
+  cores     = 10,
+  seed      = 123,
   backend = "cmdstanr"
 )
 summary(fit_bare)
-# megov_meangov_sd: -0.11 ; Std.err.:  0.07, OK!
+# megov_meangov_sd   Est -0.15  SD:  0.13 
+saveRDS(fit_bare, file = "outputs/fit_bare.rds")
 
-# model with error in predictors
-# .. but could do some more regularizing priors. Maybe simply normal ones for coefficients!
-family_bare <- brmsfamily("gaussian", "identity")
-formula_bare_me <- bf(
-  logratio_bare ~ rain + me(gov_mean, gov_sd)
-)
+# show posterior for governance effect
+corvarname <- get_variables(fit_bare)[grepl("bsp_megov_meangov_sd", get_variables(fit_bare))]
+p1 = mcmc_areas_ridges(fit_bare, 
+                       corvarname) + 
+  geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
+  theme(axis.text.y = element_blank(),
+        text = element_text(family = fontfam)) + 
+  labs(subtitle = corvarname)
 
-fit_bare_me <- brm(
-  formula = formula_bare_me,
-  data = dfgis,
-  family = family_bare,
-  #prior = ,
-  control   = list(adapt_delta = 0.999, max_treedepth = 15),
-  warmup    = 1e3,
-  iter      = 6e3,
-  thin      = 1,
-  chains    = 2,
-  cores     = 2,
-  seed      = 1,
-  backend = "cmdstanr"
-)
-summary(fit_bare_me)
-# megov_meangov_sd: -0.19; Std.err.:  0.25, OK!
-
-
-
-
+png("outputs/megov.png", width = 2000, height = 1500, res = 320)
+p1
+dev.off()
 
 # ###################################
 # #### moderation by disturbance ####
