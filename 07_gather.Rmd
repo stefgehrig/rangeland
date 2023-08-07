@@ -1,0 +1,113 @@
+---
+title: "Gathering main findings, tables and figures  for TNC-NTRI rangeland management project publication"
+author: "Stefan Gehrig, [estimact]('https://www.estimact.com)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  bookdown::pdf_document2:
+    extra_dependencies: ["float"]
+    fig_caption: yes
+    latex_engine: xelatex
+    number_sections: yes
+    toc: no
+header-includes:
+  \usepackage{hyperref}
+    \hypersetup{
+    colorlinks = true
+    }
+  \pagenumbering{gobble}
+  \usepackage{fontspec}
+  \usepackage{natbib}
+  \setmainfont{Segoe UI Light}
+  \usepackage{xfrac}
+  \usepackage{amsmath}
+  \usepackage[left]{lineno}
+  \usepackage{pdflscape}
+  \newcommand{\blandscape}{\begin{landscape}}
+  \newcommand{\elandscape}{\end{landscape}}
+  \setlength{\tabcolsep}{4pt}
+  \usepackage{titling}
+  \pretitle{\begin{center}
+  \vspace{-2.5cm}
+  \includegraphics[height=1.25cm]{utils/estimact.png}
+    \vspace{0.85cm}\LARGE\\}
+  \posttitle{\end{center}}
+  \usepackage{setspace}
+  \singlespacing
+fontsize: 10pt
+bibliography: utils/refs.bib
+urlcolor: blue
+geometry: top=1in, bottom=1in, left=1in, right=1in
+---
+\vspace{0.5cm}
+
+*Data:* https://stefgehrig.shinyapps.io/TNC-NTRI/   
+*Code:* https://github.com/stefgehrig/rangeland 
+
+\vspace{0.25cm}
+
+In line with the comments received and discussions had (e-mail from Monique, 2023-08-05), here we are starting to collect and results, tables and figures which could make it into the main text or supplemental material (SM) of the manuscript that Monique et al. will be preparing. The previous delivery of results (my e-mail from 2023-07-24) contained a more diverse set of explorations and presentations, but at this stage, we are ready to zoom in again on the relevant paths of analysis to be pursued and a reduced set of ways to present the results. This helps to gain structure and reduce confusion.
+
+\vspace{0.25cm}
+
+```{=latex}
+\tableofcontents
+```
+ 
+\newpage \pagenumbering{arabic} \setcounter{page}{1}
+ 
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(brms)
+library(dagitty)
+library(ggdag)
+knitr::opts_chunk$set(echo = FALSE)
+
+summary_tier3 <- readRDS("outputs/summary_tier3.rds")
+irm_items = readRDS("outputs/irm_items.rds")
+irm_items_dist = readRDS("outputs/irm_items_dist.rds")
+fit = readRDS("outputs/fit_ord_cum_2pl.rds")
+fit2 = readRDS("outputs/fit_bare.rds")
+```
+
+# Descriptive tables and figures
+
+It would make sense to split the data we use in two "types" and also present them in that way, to be very clear to readers. The first type are those Diagnostic Framework (DF) variables that are constructed from interviews and focus groups and coded in binary / ordinal manner (and used as outcome or predictor). These are noisy measurements of underlying latent traits and that is also the way we treat them in the analysis. A good way to present them (main text or SM) is for example Table \ref{tab:dfsum}, using the DF terminology from @mcginnis_social-ecological_2014, including the small adjustments you made. I'm much in favor of only presenting the variables we use for the analysis here, which is the logic I followed.^[Of course, a full list of DF variables collected during the project could still go in the SM. But there are some variables that we cannot make good use of for the current analysis.] This reduction of DF variables from the full set to a reduced set could become a methodological side-story of the manuscript: The full DF is a very mixed bag and not per se a suitable tool for impact assessments or analyzing cause-and-effect pathways of change -- but it a quite massively filled bag from which one can draw for more targeted research questions.
+
+Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. All different ways to bring them on comparable scales for presentations (see previous reports) have not been ideal. Some of them have some correspondence with DF variables, others do not. They are summarized in Table \ref{tab:othersum}.
+
+A natural way to visualize the data in Table \ref{tab:dfsum} is via spider plots (Figure \ref{fig:spider}), for Table \ref{tab:dfsum} it is via box plots (Figure \ref{fig:box}).
+
+# Item response modeling: Relation of self-reported governance processes and outcomes
+
+a Bayesian Item Response Model (IRM) fit with `brms` [@burkner_bayesian_2020].
+
+# Modeling remote sensing outcomes as a result of governance processes
+
+- add to dag an edge from rainfall to governance: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing."
+
+# Modeling wealth outcomes as a result of governance processes
+
+- wealth inequality from PCA, for example @sharma_escalation_2023.
+
+- "but I did think (again initially) it would be nice to have a measure of wealth (averaged across households) and inequality in wealth. I could think about this more if I wer to turn back to the original data, but now. But having wealth and inequality in wealth as an outcomes measure woud be kind of cool. I know its weak, as it is also something of a predictor variable f success (presumably), and without a longitudinal perspective inference is weak, but even with those prosvisos it might be worth including in the current modelling structure as a village level “outcome”."
+
+# Governance processes and outcomes under disturbances
+
+- "it would be good to look at interactins and/or mediations with disturbances, and I agree rainfall, ethnic/econ heterogeneity, and pop growth are all good candidates, if handled separately"
+
+- "external threats could be added to the disturbance analysis discussed earlier – worth doing, even if only ends up in SM so we can say in the the MS that we examined disturbances."
+
+- rainfall variability can also be used: "Pastoralist scholars are oftn mre concerned about rainfall unpredictabiilty and variability than mean amount, but under the current circumstances of increasing drought, this measure may be fine for us. I will keep my eyes open for how rainfall is being used in recent paper"
+
+- there is a hypothesis why rainfall might cause worse pastoralist governacne processes and outcomes: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing." and it could lead to discussion like: "'Is agriculture a feasible livelihood option?'. It might lead on from the finding (prelim pr page 12 descriptive analysis) that rainfall has neg effects on governance, on the logic that if PA institutions suffer in wetter areas, what is the logic for mving to agric. [Very politically un PC, but possibly worth investigating for the area]."
+
+# Comparing remote sensing outcomes with a control group
+
+- "might require some sort of “synthetic counterfactual”. Quite how we deal with the fact that NTRI presumably selected the villages for intervention on the basis of some criteria will take some thought. Initially Susan or Majory could help us here. I am not sure that our 12 villages comprise the full set of NTRI targets – this would help us enormously with developing controls for GIS."
+
+# References
+
+
+
