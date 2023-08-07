@@ -1,6 +1,8 @@
 ---
 title: "Gathering main findings, tables and figures  for TNC-NTRI rangeland management project publication"
-author: "Stefan Gehrig, [estimact]('https://www.estimact.com)"
+author: |
+  | Stefan Gehrig
+  | www.estimact.com / estimact@onmail.com
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   bookdown::pdf_document2:
@@ -33,11 +35,18 @@ header-includes:
   \posttitle{\end{center}}
   \usepackage{setspace}
   \singlespacing
+  \usepackage{fancyhdr}
+  \usepackage{fancybox}
+  \pagestyle{fancy}
+  \fancyhead{}
 fontsize: 10pt
 bibliography: utils/refs.bib
 urlcolor: blue
 geometry: top=1in, bottom=1in, left=1in, right=1in
 ---
+
+\fancyhead[C]{www.estimact.com / estimact@onmail.com}
+
 \vspace{0.5cm}
 
 *Data:* https://stefgehrig.shinyapps.io/TNC-NTRI/   
