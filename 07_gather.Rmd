@@ -87,7 +87,11 @@ a Bayesian Item Response Model (IRM) fit with `brms` [@burkner_bayesian_2020].
 
 # Modeling remote sensing outcomes as a result of governance processes
 
+- make sure that these are (mostly) mututally exclusive, which is an assumption I used and monique shares: "I assume maize wheat and bean fields dont look bare in a satelite image". We asked Nathaniel
+
 - add to dag an edge from rainfall to governance: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing."
+
+- maybe extend dag: "The DAG starting page 20 on bare ground looks pretty good to me, but I think we’d need a zoom session with Majory and Susan where you explain it, as they are more likely to think of additional paths/variables than I am."
 
 # Modeling wealth outcomes as a result of governance processes
 
