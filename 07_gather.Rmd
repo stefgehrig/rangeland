@@ -12,18 +12,21 @@ output:
     number_sections: yes
     toc: no
 header-includes:
-  \usepackage{hyperref}
-    \hypersetup{
-    colorlinks = true
-    }
+  \usepackage[colorlinks]{hyperref}
+  \AtBeginDocument{
+  \hypersetup{
+    linkcolor=Blue}}
   \pagenumbering{gobble}
   \usepackage{fontspec}
+  \usepackage{float}
+  \floatplacement{figure}{H}
   \usepackage{natbib}
   \setmainfont{Segoe UI Light}
   \usepackage{xfrac}
   \usepackage{amsmath}
   \usepackage[left]{lineno}
   \usepackage{pdflscape}
+  \usepackage[labelfont=bf]{caption}
   \newcommand{\blandscape}{\begin{landscape}}
   \newcommand{\elandscape}{\end{landscape}}
   \setlength{\tabcolsep}{4pt}
@@ -73,22 +76,66 @@ library(dagitty)
 library(ggdag)
 knitr::opts_chunk$set(echo = FALSE)
 
-summary_tier3 <- readRDS("outputs/summary_tier3.rds")
-irm_items = readRDS("outputs/irm_items.rds")
-irm_items_dist = readRDS("outputs/irm_items_dist.rds")
-fit = readRDS("outputs/fit_ord_cum_2pl.rds")
-fit2 = readRDS("outputs/fit_bare.rds")
+gat_tab1 <- readRDS("outputs/gat_tab1.rds")
+gat_tab2 <- readRDS("outputs/gat_tab2.rds")
 ```
+
+\textcolor{red}{schau nochmal in den NTRI (!) report, das Word doc. Da sind viele wertvolle richtungen zu denken drin mit dem ganzen substantivem wissen über den Ort und so und den Fragen die sie analysieren.}
 
 # Descriptive tables and figures
 
-It would make sense to split the data we use in two "types" and also present them in that way, to be very clear to readers. The first type are those Diagnostic Framework (DF) variables that are constructed from interviews and focus groups and coded in binary / ordinal manner (and used as outcome or predictor). These are noisy measurements of underlying latent traits and that is also the way we treat them in the analysis. A good way to present them (main text or SM) is for example Table \ref{tab:dfsum}, using the DF terminology from @mcginnis_social-ecological_2014, including the small adjustments you made. I'm much in favor of only presenting the variables we use for the analysis here, which is the logic I followed.^[Of course, a full list of DF variables collected during the project could still go in the SM. But there are some variables that we cannot make good use of for the current analysis and they would distract.] This reduction of DF variables from the full set to a reduced set could become a methodological side-story of the manuscript: The full DF is a very mixed bag and not per se a suitable tool for impact assessments or analyzing cause-and-effect pathways of change -- but it a quite massively filled bag from which one can draw for more targeted research questions.
+It would make sense to split the data we use in two "types" and also present them in that way, to be very clear to readers. The first type are those Diagnostic Framework (DF) variables that are constructed from interviews and focus groups and coded in binary / ordinal manner (and used as outcome or predictor). These are noisy measurements of underlying latent traits and that is also the way we treat them in the analysis. One way to present them (main text or SM) is for example Table \ref{tab:dfsum}, based on the DF in the version from @mcginnis_social-ecological_2014. I'd suggest to only present the DF variables which actually use for the analysis, which is the logic I followed here.^[Of course, a full list of DF variables collected during the project could still go in the SM. But there are some variables that we cannot make good use of for the current analysis and they would maybe distract.] This reduction of DF variables from the full set to a reduced set could become a methodological side-story of the manuscript: The full DF is a very mixed bag and not per se a suitable tool for impact assessments or analyzing pathways of change -- but it a quite massively filled bag from which one can draw subsets for more targeted research questions.
 
-Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. All different ways to bring them on comparable scales for presentations (see previous reports) have not been ideal. Some of them have some correspondence with DF variables, others do not. They are summarized in Table \ref{tab:othersum}.
+```{r dfsum}
+dfsum <- gat_tab1 %>% 
+  mutate(bin = ifelse(bin==TRUE, "*", " "),
+         tier1 = droplevels(tier1)) 
 
-A natural way to visualize the data in Table \ref{tab:dfsum} is via spider plots (Figure \ref{fig:spider}), for Table \ref{tab:dfsum} it is via stripe and box plots (Figure \ref{fig:box}).
+dfsum %>% 
+  select(-tier1) %>% 
+  kable(
+    booktabs = TRUE,
+     linesep = "",
+    caption = "DF variables used in the analysis and their response distributions in the 12 villages. The asterik indicates whether a variable has originally been coded as binary and was therefore transformed to only have response options 1 and 3 (i.e., no middle option).",
+    col.names = c("Third-tier variable", "1", "2", "3", " ", "Explanation of high score"),
+    ) %>% 
+  kable_styling(font_size = 5.5, latex_options = "HOLD_position") %>% 
+  add_header_above(c(" " = 1, "Score\nfrequency" = 3, " " = 2)) %>% 
+  kableExtra::group_rows(index = table(dfsum$tier1))
+```
 
-- table 1: tier3, tier1, description/direction, distirbution 1, 2, 3. caption: binary coded as 1-3, middle optino always missing
+
+Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis. They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [just as, for example, in @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
+
+```{r othersum}
+gat_tab2 %>% 
+  kable(
+    booktabs = TRUE,
+    digits = 2,
+     linesep = "",
+    caption = "Other, continuously measured variables used in the analysis and their response distributions in the 12 villages.",
+    col.names = c("Variable", "Mean", "Min", "Max", "Source"),
+    ) %>% 
+  kable_styling(font_size = 8, latex_options = "HOLD_position")%>% 
+  add_header_above(c(" " = 1, "Distribution" = 3, " " = 1)) 
+```
+
+
+A natural way to visualize  for all villages the data in Table \ref{tab:dfsum} is via spider plots (Figure \ref{fig:radar}), for Table \ref{tab:othersum} it is via stripe / box plots (Figure \ref{fig:boxes}).
+
+\newpage
+
+```{r radar, fig.align='center', fig.cap='Radar plots of scores for all DF variables from Table 1, split by whether they refer to outcome dimensions or not.', out.width="100%"}
+include_graphics("outputs/gat_spiders.png")
+```
+
+\newpage
+
+```{r boxes, fig.align='center', fig.cap='Boxplots for variables from Table 2. In the horizontal direction, positions are randomly scattered.', out.width="100%"}
+include_graphics("outputs/gat_boxes.png")
+```
+
+\newpage
 
 # Item response modeling: Relation of self-reported governance processes and outcomes
 

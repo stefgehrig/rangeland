@@ -27,7 +27,7 @@ name_the_tiers <- function(df_codescores){
       
     )))
   
-  # create tier 2 names
+  # create tier 3 names
   df_codescores <- df_codescores %>% 
     mutate(tier3 = case_when(
       dimension == "a1.1.1.actor.group.size.(#.of.cattle)"       ~ "A1.1: Number of relevant actors (# Cattle)",
@@ -70,6 +70,53 @@ name_the_tiers <- function(df_codescores){
       dimension == "s1.1.human.population.size.change.(annual.increase)"      ~ "S1.1: Change in human population size",
       dimension == "s1.2.changes.in.ethnic.composition.(village.leader.data)" ~ "S1.2: Changes in ethnic composition",
       dimension == "s1.3.changes.in.livelihood.activities"                    ~ "S1.3: Changes in livelihood activities"
+    )) %>% 
+    # create pubishable descriptions of the high option for those used as items in analysis
+    mutate(descr = case_when(
+      # dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                    ~ "A1.1: Number of relevant actors (# Cattle)",
+      # dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"               ~ "A1.1: Number of relevant actors (# Sheep/goats)",
+      # dimension == "a2.1.economic.heterogeneity"                              ~ "A2.1: Economic heterogeneity",
+      # dimension == "a2.2.interest.heterogeneity"                              ~ "A2.2: Interest heterogeneity",
+      dimension == "a4.1.leadership.accountability"        ~ "Mechanisms of accountability are very effective and the group members represented by a leader are able to invoke/use them",
+      dimension == "a5.1.actor.group.trust"                ~ "Members have full faith and confidence in one another to fullfill promises",
+      dimension == "a5.2.inter-group.trust"                ~ "Groups have the full faith and confidence that the other groups will fulfill their promises",
+      # dimension == "a7.1.economic.dependence"                                 ~ "A7.1: Economic dependence",
+      # dimension == "a7.2.commons.alternatives"                                ~ "A7.2: Commons alternatives",
+                   
+      # dimension == "eco1.01.rainfall.patterns"                                ~ "ECO1.1: Rainfall patterns",
+                   
+      dimension == "gs2.1.external.support"                                   ~ "Higher level organizations involved provide extensive, ongoing support to lower level jurisdictions",
+      dimension == "gs3.2.property.security"                                  ~ "There is a strong common understanding of what aspects of a commons are owned and these rights are complied with",
+      dimension == "gs4.1.rules-in-use"                                       ~ "Rules are in place that govern when and where to graze livestock",
+      dimension == "gs4.2.governance.strictness.trend"                        ~ "There has been change towards enhanced enforcement and/or increased application of sanctions",
+      dimension == "gs5.1.external.recognition"                               ~ "Complete recognition of communities' autonomy in decision-making regarding the rangeland by larger governmental jurisdictions",
+      dimension == "gs5.4.participation.in.zoning"                            ~ "The actor group is in charge of the zoning of the rangeland",
+      dimension == "gs5.3.participation.in.rule.making"                       ~ "Users have active engagement in decision-making processes",
+      dimension == "gs5.5.commons.political.power"                            ~ "User or leadership group with high levels of power have the ability to change rules on their own",
+      dimension == "gs6.2.outsider.exclusion"                                 ~ "Users are able to prevent the great majority to all incursion by outsiders",
+      dimension == "gs7.1.environmental.monitoring"                           ~ "The group engages in frequent and systematic monitoring efforts to observe changes in rangeland's conditions.",
+      dimension == "gs7.2.self.sanctions"                                     ~ "Sanctions are applied by and to the members of the group for violations of extraction rules",
+      dimension == "gs7.3.external.sanctions"                                 ~ "Sanctions are applied by other actor groups (i.e., external authority) to the members of the group for violations of extraction rules",
+      
+      
+      
+      
+      
+      dimension == "i1.1.conflict.resolution"                                 ~ "Mechanisms are in place to address conflicts that arise over the use of the rangeland by the user group",
+      dimension == "i2.1.participation.in.social.monitoring.(enforcement)"    ~ "The users always participate in monitoring other people's grazing behaviors",
+      
+      dimension == "o1.1.compliance"                                          ~ "This user group almost always or always complies with formal rules",
+      dimension == "o2.1.commons.condition.trend"                             ~ "Condition of the rangeland has improved",
+      dimension == "o2.3.invasives"                                           ~ "Invasive species do not pose a threat to this resource",
+      
+      dimension == "rs2.1.commons.boundaries"                                 ~ "The limits of the rangeland are clearly defined and highly visible",
+      dimension == "rs2.2.commons.boundary.negotiability"                     ~ "Negotiations to access this village rangeland by non-members are not possible or not fruitful",
+      # dimension == "rs3.1.commons.spatial.extent.(ha)"                        ~ "RS3.1: Commons spatial extent",
+      # dimension == "rs5.1.productivity"                                       ~ "RS5.1: Productivity",
+      # 
+      # dimension == "s1.1.human.population.size.change.(annual.increase)"      ~ "S1.1: Change in human population size",
+      # dimension == "s1.2.changes.in.ethnic.composition.(village.leader.data)" ~ "S1.2: Changes in ethnic composition",
+      # dimension == "s1.3.changes.in.livelihood.activities"                    ~ "S1.3: Changes in livelihood activities"
     ))
   
   # check data
@@ -81,74 +128,136 @@ name_the_tiers <- function(df_codescores){
 }
 
 
-coord_radar <- function (theta = "x", start = 0, direction = 1) 
-{
+
+# https://stackoverflow.com/questions/67334137/increase-space-for-long-axis-labels-in-radar-chart
+coord_radar2 <- function(theta = "x", start = 0, direction = 1, clip = "off") {
   theta <- match.arg(theta, c("x", "y"))
-  r <- if (theta == "x") 
+  r <- if (theta == "x") {
     "y"
-  else "x"
-  
-  #dirty
-  rename_data <- function(coord, data) {
-    if (coord$theta == "y") {
-      plyr::rename(data, c("y" = "theta", "x" = "r"), warn_missing = FALSE)
-    } else {
-      plyr::rename(data, c("y" = "r", "x" = "theta"), warn_missing = FALSE)
+  } else {
+    "x"
+  }
+  ggproto("CoordRadar", ggplot2::CoordPolar,
+          theta = theta,
+          r = r, start = start, clip = clip,
+          direction = sign(direction), is_linear = function(coord) TRUE
+  )
+}
+
+ggRadar2 <- function(data, mapping = NULL, rescale = TRUE, legend.position = "top",
+                     colour = "red", alpha = 0.3, size = 3, ylim = NULL, scales = "fixed",
+                     use.label = FALSE, interactive = FALSE, clip = "off", ...) {
+  data <- as.data.frame(data)
+  (groupname <- setdiff(names(mapping), c("x", "y")))
+  groupname
+  mapping
+  length(groupname)
+  if (length(groupname) == 0) {
+    groupvar <- NULL
+  }
+  else {
+    groupvar <- ggiraphExtra:::getMapping(mapping, groupname)
+  }
+  groupvar
+  facetname <- colorname <- NULL
+  if ("facet" %in% names(mapping)) {
+    facetname <- ggiraphExtra:::getMapping(mapping, "facet")
+  }
+  (colorname <- setdiff(groupvar, facetname))
+  if ((length(colorname) == 0) & !is.null(facetname)) {
+    colorname <- facetname
+  }
+  data <- ggiraphExtra:::num2factorDf(data, groupvar)
+  (select <- sapply(data, is.numeric))
+  if ("x" %in% names(mapping)) {
+    xvars <- ggiraphExtra:::getMapping(mapping, "x")
+    xvars
+    if (length(xvars) < 3) {
+      warning("At least three variables are required")
     }
   }
-  theta_rescale <- function(coord, x, scale_details) {
-    rotate <- function(x) (x + coord$start) %% (2 * pi) * coord$direction
-    rotate(scales::rescale(x, c(0, 2 * pi), scale_details$theta.range))
+  else {
+    xvars <- colnames(data)[select]
   }
-  
-  r_rescale <- function(coord, x, scale_details) {
-    scales::rescale(x, c(0, 0.4), scale_details$r.range)
+  (xvars <- setdiff(xvars, groupvar))
+  if (rescale) {
+    data <- ggiraphExtra:::rescale_df(data, groupvar)
   }
+  temp <- sjlabelled::get_label(data)
+  cols <- ifelse(temp == "", colnames(data), temp)
+  if (is.null(groupvar)) {
+    id <- ggiraphExtra:::newColName(data)
+    data[[id]] <- 1
+    longdf <- reshape2::melt(data, id.vars = id, measure.vars = xvars)
+  }
+  else {
+    cols <- setdiff(cols, groupvar)
+    longdf <- reshape2::melt(data, id.vars = groupvar, measure.vars = xvars)
+  }
+  temp <- paste0("plyr::ddply(longdf,c(groupvar,'variable'), dplyr::summarize,mean=mean(value,na.rm=TRUE))")
+  df <- eval(parse(text = temp))
+  colnames(df)[length(df)] <- "value"
+  df
+  groupvar
+  if (is.null(groupvar)) {
+    id2 <- ggiraphExtra:::newColName(df)
+    df[[id2]] <- "all"
+    id3 <- ggiraphExtra:::newColName(df)
+    df[[id3]] <- 1:nrow(df)
+    df$tooltip <- paste0(df$variable, "=", round(
+      df$value,
+      1
+    ))
+    df$tooltip2 <- paste0("all")
+    p <- ggplot(data = df, aes_string(
+      x = "variable", y = "value",
+      group = 1
+    )) +
+      ggiraph::geom_polygon_interactive(aes_string(tooltip = "tooltip2"),
+                                        colour = colour, fill = colour, alpha = alpha
+      ) +
+      ggiraph::geom_point_interactive(aes_string(
+        data_id = id3,
+        tooltip = "tooltip"
+      ), colour = colour, size = size)
+  }
+  else {
+    if (!is.null(colorname)) {
+      id2 <- ggiraphExtra:::newColName(df)
+      df[[id2]] <- df[[colorname]]
+    }
+    id3 <- ggiraphExtra:::newColName(df)
+    df[[id3]] <- 1:nrow(df)
+    df$tooltip <- paste0(
+      groupvar, "=", df[[colorname]], "<br>",
+      df$variable, "=", round(df$value, 1)
+    )
+    df$tooltip2 <- paste0(groupvar, "=", df[[colorname]])
+    p <- ggplot(data = df, aes_string(
+      x = "variable", y = "value",
+      colour = colorname, fill = colorname, group = colorname
+    )) +
+      ggiraph::geom_polygon_interactive(aes_string(tooltip = "tooltip2"),
+                                        alpha = alpha
+      ) +
+      ggiraph::geom_point_interactive(aes_string(
+        data_id = id3,
+        tooltip = "tooltip"
+      ), size = size)
+  }
+  p
+  if (!is.null(facetname)) {
+    formula1 <- as.formula(paste0("~", facetname))
+    p <- p + facet_wrap(formula1, scales = scales)
+  }
+  p <- p + xlab("") + ylab("") + theme(legend.position = legend.position)
   
-  ggproto("CordRadar", CoordPolar, theta = theta, r = r, start = start, 
-          direction = sign(direction),
-          is_linear = function(coord) TRUE,
-          render_bg = function(self, scale_details, theme) {
-            scale_details <- rename_data(self, scale_details)
-            
-            theta <- if (length(scale_details$theta.major) > 0)
-              theta_rescale(self, scale_details$theta.major, scale_details)
-            thetamin <- if (length(scale_details$theta.minor) > 0)
-              theta_rescale(self, scale_details$theta.minor, scale_details)
-            thetafine <- seq(0, 2 * pi, length.out = 100)
-            
-            rfine <- c(r_rescale(self, scale_details$r.major, scale_details))
-            
-            # This gets the proper theme element for theta and r grid lines:
-            #   panel.grid.major.x or .y
-            majortheta <- paste("panel.grid.major.", self$theta, sep = "")
-            minortheta <- paste("panel.grid.minor.", self$theta, sep = "")
-            majorr     <- paste("panel.grid.major.", self$r,     sep = "")
-            
-            ggplot2:::ggname("grill", grid::grobTree(
-              ggplot2:::element_render(theme, "panel.background"),
-              if (length(theta) > 0) ggplot2:::element_render(
-                theme, majortheta, name = "angle",
-                x = c(rbind(0, 0.45 * sin(theta))) + 0.5,
-                y = c(rbind(0, 0.45 * cos(theta))) + 0.5,
-                id.lengths = rep(2, length(theta)),
-                default.units = "native"
-              ),
-              if (length(thetamin) > 0) ggplot2:::element_render(
-                theme, minortheta, name = "angle",
-                x = c(rbind(0, 0.45 * sin(thetamin))) + 0.5,
-                y = c(rbind(0, 0.45 * cos(thetamin))) + 0.5,
-                id.lengths = rep(2, length(thetamin)),
-                default.units = "native"
-              ),
-              
-              ggplot2:::element_render(
-                theme, majorr, name = "radius",
-                x = rep(rfine, each = length(thetafine)) * sin(thetafine) + 0.5,
-                y = rep(rfine, each = length(thetafine)) * cos(thetafine) + 0.5,
-                id.lengths = rep(length(thetafine), length(rfine)),
-                default.units = "native"
-              )
-            ))
-          })
+  p <- p + coord_radar2(clip = clip)
+  if (!is.null(ylim)) {
+    p <- p + expand_limits(y = ylim)
+  }
+  p
+  
+  p
 }
+

@@ -14,6 +14,7 @@ library(janitor)
 library(sp)
 library(psych)
 library(DescTools)
+select<-dplyr::select
 
 ############################
 #### 9: population data ####
@@ -194,15 +195,15 @@ df3 <- df3 %>% mutate(village = str_to_lower(village))
 #   select(-`A1.1.Actor.group.size.(#.of.livestock.keepers)`) %>%  # you could probably just use the alternative variable, "A1.1.1 Actor group size (# of cattle)," instead (r = 0.9)
 #   select(-`GS6.1.Actor.group.boundary.clarity`)# This variable was not well addressed and not all the intended groups were asked the question. You don't need to worry about it cos it is correlated with other variables - i.e., you can leave it out
 
-# replace variables (with and without missings) where better measures are available
-df3$a2.1.economic.heterogeneity
-df3$eco1.01.rainfall.patterns
-df3$`rs3.1.commons.spatial.extent.(ha)`
-df3$`s1.1.human.population.size.change.(annual.increase)`
-
-# # a) economic heterogeneity as wealth index
-# # "Given our sites are pretty homogenous, a better indicator of inequality might simply
-# #  be the proportion of homes with a tin/aluminum/bati roof, or the proportion of homes with a pikipiki."
+# # replace variables (with and without missings) where better measures are available
+# df3$a2.1.economic.heterogeneity
+# df3$eco1.01.rainfall.patterns
+# df3$`rs3.1.commons.spatial.extent.(ha)`
+# df3$`s1.1.human.population.size.change.(annual.increase)`
+# 
+# # # a) economic heterogeneity as wealth index
+# # # "Given our sites are pretty homogenous, a better indicator of inequality might simply
+# # #  be the proportion of homes with a tin/aluminum/bati roof, or the proportion of homes with a pikipiki."
 # df1 %>% tabyl(village, houserooftype)
 # df1 %>% tabyl(village, motorcycle) %>%
 #   adorn_percentages()
@@ -249,15 +250,21 @@ df1_econ <- df1 %>%
 pca_econ <- principal(df1_econ %>% select(-village), nfactors = 1)
 pca_econ$loadings # high correlations consistently with PC1
 
-df1_econ_smry <- df1 %>%
+df1_econ_smry_pca <- df1 %>%
   bind_cols(wealth = pca_econ$scores) %>%
   group_by(village) %>% 
-  summarise(`a2.1.economic.heterogeneity` = 1/sd(wealth)) # HOMOGENEITY we need; higher values --> more homogeneity;
-# correlates well with above out-commented approach by Monique (r = 0.7)
-  
+  summarise(`a2.1.economic.heterogeneity` = sd(wealth))
+
+#   summarise(`a2.1.economic.heterogeneity` = 1/sd(wealth)) # HOMOGENEITY we need; higher values --> more homogeneity;
+# # correlates well with above out-commented approach by Monique (r = 0.7)
+# plot(df1_econ_smryB$a2.1.economic.heterogeneity,
+# df1_econ_smry_pca$a2.1.economic.heterogeneity)
+# cor(df1_econ_smryB$a2.1.economic.heterogeneity,
+#      df1_econ_smry_pca$a2.1.economic.heterogeneity) # -0.6945469
+
 df3 <- df3 %>%
   select(-`a2.1.economic.heterogeneity`) %>%
-  left_join(df1_econ_smry)
+  left_join(df1_econ_smry_pca)
   
 # b) rainfall patterns
 df7_rain_smry <- df7 %>% 
@@ -305,17 +312,17 @@ df9_pop_smry <- df9 %>%
   )) %>% 
   mutate(total_rel_increase = 1+(`2020`-`2012`) / `2012`) %>% 
   mutate(growth_factor = (total_rel_increase)^(1/8)-1) %>%
-  mutate(growth_factor = -growth_factor) %>% # reverse coding
+  #mutate(growth_factor = -growth_factor) %>% # reverse coding
   select(village, `s1.1.human.population.size.change.(annual.increase)` = growth_factor) # higher values, more annual increase
 
 df3 <- df3 %>% 
   select(-`s1.1.human.population.size.change.(annual.increase)`) %>% # take negative, such that higher values, less annual increase
   left_join(df9_pop_smry)
 
-# d) cattle and sheep continuous; direction
-df3 <- df3 %>% 
-  mutate(`a1.1.1.actor.group.size.(#.of.cattle)` = -`a1.1.1.actor.group.size.(#.of.cattle)`,
-         `a1.1.1.actor.group.size.(#.of.sheep/goats)` = -`a1.1.1.actor.group.size.(#.of.sheep/goats)`)
+# # d) cattle and sheep continuous; direction
+# df3 <- df3 %>% 
+#   mutate(`a1.1.1.actor.group.size.(#.of.cattle)` = -`a1.1.1.actor.group.size.(#.of.cattle)`,
+#          `a1.1.1.actor.group.size.(#.of.sheep/goats)` = -`a1.1.1.actor.group.size.(#.of.sheep/goats)`)
 
 # reshape
 df3_long <- df3 %>%   
@@ -327,12 +334,12 @@ df3_info <- df3_info %>%
   # add in my own new definitions from above (all continuous variables com from me, all others from majory's coding)
   mutate(
     dimension_coding = case_when(
-      dimension == "a2.1.economic.heterogeneity"                           ~ "continuous: (-1) * SD of first PCA for toilet, wall, floor, roof, pikipiki, phones",
+      dimension == "a2.1.economic.heterogeneity"                           ~ "continuous: SD of first PCA for toilet, wall, floor, roof, pikipiki, phones",
       dimension == "eco1.01.rainfall.patterns"                             ~ "continuous: average of mean annual precipitation 2016-2020 (mm)",
       dimension == "rs3.1.commons.spatial.extent.(ha)"                     ~ "continuous: area bare land (ha)",
-      dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: (-1) * annual relative increase from 2012 to 2020 (i.e., less strong increase)",
-      dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                 ~ "continuous: (-1) * number of cattle",
-      dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"            ~ "continuous: (-1) * number of sheep/goats",
+      dimension == "s1.1.human.population.size.change.(annual.increase)"   ~ "continuous: annual relative increase from 2012 to 2020 (i.e., less strong increase)",
+      dimension == "a1.1.1.actor.group.size.(#.of.cattle)"                 ~ "continuous: number of cattle",
+      dimension == "a1.1.1.actor.group.size.(#.of.sheep/goats)"            ~ "continuous: number of sheep/goats",
       TRUE ~ dimension_coding
     )
   )
