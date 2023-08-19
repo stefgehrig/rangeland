@@ -23,6 +23,7 @@ header-includes:
   \usepackage{natbib}
   \setmainfont{Segoe UI Light}
   \usepackage{xfrac}
+  \usepackage{bm}
   \usepackage{amsmath}
   \usepackage[left]{lineno}
   \usepackage{pdflscape}
@@ -97,7 +98,7 @@ dfsum %>%
     booktabs = TRUE,
      linesep = "",
     caption = "DF variables used in the analysis and their response distributions in the 12 villages. The asterik indicates whether a variable has originally been coded as binary and was therefore transformed to only have response options 1 and 3 (i.e., no middle option).",
-    col.names = c("Third-tier variable", "1", "2", "3", " ", "Explanation of high score"),
+    col.names = c("Third-tier variable", "1", "2", "3", " ", "Explanation of highest score"),
     ) %>% 
   kable_styling(font_size = 5.5, latex_options = "HOLD_position") %>% 
   add_header_above(c(" " = 1, "Score\nfrequency" = 3, " " = 2)) %>% 
@@ -105,7 +106,7 @@ dfsum %>%
 ```
 
 
-Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis. They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [just as, for example, in @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
+Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis. They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [following @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
 
 ```{r othersum}
 gat_tab2 %>% 
@@ -125,7 +126,7 @@ A natural way to visualize  for all villages the data in Table \ref{tab:dfsum} i
 
 \newpage
 
-```{r radar, fig.align='center', fig.cap='Radar plots of scores for all DF variables from Table 1, split by whether they refer to outcome dimensions or not.', out.width="100%"}
+```{r radar, fig.align='center', fig.cap='Village-level spider plots of scores for all DF variables from Table 1, split by whether they refer to outcome dimensions (right) or not (left).', out.width="100%"}
 include_graphics("outputs/gat_spiders.png")
 ```
 
@@ -137,13 +138,89 @@ include_graphics("outputs/gat_boxes.png")
 
 \newpage
 
-# Item response modeling: Relation of self-reported governance processes and outcomes
+# Item response modeling: Relation between self-reported governance processes and outcomes
 
-a Bayesian Item Response Model (IRM) fit with `brms` [@burkner_bayesian_2020].
+This section is more or less completely drafted and open to discussion.
+
+## Motivation
+
+We now model the association between governance processes and governance outcomes as reported by communities. This is based on the data presented in Table \ref{tab:dfsum}. The workhorse of the analysis will be a Bayesian Item Response Model fit with `brms` [@burkner_bayesian_2020]. 
+
+Item Response Theory (IRT) is a statistical modeling paradigm from psychology that aims to simultaneously assess the impact of subject-level and item-level influences on test scores [@linden_handbook_1997]. It can be viewed as a form of statistical adjustment for item characteristics that allows inference about unobserved latent characteristics of subjects. In our research context, the "subjects" are communities and the items are coded responses from in-depth focus group discussions and interviews. Therefore, in the context of this analysis, we also refer to the third-tier DF variables in Table \ref{tab:dfsum} as items. 
+
+Based on the nature of our items, we propose two underlying latent traits of communities: The quality of the governance process and the quality of the governance outcome. We briefly call the two dimensions *Governance* and *Outcome*. The former is measured by the type of items that refer to governance processes -- all third-tier variables in Table \ref{tab:dfsum} listed under the first-tier categories *Resource Systems (RS)*, *Governance Systems (GS)*, *Actors (A)* and *Interactions (I)*. The latter is measured by the type of items that measure governance outcomes -- listed in Table \ref{tab:dfsum} under the first-tier category *Outcomes (O)*.^[Even though the DF does not put all of these variables into the *Governance Systems (GS)* category, they arguably reflect commons governance processes.] This distinction between these two item types is made a priori on conceptual grounds and in line with the goal to assess the association between governance processes and governance outcomes.
+
+Variation in item responses between villages is assumed to partially reflect true variation in the underlying latent traits of villages. At the same time, the IRT models will allow to model variation in responses between items in terms of item *easiness* (characteristics of an item to produce higher responses) and item *discrimination* (characteristics of an item to produces more variable responses). Such variation is clearly suggested already by the raw data (see Table \ref{tab:dfsum}). Thus, IRT can provide a comprehensive picture of different sources of variation in item responses. Most importantly for our purpose, the model will allow to estimate the positioning of all villages on the two latent dimensions *Governance* and *Outcome*, as well as the correlation across dimensions.
+
+Fitting the IRT model in a Bayesian framework provides a natural way to induce regularization via prior distributions and to quantify and present uncertainty. Due to the rather small sample of villages and the inherent tendency of IRT models to have a high number of parameters to be estimated from data, these aspects are both important in the present analysis. Bayesian IRT models have been gaining popularity in social-ecological research for analyzing imperfectly measured traits of natural resource users [e.g., @pretelli_rates_2022]. 
+
+## Formal model definition
+
+Response of village $j = 1,...,J$ on item $i = 1, ..., I$ shall be denoted as $Y_{i,j}$. Since these scores can take discrete values $k = 1,2,3$, we assume a multinomial distribution of item responses 
+
+$$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j})$$
+
+where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response $k$ on item $i$. Note that $\pi_{1, i, j} + \pi_{2, i, j}+ \pi_{3, i, j} = 1$ for all $i,j$.
+
+Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes^[In the IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].]. The probabilities to give responses $k = 1,2,3$ can hence be written as
+
+
+\begin{align*}
+\pi_{1, i, j} & = P(Y_{i,j} = 1) = \text{logit}^{-1}(\beta_1 - \eta_{i,j}), \\
+\pi_{2, i, j} & = P(Y_{i,j} = 2) = \text{logit}^{-1}(\beta_2 - \eta_{i,j}) - \text{logit}^{-1}(\beta_1 - \eta_{i,j}), \\
+\pi_{3, i, j} & = P(Y_{i,j} = 3) = 1 - \pi_{2, i, j} - \pi_{1, i, j},
+\end{align*}
+
+with $\beta_1$, $\beta_2$ being the cutpoint parameters. The parameter $\eta_{i,j}$ is of substantive interest: It is a non-linear combination of village- and item-level characteristics, where higher values of $\eta_{i,j}$ mean a higher expected response category.
+
+Most importantly, $\eta_{i,j}$ shall be affected by $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$. These parameters describe the quality of governance processes and of outcomes in village $j$, respectively. Note that here we are ultimately interested in their correlation parameter $\rho_{\text{Gov},\text{Out}}$. Applying the IRT framework, we will model $\eta_{i,j}$ also as a function of easiness of the item, $b_i$. Further, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter $a_i$ for the discriminatory power of an item is introduced. The discrimination parameter can be understood as an effect modifier: The stronger discrimination of an item, the more differences in $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$ between villages will lead to differences in observed item responses between villages.^[Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] Accordingly, we write
+
+
+$$\eta_{i,j} = (\alpha + a_i) \left(b_i + \theta_j^{\text{Gov}} \text{Gov}_i + \theta_j^{\text{Out}} \text{Out}_i \right),$$
+where $\alpha$ is an intercept parameter for item discrimination, such that $a_i$ represent deviations from mean discrimination for each item. $\text{Gov}_i$ is an indicator that is 1 if item $i$ is of type *Governance* and 0 otherwise. $\text{Out}_i$ is an indicator that is 1 if item $i$ is of type *Outcome* and 0 otherwise.
+
+
+Finally, working in a Bayesian framework with varying parameters, we assume the following distributions for item- and village-level parameters:
+
+\begin{align*}
+a_i & \sim N(0, \sigma^2_a), \\
+b_i & \sim N(0, \sigma^2_b), \\
+(\theta_j^{\text{Gov}}, \theta_j^{\text{Out}}) & \sim N(\bm{0}, D), \text{with} \\ 
+& D =
+\begin{pmatrix}
+\sigma^2_{\text{Gov}} & \sigma_{\text{Gov},\text{Out}}\\
+\sigma_{\text{Gov},\text{Out}} & \sigma^2_{\text{Out}}
+\end{pmatrix}.
+\end{align*}
+
+This implies that the two item parameters $a_i$ and $b_i$ are assumed independent.^[This is a common assumption in IRT models and it is helpful in a sparse-data context like ours.] The two village-parameters $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$, however, follow a bivariate normal distribution with covariance $\sigma_{\text{Gov},\text{Out}}$. We can hence define our parameter of interest, the correlation between governance and outcome quality, based on the IRT model as 
+
+$$\rho_{\text{Gov},\text{Out}} = \frac{\sigma_{\text{Gov},\text{Out}}}{\sigma_{\text{Gov}} \sigma_{\text{Out}}}.$$
+
+
+By choosing adaptive priors that induce partial pooling, above IRT model becomes a Bayesian multilevel model [@burkner_bayesian_2020]. Specifically, we work with the following priors:
+
+\textcolor{red}{to write down:}
+
+- denn $\sigma_{b}$ bekommt nichts fixes, sondern selbst estimated und hyperprior
+
+- Note constancy restritions that need to be done. (identifiability! see also Bayesian IRT book)
+
+- Weakly informative Bayesian priors are used which shrink item and village effects towards zero. This ensures model convergence and stability of estimates, thereby also being generally conservative.
+
+- Not adjusted with other covariates.
+
+- Note that the approach allows us to even keep items with no variability in the sample.
+
+- In results dann $a_i$ zeigen: das was aus dem Modell kommt also umdrehen, so dass hohere werte = mehr discrimination. Außerdem: By default, disc is modeled on the log-scale to ensure that the actual discrimination estimates are positive (see Section 5.1 for a discussion of that issue).
+
+## Results
+
+
 
 # Modeling remote sensing outcomes as a result of governance processes
 
-- make sure that these are (mostly) mututally exclusive, which is an assumption I used and monique shares: "I assume maize wheat and bean fields dont look bare in a satelite image". We asked Nathaniel
+- make sure that these are (mostly) mututally exclusive, which is an assumption I used and monique shares: "I assume maize wheat and bean fields dont look bare in a satelite image". We asked Nathaniel. Maybe we need to look into the polygon files
 
 - add to dag an edge from rainfall to governance: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing."
 
