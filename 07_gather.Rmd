@@ -162,25 +162,29 @@ $$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j})$$
 
 where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response $k$ on item $i$. Note that $\pi_{1, i, j} + \pi_{2, i, j}+ \pi_{3, i, j} = 1$ for all $i,j$.
 
-Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes^[In the IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].]. The probabilities to give responses $k = 1,2,3$ can hence be written as
+Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes.^[In the IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ controls the magnitude of the effect that any predictors have on the response distribution for that item. This leads to
 
+$$
+P(Y_{i,j} \leq k) = \text{logit}^{-1} \left((\alpha + a_i) ( \beta_k - \eta_{i,j} ) \right), 
+$$
+
+where $\alpha$ is an intercept parameter for item discrimination, such that $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (or, difficulty, see below) is introduced.^[The discrimination parameter can be understood as an effect modifier, or as an item-specific variance parameter, see @burkner_ordinal_2019. Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.]
+
+The probabilities to give responses $k = 1,2,3$ can hence be written as
 
 \begin{align*}
-\pi_{1, i, j} & = P(Y_{i,j} = 1) = \text{logit}^{-1}(\beta_1 - \eta_{i,j}), \\
-\pi_{2, i, j} & = P(Y_{i,j} = 2) = \text{logit}^{-1}(\beta_2 - \eta_{i,j}) - \text{logit}^{-1}(\beta_1 - \eta_{i,j}), \\
+\pi_{1, i, j} & = P(Y_{i,j} = 1) = \text{logit}^{-1}\left((\alpha + a_i) ( \beta_1 - \eta_{i,j} ) \right), \\
+\pi_{2, i, j} & = P(Y_{i,j} = 2) = \text{logit}^{-1}\left((\alpha + a_i) ( \beta_2 - \eta_{i,j} ) \right) - \pi_{1, i, j}, \\
 \pi_{3, i, j} & = P(Y_{i,j} = 3) = 1 - \pi_{2, i, j} - \pi_{1, i, j},
 \end{align*}
 
-with $\beta_1$, $\beta_2$ being the cutpoint parameters. The parameter $\eta_{i,j}$ is of substantive interest: It is a non-linear combination of village- and item-level characteristics, where higher values of $\eta_{i,j}$ mean a higher expected response category.
-
-Most importantly, $\eta_{i,j}$ shall be affected by $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$. These parameters describe the quality of governance processes and of outcomes in village $j$, respectively. Note that here we are ultimately interested in their correlation parameter $\rho_{\text{Gov},\text{Out}}$. Applying the IRT framework, we will model $\eta_{i,j}$ also as a function of easiness of the item, $b_i$. Further, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter $a_i$ for the discriminatory power of an item is introduced. The discrimination parameter can be understood as an effect modifier: The stronger discrimination of an item, the more differences in $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$ between villages will lead to differences in observed item responses between villages.^[Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] Accordingly, we write
+Most importantly, $\eta_{i,j}$ shall be affected by $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$. These parameters describe the quality of governance processes and of outcomes in village $j$, respectively. Note that here we are ultimately interested in their correlation parameter $\rho_{\text{Gov},\text{Out}}$. In line with the IRT framework, we will model $\eta_{i,j}$ also as a function of easiness of the item, $b_i$. Accordingly, we write
 
 
-$$\eta_{i,j} = (\alpha + a_i) \left(b_i + \theta_j^{\text{Gov}} \text{Gov}_i + \theta_j^{\text{Out}} \text{Out}_i \right),$$
-where $\alpha$ is an intercept parameter for item discrimination, such that $a_i$ represent deviations from mean discrimination for each item. $\text{Gov}_i$ is an indicator that is 1 if item $i$ is of type *Governance* and 0 otherwise. $\text{Out}_i$ is an indicator that is 1 if item $i$ is of type *Outcome* and 0 otherwise.
+$$\eta_{i,j} = b_i + \theta_j^{\text{Gov}} \text{Gov}_i + \theta_j^{\text{Out}} \text{Out}_i ,$$
+where $\text{Gov}_i$ is an indicator that is 1 if item $i$ is of type *Governance* and 0 otherwise. $\text{Out}_i$ is an indicator that is 1 if item $i$ is of type *Outcome* and 0 otherwise.
 
-
-Finally, working in a Bayesian framework with varying parameters, we assume the following distributions for item- and village-level parameters:
+Finally, working in a Bayesian framework with varying parameters, we assume that item- and village-level parameters follow the distributions
 
 \begin{align*}
 a_i & \sim N(0, \sigma^2_a), \\
@@ -212,7 +216,27 @@ By choosing adaptive priors that induce partial pooling, above IRT model becomes
 
 - Note that the approach allows us to even keep items with no variability in the sample.
 
-- In results dann $a_i$ zeigen: das was aus dem Modell kommt also umdrehen, so dass hohere werte = mehr discrimination. Außerdem: By default, disc is modeled on the log-scale to ensure that the actual discrimination estimates are positive (see Section 5.1 for a discussion of that issue).
+- In results dann $a_i$ zeigen: das was aus dem Modell kommt also umdrehen, so dass hohere werte = mehr discrimination. Außerdem: By default, disc is modeled on the log-scale to ensure that the actual discrimination estimates are positive (see Section 5.1 for a discussion of that issue). 
+
+Ordinal-Paper sagt: 
+
+As discussed in Section 2.4.2, by default we assume
+411 the variance of the latent variable to be the same throughout the model, an assumption
+412 unavoidable in linear regression.4 Within the framework of ordinal models in brms, we can
+413 relax this assumption. For the stem cell data, this implies asking whether variances of the
+414 stem cell funding opinion differ across categories of religious belief. Conceptually, unequal variances are incorporated in the model by specifying an
+additional regression formula for the variance component of the latent variable Y˜ . In brms,
+the parameter related to latent variances is called disc (short for “discrimination”), following
+conventions in item response theory. Importantly, disc is not the variance itself, but the
+inverse of the standard deviation, s. That is, s = 1/disc. Further, because disc must be
+strictly positive, it is by default modeled on the log-scale.
+
+back-transfotmation goes like this:
+
+The estimated parameters of the unequal variance model are summarized in Table
+439 4. As discussed above, disc is the inverse of the standard deviation of Y˜ , and by default
+440 modeled through a log-link, that is we predict log(disc) instead of disc. To also display
+441 the standard deviations s, we transformed log(disc) to s with s = 1/ exp(log(disc)).5
 
 ## Results
 

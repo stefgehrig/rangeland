@@ -117,6 +117,8 @@ fit_ord_cum_2pl <- brm(
 saveRDS(fit_ord_cum_2pl, file = "outputs/fit_ord_cum_2pl.rds")
 fit_ord_cum_2pl <- readRDS("outputs/fit_ord_cum_2pl.rds")
 
+cat(stancode(fit_ord_cum_2pl), file = "outputs/fit_ord_cum_2pl_Stancode.txt")
+
 # all evaluations finite? (could not be achieved with adjacent categories and continuation ratio models)
 # table(is.finite(log_lik(fit_ord_cum_2pl)))
 
