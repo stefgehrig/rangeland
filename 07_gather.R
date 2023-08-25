@@ -1,9 +1,12 @@
 library(tidyverse)
 library(glue)
 library(brms)
+library(tidybayes)
+library(bayesplot)
 library(extrafont)
 library(patchwork)
 library(ggrepel)
+library(ggtext)
 library(ggcorrplot)
 library(ggiraphExtra)
 library(RColorBrewer)
@@ -255,29 +258,28 @@ fit_irt_2par <- brm(
   data = df_items,
   family = family,
   prior = priors,
-  control   = list(adapt_delta = 0.99, max_treedepth = 12),
-  warmup    = 1.5e3,
-  iter      = 4.5e3,
+  control   = list(adapt_delta = 0.999, max_treedepth = 15),
+  warmup    = 2e3,
+  iter      = 6e3,
   thin      = 1,
-  chains    = 2,
-  cores     = 2,
-  seed      = 123,
+  chains    = 5,
+  cores     = 5,
+  seed      = 1234,
   backend   = "cmdstanr"
-  
 )
 
 summary(fit_irt_2par)
 prior_summary(fit_irt_2par)
-
 # export model results
 saveRDS(fit_irt_2par, file = "outputs/fit_irt_2par.rds")
-cat(stancode(fit_ord_cum_2pl), file = "outputs/fit_irt_2par_stancode.txt")
+cat(stancode(fit_irt_2par), file = "outputs/fit_irt_2par_stancode.txt")
 sink("outputs/fit_irt_2par_modsummary.txt")
-summary(fit_ord_cum_2pl)
+summary(fit_irt_2par)
 sink()
 sink("outputs/fit_irt_2par_priorsummary.txt")
-prior_summary(fit_ord_cum_2pl)
+prior_summary(fit_irt_2par)
 sink()
+fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
 
 # understand parametrization of discrimination by manually creating predictions
 # ... auto predict
@@ -307,15 +309,17 @@ A == B # OK!
 
 # trace plots inspection
 mcmc_trace(fit_irt_2par, regex_pars = "disc_Intercept")
+mcmc_trace(fit_irt_2par, regex_pars = "b_")
 
 # plotting ppd
 yrep_char <- posterior_predict(fit_irt_2par)
 ppc1 <- ppc_bars_grouped(
   y = as.numeric(as.character(df_items$score)),
   yrep = yrep_char,
-  group = df_items$tier3)+ 
+  group = df_items$tier3,
+  facet_args = list(ncol =4))+ 
   theme_classic(12) +
-  theme(strip.text = element_text(size = 7, face = "bold"),
+  theme(strip.text = element_text(size = 8.5),
         text = element_text(family = fontfam),
         strip.background = element_blank()) + 
   scale_y_continuous(breaks = c(0,5,10), limits = c(0,13))+ 
@@ -326,55 +330,58 @@ ppc2 <- ppc_bars_grouped(
   yrep = yrep_char,
   group = df_items$village)  +
   theme_classic(12) +
-  theme(strip.text = element_text(size = 7, face = "bold"),
+  theme(strip.text = element_text(size = 8.5),
         text = element_text(family = fontfam),
         strip.background = element_blank()) + 
   scale_y_continuous(breaks = seq(0,20,5), limits = c(0,23))+ 
   scale_x_continuous(breaks = c(1,2,3))
 
 png("outputs/ppcs_fit_irt_2par.png", width = 4500, height = 6000, res = 380)
-ppc1/ppc2 + plot_layout(heights = c(1,3/4)) +
+ppc1/ppc2 + plot_layout(heights = c(1,2/3)) +
   plot_annotation(tag_levels = "a")
 dev.off()
 
 # figure parameter estimates
 p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Governance"))) +
   theme_classic(12) +
-  labs(subtitle = "theta^Gov_j") +
-  theme(text = element_text(family = fontfam)) + 
+  labs(subtitle = "*&#920;<sub>j</sub><sup>Gov</sup>*") +
+  theme(text = element_text(family = fontfam),
+        plot.subtitle = element_markdown()) + 
   scale_y_discrete(
-    labels = function(x) str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeGovernance\\]")
+    labels = function(x) 
+      str_replace_all(str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeGovernance\\]"), "\\.", " ")
   )
 
 p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Outcome"))) +
   theme_classic(12) +
-  labs(subtitle = "theta^Out_j") +
+  labs(subtitle = "*&#920;<sub>j</sub><sup>Out</sup>*") +
   theme(text = element_text(family = fontfam),
-        plot.subtitle = element_text(face = "bold")) + 
+        plot.subtitle = element_markdown())  + 
   scale_y_discrete(
-    labels = function(x) str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeOutcome\\]")
+    labels = function(x) 
+      str_replace_all(str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeOutcome\\]"), "\\.", " ")
   )
 
 p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[")+
-  labs(subtitle = "b_i") +
+  labs(subtitle = "*b<sub>i</sub>*") +
   theme_classic(12) +
   theme(text = element_text(family = fontfam),
-        plot.subtitle = element_text(face = "bold")) + 
+        plot.subtitle = element_markdown()) + 
   scale_y_discrete(
-    labels = function(x) str_remove_all(str_remove_all(x, "r_tier3\\["), ",Intercept\\]")
+    labels = function(x) str_replace_all(str_remove_all(str_remove_all(x, "r_tier3\\["), ",Intercept\\]"), "\\.(?=[A-Za-z])", " ")
   )
 
 p_re3 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3__disc")+
-  labs(subtitle = "a_i") +
+  labs(subtitle = "*a<sub>i</sub>*") +
   theme_classic(12) +
   theme(text = element_text(family = fontfam),
-        plot.subtitle = element_text(face = "bold")) + 
+        plot.subtitle = element_markdown()) + 
   scale_y_discrete(
-    labels = function(x) str_remove_all(str_remove_all(x, "r_tier3__disc\\["), ",Intercept\\]")
+    labels = function(x) str_replace_all(str_remove_all(str_remove_all(x, "r_tier3__disc\\["), ",Intercept\\]"), "\\.(?=[A-Za-z])", " ")
   )
 
 png("outputs/param_posts_fit_irt_2par.png", width = 4000, height = 5000, res = 420)
-(p_re1a + p_re1b) / p_re2 / p_re3 & theme(plot.subtitle = element_text(face = "bold"))
+(p_re1a + p_re1b) / p_re2 / p_re3
 dev.off()
 
 # correlation plots
@@ -383,10 +390,11 @@ p_cor1 <- mcmc_areas_ridges(fit_irt_2par, pars = vars(contains("cor_village")),
   geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
   theme(axis.text.y = element_blank(),
         text = element_text(family = fontfam)) + 
-  theme_classic(12) +
+  theme_classic(14) +
   theme(text = element_text(family = fontfam),
-        plot.subtitle = element_text(face = "bold")) +
-  labs(subtitle = "rho_(theta^Gov, theta^Out)") + 
+        plot.subtitle = element_markdown()) +
+  labs(subtitle = "*&#961;<sub>Gov, Out</sub>*",
+       y = "Posterior density") + 
   scale_y_discrete(
     labels = "",
     expand = c(0,0)
@@ -397,24 +405,49 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
   pivot_wider(values_from = .value, names_from = itemtype) %>% 
   ggplot(aes(x = itemtypeGovernance, y = itemtypeOutcome, 
              color = village, group = village, fill = village)) +
-  geom_density_2d(lwd = 0.75, contour_var = "ndensity", breaks = c(0.9)) +
+  geom_density_2d(lwd = 0.75, contour_var = "ndensity", breaks = c(0.1)) +
   # geom_point(data = gather_draws(fit_ord_cum_2pl, r_village[village,dimension], ndraws = 5e2, seed = 123) %>% 
   #              pivot_wider(names_from = dimension, values_from = .value), alpha = 1/4) +
   theme_classic(14) +
-  theme(text = element_text(family = fontfam)) +
-  scale_color_manual(values = palcolors) + 
+  theme(text = element_text(family = fontfam),
+        axis.title.x  = element_markdown(),
+        axis.title.y  = element_markdown()) +
+  scale_color_manual(values = palcolors,
+                     labels = function(x) 
+                       str_replace_all(x, "\\.", " ")) + 
   coord_cartesian(xlim = c(-3,3), ylim = c(-3,3)) + 
-  labs(x = "Quality of governance processes",
-       y = "Quality of governance outcomes",
+  labs(x = "Quality of governance processes (*&#920;<sup>Gov</sup>*)",
+       y = "Quality of governance outcomes (*&#920;<sup>Out</sup>*)",
        color = "Village")
 
-png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 350)
+png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 360)
 p_cor1 + p_cor2 +
   plot_annotation(tag_levels = "a")
 dev.off()
 
-     
-
-
+# table with other parameters posteriors
+other_pars <- get_variables(fit_irt_2par)[grepl("b_|sd_|cor_tier3",  get_variables(fit_irt_2par))]
+pars_tab <- map_dfr(other_pars, function(x){
+  gather_draws(fit_irt_2par, !!as.symbol(x)) %>% 
+    summarise(mean = mean(.value),
+              sd = sd(.value),
+              q05 = quantile(.value, 0.05),
+              q50 = median(.value),
+              q95 = quantile(.value, 0.95))
+})  %>% 
+  mutate(varlabel = 
+           case_when(
+             .variable == "b_Intercept[1]"                       ~ "$\\beta_1$",
+             .variable == "b_Intercept[2]"                       ~ "$\\beta_2$",
+             .variable == "b_disc_Intercept"                     ~ "$\\alpha$",
+             .variable == "sd_tier3__Intercept"                  ~ "$\\sigma_b$",
+             .variable == "sd_tier3__disc_Intercept"             ~ "$\\sigma_a$",
+             .variable == "sd_village__itemtypeGovernance"       ~ "$\\sigma_\\text{Gov}$",
+             .variable == "sd_village__itemtypeOutcome"          ~ "$\\sigma_\\text{Out}$",
+             .variable == "cor_tier3__Intercept__disc_Intercept" ~ "$\\rho_{a, b}$"
+             ), .before = ".variable"
+           ) %>% 
+  mutate(across(where(is.numeric), ~style_number(.x))) %>% 
+  select(-.variable)
   
-
+saveRDS(pars_tab, file = "outputs/pars_tab.rds")

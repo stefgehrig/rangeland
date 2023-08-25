@@ -77,9 +77,12 @@ library(dagitty)
 library(ggdag)
 knitr::opts_chunk$set(echo = FALSE)
 
-gat_tab1 <- readRDS("outputs/gat_tab1.rds")
-gat_tab2 <- readRDS("outputs/gat_tab2.rds")
+gat_tab1     <- readRDS("outputs/gat_tab1.rds")
+gat_tab2     <- readRDS("outputs/gat_tab2.rds")
+pars_tab     <- readRDS("outputs/pars_tab.rds")
+fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
 ```
+
 
 \textcolor{red}{schau nochmal in den NTRI (!) report, das Word doc. Da sind viele wertvolle richtungen zu denken drin mit dem ganzen substantivem wissen über den Ort und so und den Fragen die sie analysieren.}
 
@@ -162,13 +165,13 @@ $$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j})$$
 
 where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response $k$ on item $i$. Note that $\pi_{1, i, j} + \pi_{2, i, j}+ \pi_{3, i, j} = 1$ for all $i,j$.
 
-Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes.^[In IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ controls the magnitude of the effect that any predictors have on the response distribution for that item. This leads to
+Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes.^[In IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ controls the magnitude of the effect that predictors have on the response distribution for that item. This leads to
 
 $$
 P(Y_{i,j} \leq k) = \text{logit}^{-1} \left(\text{exp}(\alpha + a_i) ( \beta_k - \eta_{i,j} ) \right), 
 $$
 
-where $\alpha$ is an intercept parameter for item discrimination, such that $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (or, difficulty, see below) is introduced.^[The discrimination parameter can be understood as an effect modifier. Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] By exponentiating $(\alpha + a_i)$, discrimination is always positive. Put differently, discrimination is modeled on the log-scale, which is the conventional implementation in `brms` [see @burkner_bayesian_2020].
+where $\alpha$ is an intercept parameter for item discrimination, such that the $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (see below) is introduced.^[The discrimination parameter can be understood as an effect modifier. Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] By exponentiating $(\alpha + a_i)$, discrimination is always positive. Put differently, discrimination is modeled on the log-scale, which is the conventional implementation in `brms` [see @burkner_bayesian_2020].
 
 The probabilities to give responses $k = 1,2,3$ can hence be written as
 
@@ -177,6 +180,8 @@ The probabilities to give responses $k = 1,2,3$ can hence be written as
 \pi_{2, i, j} & = P(Y_{i,j} = 2) = \text{logit}^{-1}\left(\text{exp}(\alpha + a_i) ( \beta_2 - \eta_{i,j} ) \right) - \pi_{1, i, j}, \\
 \pi_{3, i, j} & = P(Y_{i,j} = 3) = 1 - \pi_{2, i, j} - \pi_{1, i, j},
 \end{align*}
+
+with $\beta_1 < \beta_2$. No $\beta_3$ is needed, since $\pi_{3, i, j}$ can be calculated from the response probabilities of the other two categories.
 
 Most importantly, $\eta_{i,j}$ shall be affected by $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$. These parameters describe the quality of governance processes and of outcomes in village $j$, respectively. Note that here we are ultimately interested in their correlation parameter $\rho_{\text{Gov},\text{Out}}$. In line with the IRT framework, we will model $\eta_{i,j}$ also as a function of easiness of the item, $b_i$. Accordingly, we write
 
@@ -224,29 +229,47 @@ In summary, our priors are chosen to have some regularizing influence on the par
 
 ## Results
 
-Model convergence was acceptable -- judged by inspecting trace plots and R hat statistics -- and posterior predictive checks in Figure \ref{fig:ppds} indicate a good model fit to the data. It is also visible that the model-based distributions tend to be less extreme, which is partially a consequence of shrinkage, partially of the fact that a logit link function will never strictly assign a probability zero to an outcome.
+We obtained `r summary(fit_irt_2par)$chains * (summary(fit_irt_2par)$iter - summary(fit_irt_2par)$warmup)` posterior draws sampled from `r summary(fit_irt_2par)$chains` chains, after `r summary(fit_irt_2par)$warmup` warm-up iterations per chain. Model convergence was acceptable -- judged by inspecting trace plots and R hat statistics -- and posterior predictive checks in Figure \ref{fig:ppds} indicate a good model fit to the data. It is also visible that the model-based distributions in general tend to be a bit less extreme than their empirical counterparts, which is partially a consequence of shrinkage, partially due to the logit link function, which will never strictly assign zero probability to an outcome.
 
-```{r ppds, fig.align='center', fig.cap='Posterior predictions vs. observed response distributions by item (a) and by village (b).', out.width="100%"}
+```{r ppds, fig.align='center', fig.cap='Posterior predictions vs. observed response distributions (a) by item and (b) by village. In light blue empirical responses, in dark blue posterior predictions (median and 90\\% credible interval).', out.width="100%"}
 include_graphics("outputs/ppcs_fit_irt_2par.png")
 ```
 
-Figure \ref{fig:riestims} shows posteriors for all item- and village-level characteristics (posterior median and equal-tailed 50\% and 90\% credible intervals).
+Figure \ref{fig:riestims} shows posteriors for all item- and village-level characteristics.
 
-```{r riestims, fig.align='center', fig.cap='Village and item parameter posterior distributions.', out.width="100%"}
+```{r riestims, fig.align='center', fig.cap='Village and item parameter posterior distributions (posterior median and equal-tailed 50\\% and 90\\% credible intervals).', out.width="100%"}
 include_graphics("outputs/param_posts_fit_irt_2par.png")
 ```
 
 Of primary interest is the correlation of the two latent village characteristics governance process quality and governance outcome quality. Figure \ref{fig:cor} shows the respective posterior distributions.
 
-```{r cor, fig.align='center', fig.cap='Correlation among latent village characteristics as estimated from the item response model: (a) posterior distribution of the correlation parameter with equal-tailed 90\\% credible interval; (b) Bivariate 90\\% posteriors for each village visualized as contours in the latent characteristic space.', out.width="100%"}
+```{r cor, fig.align='center', fig.cap='Correlation among latent village characteristics as estimated from the item response model: (a) Posterior distribution of the correlation parameter with equal-tailed 90\\% credible interval; (b) Bivariate 90\\% posteriors for each village visualized as contours in the latent characteristic space.', out.width="100%"}
 include_graphics("outputs/cor_itm_fit_irt_2par.png")
+```
+
+Posterior distributions for all remaining model parameters not yet shown in above figures are reported in Table \ref{tab:postpar}.
+
+```{r postpar}
+pars_tab %>% 
+  kable(
+    escape = FALSE,
+     caption = "Summary of posterior distributions for additional model parameters.",
+    booktabs = TRUE,
+    linesep = "",
+    col.names =
+      c("Parameter", "Mean", "SD", "P05", "Median", "P95"),
+    align = c("l", rep("r", ncol(pars_tab) - 1))
+  )%>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  footnote(general = "'P' refers to percentile.")
+  
 ```
 
 \textcolor{red}{to-do}
 
 - summary / interpretation sentence; also say that poerstiots can be used later. and respect uncertainty compared to averaging.
 
-- no adjustemnt --> interpretation
+- no adjustemnt --> interpretation. First DAG, simply (note: confounding of governance quality and selection of program villages coudl be two independent sources of bias? how to represent in dag?)
 
 - high discrimination = steep slope between latent quality and highest response category probability (= LOWER sd of item? that's what is suggested by beurkner ordinal paper); wie related das zu variability in items in raw data und warum?
 

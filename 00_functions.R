@@ -261,3 +261,6 @@ ggRadar2 <- function(data, mapping = NULL, rescale = TRUE, legend.position = "to
   p
 }
 
+style_number <- function(x, dig = 3){
+  format(janitor::round_half_up(x, dig), nsmall = dig)
+}
