@@ -344,7 +344,7 @@ dev.off()
 # figure parameter estimates
 p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Governance"))) +
   theme_classic(12) +
-  labs(subtitle = "*&#920;<sub>j</sub><sup>Gov</sup>*") +
+  labs(subtitle = "*&#952;<sub>j</sub><sup>Gov</sup>*") +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown()) + 
   scale_y_discrete(
@@ -354,7 +354,7 @@ p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & cont
 
 p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Outcome"))) +
   theme_classic(12) +
-  labs(subtitle = "*&#920;<sub>j</sub><sup>Out</sup>*") +
+  labs(subtitle = "*&#952;<sub>j</sub><sup>Out</sup>*") +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown())  + 
   scale_y_discrete(
@@ -416,8 +416,8 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
                      labels = function(x) 
                        str_replace_all(x, "\\.", " ")) + 
   coord_cartesian(xlim = c(-3,3), ylim = c(-3,3)) + 
-  labs(x = "Quality of governance processes (*&#920;<sup>Gov</sup>*)",
-       y = "Quality of governance outcomes (*&#920;<sup>Out</sup>*)",
+  labs(x = "Quality of governance processes (*&#952;<sup>Gov</sup>*)",
+       y = "Quality of governance outcomes (*&#952;<sup>Out</sup>*)",
        color = "Village")
 
 png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 360)

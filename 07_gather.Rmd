@@ -181,7 +181,7 @@ The probabilities to give responses $k = 1,2,3$ can hence be written as
 \pi_{3, i, j} & = P(Y_{i,j} = 3) = 1 - \pi_{2, i, j} - \pi_{1, i, j},
 \end{align*}
 
-with $\beta_1 < \beta_2$. No $\beta_3$ is needed, since $\pi_{3, i, j}$ can be calculated from the response probabilities of the other two categories.
+with $\beta_1 < \beta_2$. No parameter $\beta_3$ is needed, since $\pi_{3, i, j}$ is uniquely defined by the response probabilities of the other two categories.
 
 Most importantly, $\eta_{i,j}$ shall be affected by $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$. These parameters describe the quality of governance processes and of outcomes in village $j$, respectively. Note that here we are ultimately interested in their correlation parameter $\rho_{\text{Gov},\text{Out}}$. In line with the IRT framework, we will model $\eta_{i,j}$ also as a function of easiness of the item, $b_i$. Accordingly, we write
 
