@@ -253,7 +253,7 @@ formula <- bf(
   score ~ 1 + (1 |i| tier3) + (0 + itemtype | village),
   disc  ~ 1 + (1 |i| tier3))
 
-fit_irt_2par <- brm(
+fit_irt_2par <- brm( # RTOOLS! warum is 4.3 nicht genug?
   formula = formula,
   data = df_items,
   family = family,
@@ -342,7 +342,8 @@ ppc1/ppc2 + plot_layout(heights = c(1,2/3)) +
 dev.off()
 
 # figure parameter estimates
-p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Governance"))) +
+p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Governance")),
+                         prob = 0.5, prob_outer = 0.9, point_est = "median") +
   theme_classic(12) +
   labs(subtitle = "*&#952;<sub>j</sub><sup>Gov</sup>*") +
   theme(text = element_text(family = fontfam),
@@ -352,7 +353,8 @@ p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & cont
       str_replace_all(str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeGovernance\\]"), "\\.", " ")
   )
 
-p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Outcome"))) +
+p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Outcome")),
+                         prob = 0.5, prob_outer = 0.9, point_est = "median") +
   theme_classic(12) +
   labs(subtitle = "*&#952;<sub>j</sub><sup>Out</sup>*") +
   theme(text = element_text(family = fontfam),
@@ -362,7 +364,8 @@ p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & cont
       str_replace_all(str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeOutcome\\]"), "\\.", " ")
   )
 
-p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[")+
+p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[",
+                        prob = 0.5, prob_outer = 0.9, point_est = "median")+
   labs(subtitle = "*b<sub>i</sub>*") +
   theme_classic(12) +
   theme(text = element_text(family = fontfam),
@@ -371,7 +374,8 @@ p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[")+
     labels = function(x) str_replace_all(str_remove_all(str_remove_all(x, "r_tier3\\["), ",Intercept\\]"), "\\.(?=[A-Za-z])", " ")
   )
 
-p_re3 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3__disc")+
+p_re3 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3__disc",
+                        prob = 0.5, prob_outer = 0.9, point_est = "median")+
   labs(subtitle = "*a<sub>i</sub>*") +
   theme_classic(12) +
   theme(text = element_text(family = fontfam),
@@ -405,9 +409,13 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
   pivot_wider(values_from = .value, names_from = itemtype) %>% 
   ggplot(aes(x = itemtypeGovernance, y = itemtypeOutcome, 
              color = village, group = village, fill = village)) +
-  geom_density_2d(lwd = 0.75, contour_var = "ndensity", breaks = c(0.1)) +
-  # geom_point(data = gather_draws(fit_ord_cum_2pl, r_village[village,dimension], ndraws = 5e2, seed = 123) %>% 
-  #              pivot_wider(names_from = dimension, values_from = .value), alpha = 1/4) +
+  geom_density_2d(lwd = 1, contour_var = "ndensity", breaks = c(0.1)) +
+  #stat_ellipse(level = 0.9) +
+  # geom_point(data = gather_draws(fit_irt_2par, r_village[village,dimension], ndraws = 50, seed = 123) %>% 
+  #               pivot_wider(names_from = dimension, values_from = .value), 
+  #            size = 1,
+  #            alpha = 3/4,
+  #            show.legend = FALSE) +
   theme_classic(14) +
   theme(text = element_text(family = fontfam),
         axis.title.x  = element_markdown(),
@@ -451,3 +459,38 @@ pars_tab <- map_dfr(other_pars, function(x){
   select(-.variable)
   
 saveRDS(pars_tab, file = "outputs/pars_tab.rds")
+
+################################
+#### remote sensing outcome ####
+################################
+library(ggdist)
+library(posterior)
+library(distributional)
+
+# check normality: ok!
+gather_rvars(
+  fit_irt_2par, r_village[village, itemtype]
+) %>% 
+  filter(itemtype == "itemtypeGovernance") %>% 
+  mutate(mean = mean(.value),
+         sd = sd(.value)) %>% 
+  ggplot() + 
+  stat_halfeye(aes(xdist = .value)) +
+  stat_slab(aes(xdist = dist_normal(mean, sd)), fill = NA, 
+            lwd = 1/2,
+            color = "blue") + 
+  theme_bw(14) +
+  facet_wrap(~ village, scales = "free")
+#... this allows simplified use in brms measurement error model
+
+# extract posterior mean and SD per village
+df_theta_gov <- gather_rvars(
+  fit_irt_2par, r_village[village, itemtype]
+) %>% 
+  filter(itemtype == "itemtypeGovernance") %>% 
+  transmute(village = village, 
+            mean = mean(.value),
+            sd = sd(.value))
+
+  
+
