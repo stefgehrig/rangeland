@@ -143,7 +143,7 @@ include_graphics("outputs/gat_boxes.png")
 
 # Item response modeling: Relation between self-reported governance processes and outcomes
 
-This whole section is more or less completely drafted and open to discussion.
+This whole section is more or less completely drafted and open to discussion (e.g., what to add/leave out).
 
 ## Motivation
 
@@ -253,7 +253,7 @@ Posterior distributions for all remaining model parameters not yet shown in abov
 pars_tab %>% 
   kable(
     escape = FALSE,
-     caption = "Summary of posterior distributions for additional model parameters.",
+     caption = "Summary of posterior distributions for further model parameters.",
     booktabs = TRUE,
     linesep = "",
     col.names =
@@ -269,7 +269,7 @@ It is apparent from the rather wide quantile-based intervals that uncertainty ab
 
 The IRT nature of the model allows to extract some more insights. Figure \ref{fig:riestims} shows that items differ widely in their estimates for easiness $b_i$ (i.e., their tendency to yield high scores), which is in line with the between-item variation in response distributions already observed in the raw data (Table \ref{tab:dfsum}). We can also interpret the posterior distributions for the item-specific discrimination parameter $a_i$. If it is shifted to the right (as, e.g., for the item *GS7.3: External sanctions* in Figure \ref{fig:riestims}), then for this third-tier variable there is a steeper-than-average relationship between the underlying latent trait $\theta_j^{\text{Gov}}$ and the tendency to obtain high response scores in that item. This is equivalent with saying that the item is better able to discriminate between villages of very high and very low latent governance quality.^[Another way to look at it is that an item with higher values of $a_i$ has a lower latent standard deviation [@burkner_ordinal_2019]. The intuition is that an item that discriminates better produces less spread out response scores for one given value of the latent variable [see also @liddell_analyzing_2018, p. 331].]
 
-The posteriors of the model parameters allow to construct so-called "item characteristic curves" (ICC) to better understand the relationship between the latent village traits and response probabilities for an item [@linden_handbook_1997]. The ICC results from the interplay of the item's values for $a_i$ and $b_i$. As a relevant example, Figure \ref{fig:icc} shows how the estimated IRT model relates the latent village trait $\theta_j^{\text{Out}}$, i.e., the unobserved quality of governance outcomes, to the observed ordinal response category for the item *O1.1: Compliance*.
+The posteriors of the model parameters allow to construct so-called "item characteristic curves" (ICC) to better understand the relationship between the latent village traits and response probabilities for an item [@linden_handbook_1997]. The ICC results from the interplay of the item's values for $a_i$ and $b_i$. As a relevant example, Figure \ref{fig:icc} shows how the estimated IRT model relates the latent village trait $\theta_j^{\text{Out}}$, i.e., the unobserved quality of governance outcomes, to the propensity to choose an observable ordinal response category for the item *O1.1: Compliance*.
 
 ```{r icc, fig.align='center', fig.cap='Item characteristic curve for one item, as estimated in the ITR model. Expected probabilities for the three ordinal response options are shown (posterior median and 90\\% equal-tailed credible interval) in relation to the underlying latent village-level trait. Upper panel shows the posterior densities of the latent trait for all 12 study villages (same color coding as previously).', out.width="75%"}
 include_graphics("outputs/icc_fit_irt_2par.png")

@@ -396,7 +396,7 @@ p_cor1 <- mcmc_areas_ridges(fit_irt_2par, pars = vars(contains("cor_village")),
   geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
   theme(text = element_text(family = fontfam),
         axis.title.x = element_markdown()) +
-  labs(x = "*&#961;<sub>Gov, Out</sub>*",
+  labs(x = "Correlation of governance processes and<br>governance outcomes (*&#961;<sub>Gov, Out</sub>*)",
        y = "Posterior density")+ 
   scale_y_discrete(
     labels = "",
@@ -634,7 +634,7 @@ p_icc1 <- df_icclines_smry %>%
   scale_color_manual(values = gradcolors) + 
   scale_fill_manual(values = gradcolors) + 
   labs(y = paste0("Expected response probability for item<br>", "*", icc_item, "*"),
-       x = "*&#952;<sub>j</sub><sup>Out</sup>*",
+       x = "Quality of governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
        fill = "Response\ncategory")
 
 # p_icc1 <- df_icclines %>% 
