@@ -8,6 +8,7 @@ library(patchwork)
 library(ggrepel)
 library(ggtext)
 library(ggcorrplot)
+library(ggrain)
 library(geomtextpath)
 library(ggiraphExtra)
 library(RColorBrewer)
@@ -159,7 +160,7 @@ spiderplots <- map(split(input_spec, seq(nrow(input_spec))),
     map_df(~.x) %>% 
     ggRadar2(aes(facet = tier1),
             rescale = FALSE,
-            alpha = 0.1,
+            alpha = 0.2,
             size = 3/4,
             clip = "off") +
     theme_minimal(14) +
@@ -188,52 +189,165 @@ wrap_plots(spiderplots,
            nrow = 6)
 dev.off()
 
-# boxplots
-input_spec <- 
-  list(
-    c("Bare ground area Pre (ha)",
-      "Bare ground area Post (ha)"),
-    c("Cropland area Pre (ha)",
-      "Cropland area Post (ha)"),
-    c("Mean annual rainfall (mm)",
-      "Economic inequality (SD of PC1 from household assets)")
-  )
+# # boxplots
+# input_spec <- 
+#   list(
+#     c("Bare ground area Pre (ha)",
+#       "Bare ground area Post (ha)"),
+#     c("Cropland area Pre (ha)",
+#       "Cropland area Post (ha)"),
+#     c("Mean annual rainfall (mm)",
+#       "Economic inequality (SD of PC1 from household assets)")
+#   )
+# 
+# 
+# boxes_list <- map(input_spec, function(x){
+#   
+#   set.seed(12)
+#   gat_boxes <- df_others %>% 
+#     filter(var %in% x) %>% 
+#     mutate(x = runif(nrow(.), -0.2, 0.2)) %>% 
+#     ggplot() + 
+#     geom_boxplot(aes(y = val, x = x), fill = "grey80", 
+#                  size = 1/8,
+#                  alpha = 0.25, outlier.colour = NA) + 
+#     geom_point(aes(x = x, y = val)) + 
+#     ggrepel::geom_text_repel(aes(x = x, y = val, label = village),
+#                              size = 3, family = fontfam, vjust = 1,
+#                              segment.color = 'grey40',
+#                              max.overlaps = 2e1) + 
+#     facet_wrap(~ var, 
+#                scales = if(grepl("area", x[1])) "fixed" else "free", 
+#                ncol = 2) + 
+#     theme_bw(14) +
+#     theme(
+#       text = element_text(family = fontfam),
+#       strip.background = element_blank(),
+#       axis.text.x = element_blank(),
+#       panel.grid.major.x = element_blank(),
+#       panel.grid.minor.x = element_blank(),
+#       axis.ticks.x = element_blank()
+#     ) +
+#     labs(x = "",
+#          y = "")
+# })
+# 
+# png("outputs/gat_boxes.png", width = 2750, height = 3250, res = 290)
+# wrap_plots(boxes_list,
+#            ncol = 1)
+# dev.off()
 
-
-boxes_list<- map(input_spec, function(x){
+# raincloud plots
+df_landuse_area <- df_landuse_area %>% 
+  mutate(period = str_to_title(period)) %>% 
+  mutate(period = factor(period, ordered = TRUE, levels = c("Pre", "Post")))
   
-  set.seed(12)
-  gat_boxes <- df_others %>% 
-    filter(var %in% x) %>% 
-    mutate(x = runif(nrow(.), -0.2, 0.2)) %>% 
-    ggplot() + 
-    geom_boxplot(aes(y = val, x = x), fill = "grey80", 
-                 size = 1/8,
-                 alpha = 0.25, outlier.colour = NA) + 
-    geom_point(aes(x = x, y = val)) + 
-    ggrepel::geom_text_repel(aes(x = x, y = val, label = village),
-                             size = 3, family = fontfam, vjust = 1,
-                             segment.color = 'grey40',
-                             max.overlaps = 2e1) + 
-    facet_wrap(~ var, 
-               scales = if(grepl("area", x[1])) "fixed" else "free", 
-               ncol = 2) + 
-    theme_bw(14) +
-    theme(
-      text = element_text(family = fontfam),
-      strip.background = element_blank(),
-      axis.text.x = element_blank(),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_blank(),
-      axis.ticks.x = element_blank()
-    ) +
-    labs(x = "",
-         y = "")
-})
+p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>% 
+  ggplot(aes(period, area_ha)) + 
+  geom_rain(rain.side = 'f1x1', id.long.var = "village", fill = "grey20", alpha = 0.2) + 
+  theme_bw(14) +
+  theme(
+    text = element_text(family = fontfam),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank()
+  ) +
+  labs(x = "Period",
+       y = "Bare ground area (ha)") + 
+  ggrepel::geom_text_repel(
+    data = df_landuse_area %>% filter(type == "bare") %>% filter(period == "Pre"),
+    aes(x = period, 
+        y = area_ha, 
+        label = village),
+    size = 3, 
+    family = fontfam, 
+    hjust = -1/4,
+    segment.color = NA,
+    box.padding = 0.02,
+    max.overlaps = 10) +
+  scale_y_continuous(trans = "log", breaks = c(500,1000,2500,5000,10000,20000),
+                     limits = c(500,25000))
 
-png("outputs/gat_boxes.png", width = 2750, height = 3250, res = 290)
-wrap_plots(boxes_list,
-           ncol = 1)
+
+p_rain_crop <- df_landuse_area %>% filter(type == "crop") %>% 
+  ggplot(aes(period, area_ha)) + 
+  geom_rain(rain.side = 'f1x1', id.long.var = "village", fill = "grey20", alpha = 0.2) + 
+  theme_bw(14) +
+  theme(
+    text = element_text(family = fontfam),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank()
+  ) +
+  labs(x = "Period",
+       y = "Cropland area (ha)")+ 
+  ggrepel::geom_text_repel(
+    data = df_landuse_area %>% filter(type == "crop") %>% filter(period == "Pre"),
+    aes(x = period, 
+        y = area_ha, 
+        label = village),
+    size = 3, 
+    family = fontfam, 
+    hjust = -1/4,
+    segment.color = NA,
+    box.padding = 0.02,
+    max.overlaps = 10) +
+  scale_y_continuous(trans = "log", breaks = c(50,100,250,500,1000,2500,5000,10000,20000,30000),
+                     limits = c(50,35000))
+
+p_rain_rain <- d_rain %>% 
+  ggplot(aes(1, val)) + 
+  geom_rain(fill = "grey20", alpha = 0.2) +
+  theme_bw(14) +
+  theme(
+    text = element_text(family = fontfam),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.title.x = element_blank(), 
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  labs(y = "Mean annual rainfall (mm)")+ 
+  ggrepel::geom_text_repel(
+    aes(x = 1, 
+        y = val, 
+        label = village),
+    size = 3, 
+    family = fontfam, 
+    vjust = 0,
+    segment.color = NA,
+    box.padding = 0.02,
+    max.overlaps = 6) 
+
+p_rain_het <- d_het %>% 
+  ggplot(aes(1, val)) + 
+  geom_rain(fill = "grey20", alpha = 0.2) +
+  theme_bw(14) +
+  theme(
+    text = element_text(family = fontfam),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.title.x = element_blank(), 
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  labs(y = "Economic inequality\n(SD of PC1 from household assets)")+ 
+  ggrepel::geom_text_repel(
+    aes(x = 1, 
+        y = val, 
+        label = village),
+    size = 3, 
+    family = fontfam, 
+    vjust = 0,
+    segment.color = NA,
+    box.padding = 0.02,
+    max.overlaps = 6) 
+
+
+upr_patch <- (p_rain_bare | p_rain_crop)
+lwr_patch <- (p_rain_rain | p_rain_het)
+
+set.seed(123)
+png("outputs/gat_rainclouds.png", width = 2750, height = 3300, res = 300)
+(upr_patch / lwr_patch) + plot_layout(heights = c(3,2)) & plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
 dev.off()
 
 ###################
@@ -340,7 +454,7 @@ ppc2 <- ppc_bars_grouped(
 
 png("outputs/ppcs_fit_irt_2par.png", width = 4500, height = 6000, res = 380)
 ppc1/ppc2 + plot_layout(heights = c(1,2/3)) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
 dev.off()
 
 # figure parameter estimates
@@ -429,7 +543,7 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
 
 png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 360)
 p_cor1 + p_cor2 +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
 dev.off()
 
 # table with other parameters posteriors

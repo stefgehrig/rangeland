@@ -109,7 +109,7 @@ dfsum %>%
 ```
 
 
-Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis. They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [following @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
+Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis (that will become clearer in the sections below). They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [following @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
 
 ```{r othersum}
 gat_tab2 %>% 
@@ -125,18 +125,18 @@ gat_tab2 %>%
 ```
 
 
-A natural way to visualize  for all villages the data in Table \ref{tab:dfsum} is via spider plots (Figure \ref{fig:radar}), for Table \ref{tab:othersum} it is via stripe / box plots (Figure \ref{fig:boxes}).
+A natural way to visualize for all villages the data in Table \ref{tab:dfsum} is via spider plots (Figure \ref{fig:radar}), for Table \ref{tab:othersum} it is via raincloud plots (Figure \ref{fig:boxes}). The latter allow to once more sanity check for the remote-sensing-based variables whether they show realistic area estimates (needs to be done by people who know the villages!). In Figure \ref{fig:radar}, DF variables are already separated into whether they fall under governance processes (all DF variables in Table \ref{tab:dfsum} from the first-tier categories *Resource Systems (RS)*, *Governance Systems (GS)*, *Actors (A)* and *Interactions (I)*) or governance outcomes (all DF variables in Table \ref{tab:dfsum} from the first-tier category *Outcomes (O)*) -- a distinction motivated in a later section and relevant for the main analysis.
 
 \newpage
 
-```{r radar, fig.align='center', fig.cap='Village-level spider plots of scores for all DF variables from Table 1, split by whether they refer to outcome dimensions (right) or not (left).', out.width="100%"}
+```{r radar, fig.align='center', fig.cap='Village-level spider plots of scores for all DF variables from Table 1, split by whether they refer to outcome governance outcomes (right) or governance processes (left).', out.width="100%"}
 include_graphics("outputs/gat_spiders.png")
 ```
 
 \newpage
 
-```{r boxes, fig.align='center', fig.cap='Boxplots for variables from Table 2. In the horizontal direction, positions are randomly scattered.', out.width="100%"}
-include_graphics("outputs/gat_boxes.png")
+```{r boxes, fig.align='center', fig.cap='Rraincloud plots for variables from Table 2. Upper panels (a) and (b) have log-scaled y axes for readability.', out.width="100%"}
+include_graphics("outputs/gat_rainclouds.png")
 ```
 
 \newpage
