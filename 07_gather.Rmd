@@ -143,13 +143,13 @@ include_graphics("outputs/gat_boxes.png")
 
 # Item response modeling: Relation between self-reported governance processes and outcomes
 
-This whole section is more or less completely drafted and open to discussion. The figures are not yet final and their layout and readability will be improved for publication.
+This whole section is more or less completely drafted and open to discussion.
 
 ## Motivation
 
-We now model the association between governance processes and governance outcomes as reported by communities. This is based on the data presented in Table \ref{tab:dfsum}. The workhorse of the analysis will be a Bayesian Item Response Model fit with `brms` [@burkner_bayesian_2020; @fox_bayesian_2010]. 
+We now model the association between governance processes and governance outcomes as reported by communities. This is based on the data presented in Table \ref{tab:dfsum}. The workhorse of the analysis will be a Bayesian Item Response Model fit with `brms` [@burkner_bayesian_2021; @fox_bayesian_2010]. 
 
-Item Response Theory (IRT) is a statistical modeling paradigm from psychology that aims to simultaneously assess respondent-level and item-level influences on test scores [@linden_handbook_1997]. It can be viewed as a form of statistical adjustment for item characteristics that allows inference about unobserved latent characteristics of respondents. In our research context, the "respondents" are communities and the items are coded responses from in-depth focus group discussions and interviews. Therefore, in the context of this analysis, we also refer to the third-tier DF variables in Table \ref{tab:dfsum} as items. 
+Item Response Theory (IRT) is a statistical modeling paradigm from psychology that aims to simultaneously assess respondent-level and item-level influences on test scores [@linden_handbook_1997]. It can be viewed as a form of statistical adjustment for item characteristics that allows inference about unobserved latent characteristics of respondents. In our research context, the "respondents" are communities and the items are coded responses from in-depth focus group discussions and interviews. Therefore, in the context of this analysis, we also refer to the third-tier DF variables in Table \ref{tab:dfsum} as items.
 
 Based on the nature of our items, we a priori propose two underlying latent traits of communities: The quality of the governance process and the quality of the governance outcome. We briefly call the two dimensions *Governance* and *Outcome*. The former is measured by the type of items that refer to governance processes -- all third-tier variables in Table \ref{tab:dfsum} listed under the first-tier categories *Resource Systems (RS)*, *Governance Systems (GS)*, *Actors (A)* and *Interactions (I)*. The latter is measured by the type of items that measure governance outcomes -- listed in Table \ref{tab:dfsum} under the first-tier category *Outcomes (O)*.^[Even though the DF does not put all of these variables into the *Governance Systems (GS)* category, they arguably reflect commons governance processes.] This distinction between these two item types is made on conceptual grounds and in line with the goal to assess the association between governance processes and governance outcomes.
 
@@ -165,13 +165,13 @@ $$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j})$$
 
 where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response $k$ on item $i$. Note that $\pi_{1, i, j} + \pi_{2, i, j}+ \pi_{3, i, j} = 1$ for all $i,j$.
 
-Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes.^[In IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ controls the magnitude of the effect that predictors have on the response distribution for that item. This leads to
+Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes, also known as proportional odds model.^[In IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997, chapter 5].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ is introduced. This leads to
 
 $$
 P(Y_{i,j} \leq k) = \text{logit}^{-1} \left(\text{exp}(\alpha + a_i) ( \beta_k - \eta_{i,j} ) \right), 
 $$
 
-where $\alpha$ is an intercept parameter for item discrimination, such that the $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we acknowledge that items do not have constant discrimination. In IRT terminology, this leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (see below) is introduced.^[The discrimination parameter can be understood as an effect modifier. Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] By exponentiating $(\alpha + a_i)$, discrimination is always positive. Put differently, discrimination is modeled on the log-scale, which is the conventional implementation in `brms` [see @burkner_bayesian_2020].
+where $\alpha$ is an intercept parameter for item discrimination, such that the $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we allow that items do not have constant discrimination, i.e., that they may differ in how strongly changes in the latent trait of villages (a component of $\eta_{i,j}$, see below) affect response probabilities for that item. Unequal discrimination is a sensible assumption in the present setting particularly some of the items were originally scored on a dichotomous, others on a polytomous scale. In IRT terminology, the assumption of non-constant discrimination leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (see below) is introduced.^[Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] By exponentiating $(\alpha + a_i)$, discrimination is always positive. Put differently, discrimination is modeled on the log-scale, which is the default implementation in `brms` [@burkner_bayesian_2021].
 
 The probabilities to give responses $k = 1,2,3$ can hence be written as
 
@@ -206,12 +206,12 @@ Finally, working in a Bayesian framework with varying parameters, we assume that
 \end{pmatrix}.
 \end{align*}
 
-This implies that the two item parameters $a_i$ and $b_i$ are allowed to covary. Accounting for within-item dependencies in this way is usually desirable in IRT modeling [@fox_bayesian_2010]. Likewise, the two village-parameters $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$, follow a bivariate normal distribution with covariance $\sigma_{\text{Gov},\text{Out}}$. We can hence define our parameter of interest, the correlation between governance and outcome quality, based on the IRT model as 
+This implies that the two item parameters $a_i$ and $b_i$ are allowed to covary. Accounting for within-item dependencies in this way is usually desirable in IRT modeling [@fox_bayesian_2010, p. 36-37]. Likewise, the two village-parameters $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$, follow a bivariate normal distribution with covariance $\sigma_{\text{Gov},\text{Out}}$. We can hence define our parameter of interest, the correlation between governance and outcome quality, based on the IRT model as 
 
 $$\rho_{\text{Gov},\text{Out}} = \frac{\sigma_{\text{Gov},\text{Out}}}{\sigma_{\text{Gov}} \sigma_{\text{Out}}}.$$
 
 
-By choosing hierarchical priors that induce some shrinkage to the empirical mean, above IRT model becomes a Bayesian hierarchical model. Such pooling of information can lead to improved estimation of respondent and item parameters in IRT models [@fox_bayesian_2010; @burkner_bayesian_2020]. Specifically, we work with the following priors:
+By choosing hierarchical priors that induce some shrinkage to the empirical mean, above IRT model becomes a Bayesian hierarchical model. Such pooling of information can lead to improved estimation of respondent and item parameters in IRT models [@fox_bayesian_2010; @burkner_bayesian_2021]. Specifically, we work with the following priors:
 
 \begin{align*}
 \alpha & \sim \text{Normal}(0,1), \\
@@ -223,15 +223,15 @@ By choosing hierarchical priors that induce some shrinkage to the empirical mean
 \beta_2 & \sim \text{Normal}(0, 2.5). \\
 \end{align*}
 
-In addition, the variances of the latent village characteristics are assumed as $\sigma^2_{\text{Gov}} = \sigma^2_{\text{Out}} = 1$, which we can interpret as a prior with all mass in one point. This is a common restriction in IRT to ensure identifiability of the model. These priors simply fix the metric of the latent village characteristics to a standard normal distribution [@fox_bayesian_2010, p. 88; @burkner_bayesian_2020].
+In addition, the variances of the latent village characteristics are assumed as $\sigma^2_{\text{Gov}} = \sigma^2_{\text{Out}} = 1$, which we can interpret as a prior with all mass in one point. This is a common restriction in IRT to ensure identifiability of the model. These priors simply fix the metric of the latent village characteristics to a standard normal distribution [@fox_bayesian_2010, p. 88; @burkner_bayesian_2021].
 
 In summary, our priors are chosen to have some regularizing influence on the parameters, ensuring model convergence and stability of estimates against the background of relatively sparse data, the occurrence of items with little to no variability between villages (see Table \ref{tab:dfsum}), and a rather richly parametrized model. For example, above exponential priors on the SD of both item parameters put most prior probability ($\approx$ `r round(pexp(1, 1.5), 2)`) on the SD being $\leq 1$ on the logit scale, but also allows for larger values.
 
 ## Results
 
-We obtained `r summary(fit_irt_2par)$chains * (summary(fit_irt_2par)$iter - summary(fit_irt_2par)$warmup)` posterior draws sampled from `r summary(fit_irt_2par)$chains` chains, after `r summary(fit_irt_2par)$warmup` warm-up iterations per chain. Model convergence was acceptable -- judged by inspecting trace plots and R hat statistics -- and posterior predictive checks in Figure \ref{fig:ppds} indicate a good model fit to the data. It is also visible that the model-based distributions in general tend to be a bit less extreme than their empirical counterparts, which is partially a consequence of shrinkage, partially due to the logit link function, which will never strictly assign zero probability to an outcome.
+We obtained `r summary(fit_irt_2par)$chains * (summary(fit_irt_2par)$iter - summary(fit_irt_2par)$warmup)` posterior draws sampled from `r summary(fit_irt_2par)$chains` chains, after `r summary(fit_irt_2par)$warmup` warm-up iterations per chain. Model convergence was acceptable -- judged by inspecting trace plots and R hat statistics -- and posterior predictive checks in Figure \ref{fig:ppds} indicate a good model fit to the data. It is also visible that the model-based distributions in general tend to be a bit less extreme than their empirical counterparts, which is at least partially a consequence of shrinkage^[@fox_bayesian_2010[p. 36] explicitly mentions this as an advantage of Bayesian IRT modeling: "An extreme and infinite item parameter estimate caused by the fact that the item is answered correctly or incorrectly by all respondents is avoided due to shrinkage towards the mean of the prior."], but follows also from some restrictions imposed by the proportional odds model.
 
-```{r ppds, fig.align='center', fig.cap='Posterior predictions vs. observed response distributions (a) by item and (b) by village. In light blue empirical responses, in dark blue posterior predictions (median and 90\\% credible interval).', out.width="100%"}
+```{r ppds, fig.align='center', fig.cap='Posterior predictions vs. observed response distributions (a) by item and (b) by village. In light blue empirical responses, in dark blue posterior predictions (median and 90\\% equal-tailed credible interval).', out.width="100%"}
 include_graphics("outputs/ppcs_fit_irt_2par.png")
 ```
 
@@ -265,13 +265,23 @@ pars_tab %>%
   
 ```
 
-\textcolor{red}{to-do}
+It is apparent from the rather wide quantile-based intervals that uncertainty about the model parameters is generally high. It is a consequence of the small sample size of villages and the many parameters of the IRT model. Nevertheless, as discernible from Figure \ref{fig:cor}, we can be very certain about the positive relationship between quality of governance processes and governance outcomes on the village level as characterized by Ostrom's Diagnostic Framework variables.
 
-- summary / interpretation sentence; also say that poerstiots can be used later. and respect uncertainty compared to averaging.
+The IRT nature of the model allows to extract some more insights. Figure \ref{fig:riestims} shows that items differ widely in their estimates for easiness $b_i$ (i.e., their tendency to yield high scores), which is in line with the between-item variation in response distributions already observed in the raw data (Table \ref{tab:dfsum}). We can also interpret the posterior distributions for the item-specific discrimination parameter $a_i$. If it is shifted to the right (as, e.g., for the item *GS7.3: External sanctions* in Figure \ref{fig:riestims}), then for this third-tier variable there is a steeper-than-average relationship between the underlying latent trait $\theta_j^{\text{Gov}}$ and the tendency to obtain high response scores in that item. This is equivalent with saying that the item is better able to discriminate between villages of very high and very low latent governance quality.^[Another way to look at it is that an item with higher values of $a_i$ has a lower latent standard deviation [@burkner_ordinal_2019]. The intuition is that an item that discriminates better produces less spread out response scores for one given value of the latent variable [see also @liddell_analyzing_2018, p. 331].]
+
+The posteriors of the model parameters allow to construct so-called "item characteristic curves" (ICC) to better understand the relationship between the latent village traits and response probabilities for an item [@linden_handbook_1997]. The ICC results from the interplay of the item's values for $a_i$ and $b_i$. As a relevant example, Figure \ref{fig:icc} shows how the estimated IRT model relates the latent village trait $\theta_j^{\text{Out}}$, i.e., the unobserved quality of governance outcomes, to the observed ordinal response category for the item *O1.1: Compliance*.
+
+```{r icc, fig.align='center', fig.cap='Item characteristic curve for one item, as estimated in the ITR model. Expected probabilities for the three ordinal response options are shown (posterior median and 90\\% equal-tailed credible interval) in relation to the underlying latent village-level trait. Upper panel shows the posterior densities of the latent trait for all 12 study villages (same color coding as previously).', out.width="75%"}
+include_graphics("outputs/icc_fit_irt_2par.png")
+```
+
+It is clear from Figure \ref{fig:icc} that based on the model we would expect most villages to give medium or high responses in the item *O1.1: Compliance*, which aligns well with observed and predicted frequencies for that same item shown in Figure \ref{fig:ppds}.
+
+\textcolor{red}{to do}
+
+- paired boxplots for pre-post in Figure 2
 
 - no adjustemnt --> interpretation. First DAG, simply (note: confounding of governance quality and selection of program villages coudl be two independent sources of bias? how to represent in dag?)
-
-- high discrimination = steep slope between latent quality and highest response category probability (= LOWER sd of item? that's what is suggested by beurkner ordinal paper); wie related das zu variability in items in raw data und warum?
 
 # Modeling remote sensing outcomes as a result of governance processes
 

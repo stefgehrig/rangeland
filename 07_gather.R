@@ -8,13 +8,15 @@ library(patchwork)
 library(ggrepel)
 library(ggtext)
 library(ggcorrplot)
+library(geomtextpath)
 library(ggiraphExtra)
 library(RColorBrewer)
 library(ggradar2)
 loadfonts()
 source("00_functions.R")
 fontfam <- "Segoe UI"
-palcolors <- colorRampPalette(brewer.pal(11, "Set3"))(12)
+palcolors <- colorRampPalette(brewer.pal(12, "Set3"))(12)
+
 
 ###################
 #### load data ####
@@ -392,13 +394,10 @@ dev.off()
 p_cor1 <- mcmc_areas_ridges(fit_irt_2par, pars = vars(contains("cor_village")),
                             prob_outer = 1, prob = 0.9) + 
   geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
-  theme(axis.text.y = element_blank(),
-        text = element_text(family = fontfam)) + 
-  theme_classic(14) +
   theme(text = element_text(family = fontfam),
-        plot.subtitle = element_markdown()) +
-  labs(subtitle = "*&#961;<sub>Gov, Out</sub>*",
-       y = "Posterior density") + 
+        axis.title.x = element_markdown()) +
+  labs(x = "*&#961;<sub>Gov, Out</sub>*",
+       y = "Posterior density")+ 
   scale_y_discrete(
     labels = "",
     expand = c(0,0)
@@ -424,8 +423,8 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
                      labels = function(x) 
                        str_replace_all(x, "\\.", " ")) + 
   coord_cartesian(xlim = c(-3,3), ylim = c(-3,3)) + 
-  labs(x = "Quality of governance processes (*&#952;<sup>Gov</sup>*)",
-       y = "Quality of governance outcomes (*&#952;<sup>Out</sup>*)",
+  labs(x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
+       y = "Quality of governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
        color = "Village")
 
 png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 360)
@@ -492,5 +491,189 @@ df_theta_gov <- gather_rvars(
             mean = mean(.value),
             sd = sd(.value))
 
-  
+#######################################################################
+##### check high vs low discrimination item to better understand that #
+##### high discrimination items show little variation in the raw data #
+#######################################################################
+coef(fit_irt_2par)
+summary(fit_irt_2par)
 
+postdraws %>% 
+  ungroup %>% 
+  distinct(.draw, threshold, .keep_all = TRUE) %>% 
+  group_by(threshold) %>% 
+  summarise(across(contains("b_Intercept"), mean))
+beta_1 <- -2.02  
+beta_2 <- 0.00484
+
+postdraws %>% 
+  ungroup %>% 
+  distinct(.draw, .keep_all = TRUE) %>% 
+  summarise(across(contains("b_disc_Intercept"), mean))
+alpha <- 0.305
+
+x <- seq(-4,4,0.01)
+
+#### external recognition (HIGH discrimination)
+postdraws %>% 
+  ungroup %>% 
+  filter(grepl("recognition", item)) %>% 
+  distinct(.draw, .keep_all = TRUE) %>% 
+  summarise(across(contains("tier3"), mean))
+
+a_i =   0.647
+b_i =-1.03
+# response probabilities of this item
+plot(x, 
+     plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+     type = "l",
+     main = "external recognition (high discr)",
+     ylim = c(0,1))
+lines(x, 
+  plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+  col = "blue")
+lines(x, 
+  1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+  col = "green")
+
+# estimated village locations x
+v = postdraws %>% 
+  ungroup %>% 
+  filter(itemtype == "itemtypeGovernance") %>% 
+  group_by(village) %>% 
+  summarise(m=mean(r_village)) %>% 
+  pull(m)
+abline(v = v, lty = 2)
+
+####  rules in use (LOW discrimination)
+postdraws %>% 
+  ungroup %>% 
+  filter(grepl("Rules-in-use", item)) %>% 
+  distinct(.draw, .keep_all = TRUE) %>% 
+  summarise(across(contains("tier3"), mean))
+a_i = -0.766
+b_i = 0.383
+# response probabilities of this item
+plot(x, 
+     plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+     type = "l",
+     main = "rules use (low discr)",
+     ylim = c(0,1))
+lines(x, 
+  plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+  col = "blue")
+lines(x, 
+  1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+  col = "green")
+
+# estimated village locations x
+abline(v = v, lty = 2)
+
+# so we see: 
+sd(sample(c(1,2,3), prob = c(0, 0.6, 0.4), replace = TRUE, size = 1e4))
+sd(sample(c(1,2,3), prob = c(0.1, 0.2, 0.7), replace = TRUE, size = 1e4))
+
+############################
+##### ICC for one item #####
+############################
+# two versions: one with itemtypeOutcome (standard ICC) and one with itemtytepGovernance (should be possible due to correlation parameter?)
+icc_item = "O1.1: Compliance"
+
+draws_icc <- spread_draws(fit_irt_2par,
+             b_Intercept[threshold],
+             b_disc_Intercept,
+             r_tier3[item, par],
+             r_tier3__disc[item, par]#,
+             #seed = 1234,
+             #ndraws = 5
+             ) %>% 
+  mutate(item = str_replace_all(item, "\\.(?=[A-Za-z])", " ")) %>% 
+  filter(item == icc_item) %>% 
+  pivot_wider(names_from = "threshold", values_from = "b_Intercept", names_prefix = "threshold") 
+
+df_icclines <- expand_grid(
+  draws_icc,
+  x = seq(-4,4,0.01)
+) %>% 
+  mutate(
+    pi_1 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold1 - (r_tier3 + x))),
+    pi_2 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold2 - (r_tier3 + x))) - pi_1,
+    pi_3 = 1 - pi_1 - pi_2
+  ) %>% 
+  pivot_longer(
+    cols = contains("pi_"),
+    names_to = "response",
+    values_to = "prob"
+  ) %>% 
+  mutate(response = str_remove(response, "pi_"))
+
+gradcolors <- c(
+  "#bdc9e1",
+  "#67a9cf",
+  "#02818a"
+)
+
+df_icclines_smry <- df_icclines %>% 
+  group_by(response, x) %>% 
+  summarise(
+    point = median(prob),
+    lwr = quantile(prob, 0.05),
+    upr = quantile(prob, 0.95)
+  )
+
+p_icc1 <- df_icclines_smry %>% 
+  ggplot() + 
+  geom_ribbon(aes(x = x, ymin = lwr, ymax = upr, fill = response), alpha = 1/10) +
+  geom_textline(aes(x = x, y = point, col = response, label = response),
+            lwd = 1, hjust = 0.1, size = 5) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam),
+        axis.title.x  = element_markdown(),
+        legend.position = "none",
+        axis.title.y = element_markdown()) + 
+  scale_color_manual(values = gradcolors) + 
+  scale_fill_manual(values = gradcolors) + 
+  labs(y = paste0("Expected response probability for item<br>", "*", icc_item, "*"),
+       x = "*&#952;<sub>j</sub><sup>Out</sup>*",
+       fill = "Response\ncategory")
+
+# p_icc1 <- df_icclines %>% 
+#   ggplot() + 
+#   geom_line(aes(x = x, y = prob, col = response, 
+#                     label = response,
+#                     group = paste0(.draw, response)),
+#             lwd = 1, alpha = 1/2) + 
+#   theme_classic(14) +
+#   theme(text = element_text(family = fontfam),
+#         axis.title.x  = element_markdown(),
+#         axis.title.y = element_markdown()) + 
+#   scale_color_manual(values = gradcolors) + 
+#   labs(y = paste0("Response probability for item<br>", "*", icc_item, "*"),
+#        x = "*&#952;<sub>j</sub><sup>Out</sup>*",
+#        color = "Response\ncategory")
+
+p_icc2 <- spread_draws(fit_irt_2par,
+             r_village[village, itemtype]) %>% 
+  group_by(village) %>% 
+  mutate(hjust_par = runif(1,0,1)) %>% 
+  filter(itemtype == "itemtypeOutcome") %>% 
+  ggplot() + 
+  geom_density(aes(x = r_village, fill = village), 
+               col = NA,
+                   alpha = 0.2, 
+                   show.legend = FALSE,
+  ) +
+  # geom_textdensity(aes(x = r_village, 
+  #                      label = village,
+  #                      fill = village)
+  #                  ) +
+  theme_void(14) +
+  theme(text = element_text(family = fontfam)) + 
+  scale_fill_manual(values = palcolors,
+                     labels = function(x) 
+                       str_replace_all(x, "\\.", " ")) + 
+  coord_cartesian(xlim = c(-4,4))
+
+png("outputs/icc_fit_irt_2par.png", width = 2800, height = 1800, res = 360)
+p_icc2 / p_icc1 + plot_layout(heights = c(1,4))
+dev.off()
