@@ -17,7 +17,12 @@ loadfonts()
 source("00_functions.R")
 fontfam <- "Segoe UI"
 palcolors <- colorRampPalette(brewer.pal(12, "Set3"))(12)
-
+gradcolors <- c(
+  "#bdc9e1",
+  "#67a9cf",
+  "#02818a"
+)
+onecolor <- "#02818a"
 
 ###################
 #### load data ####
@@ -605,87 +610,87 @@ df_theta_gov <- gather_rvars(
             mean = mean(.value),
             sd = sd(.value))
 
-#######################################################################
-##### check high vs low discrimination item to better understand that #
-##### high discrimination items show little variation in the raw data #
-#######################################################################
-coef(fit_irt_2par)
-summary(fit_irt_2par)
-
-postdraws %>% 
-  ungroup %>% 
-  distinct(.draw, threshold, .keep_all = TRUE) %>% 
-  group_by(threshold) %>% 
-  summarise(across(contains("b_Intercept"), mean))
-beta_1 <- -2.02  
-beta_2 <- 0.00484
-
-postdraws %>% 
-  ungroup %>% 
-  distinct(.draw, .keep_all = TRUE) %>% 
-  summarise(across(contains("b_disc_Intercept"), mean))
-alpha <- 0.305
-
-x <- seq(-4,4,0.01)
-
-#### external recognition (HIGH discrimination)
-postdraws %>% 
-  ungroup %>% 
-  filter(grepl("recognition", item)) %>% 
-  distinct(.draw, .keep_all = TRUE) %>% 
-  summarise(across(contains("tier3"), mean))
-
-a_i =   0.647
-b_i =-1.03
-# response probabilities of this item
-plot(x, 
-     plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-     type = "l",
-     main = "external recognition (high discr)",
-     ylim = c(0,1))
-lines(x, 
-  plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-  col = "blue")
-lines(x, 
-  1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-  col = "green")
-
-# estimated village locations x
-v = postdraws %>% 
-  ungroup %>% 
-  filter(itemtype == "itemtypeGovernance") %>% 
-  group_by(village) %>% 
-  summarise(m=mean(r_village)) %>% 
-  pull(m)
-abline(v = v, lty = 2)
-
-####  rules in use (LOW discrimination)
-postdraws %>% 
-  ungroup %>% 
-  filter(grepl("Rules-in-use", item)) %>% 
-  distinct(.draw, .keep_all = TRUE) %>% 
-  summarise(across(contains("tier3"), mean))
-a_i = -0.766
-b_i = 0.383
-# response probabilities of this item
-plot(x, 
-     plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-     type = "l",
-     main = "rules use (low discr)",
-     ylim = c(0,1))
-lines(x, 
-  plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-  col = "blue")
-lines(x, 
-  1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
-  col = "green")
-
-# estimated village locations x
-abline(v = v, lty = 2)
-
-# so we see: 
-sd(sample(c(1,2,3), prob = c(0, 0.6, 0.4), replace = TRUE, size = 1e4))
-sd(sample(c(1,2,3), prob = c(0.1, 0.2, 0.7), replace = TRUE, size = 1e4))
+# #######################################################################
+# ##### check high vs low discrimination item to better understand that #
+# ##### high discrimination items show little variation in the raw data #
+# #######################################################################
+# coef(fit_irt_2par)
+# summary(fit_irt_2par)
+# 
+# postdraws %>% 
+#   ungroup %>% 
+#   distinct(.draw, threshold, .keep_all = TRUE) %>% 
+#   group_by(threshold) %>% 
+#   summarise(across(contains("b_Intercept"), mean))
+# beta_1 <- -2.02  
+# beta_2 <- 0.00484
+# 
+# postdraws %>% 
+#   ungroup %>% 
+#   distinct(.draw, .keep_all = TRUE) %>% 
+#   summarise(across(contains("b_disc_Intercept"), mean))
+# alpha <- 0.305
+# 
+# x <- seq(-4,4,0.01)
+# 
+# #### external recognition (HIGH discrimination)
+# postdraws %>% 
+#   ungroup %>% 
+#   filter(grepl("recognition", item)) %>% 
+#   distinct(.draw, .keep_all = TRUE) %>% 
+#   summarise(across(contains("tier3"), mean))
+# 
+# a_i =   0.647
+# b_i =-1.03
+# # response probabilities of this item
+# plot(x, 
+#      plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#      type = "l",
+#      main = "external recognition (high discr)",
+#      ylim = c(0,1))
+# lines(x, 
+#   plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#   col = "blue")
+# lines(x, 
+#   1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#   col = "green")
+# 
+# # estimated village locations x
+# v = postdraws %>% 
+#   ungroup %>% 
+#   filter(itemtype == "itemtypeGovernance") %>% 
+#   group_by(village) %>% 
+#   summarise(m=mean(r_village)) %>% 
+#   pull(m)
+# abline(v = v, lty = 2)
+# 
+# ####  rules in use (LOW discrimination)
+# postdraws %>% 
+#   ungroup %>% 
+#   filter(grepl("Rules-in-use", item)) %>% 
+#   distinct(.draw, .keep_all = TRUE) %>% 
+#   summarise(across(contains("tier3"), mean))
+# a_i = -0.766
+# b_i = 0.383
+# # response probabilities of this item
+# plot(x, 
+#      plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#      type = "l",
+#      main = "rules use (low discr)",
+#      ylim = c(0,1))
+# lines(x, 
+#   plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#   col = "blue")
+# lines(x, 
+#   1 - (plogis(exp(alpha + a_i) * (beta_2 - (b_i + x))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x)))) - plogis(exp(alpha + a_i) * (beta_1 - (b_i + x))),
+#   col = "green")
+# 
+# # estimated village locations x
+# abline(v = v, lty = 2)
+# 
+# # so we see: 
+# sd(sample(c(1,2,3), prob = c(0, 0.6, 0.4), replace = TRUE, size = 1e4))
+# sd(sample(c(1,2,3), prob = c(0.1, 0.2, 0.7), replace = TRUE, size = 1e4))
 
 ############################
 ##### ICC for one item #####
@@ -720,12 +725,6 @@ df_icclines <- expand_grid(
     values_to = "prob"
   ) %>% 
   mutate(response = str_remove(response, "pi_"))
-
-gradcolors <- c(
-  "#bdc9e1",
-  "#67a9cf",
-  "#02818a"
-)
 
 df_icclines_smry <- df_icclines %>% 
   group_by(response, x) %>% 
@@ -791,3 +790,120 @@ p_icc2 <- spread_draws(fit_irt_2par,
 png("outputs/icc_fit_irt_2par.png", width = 2800, height = 1800, res = 360)
 p_icc2 / p_icc1 + plot_layout(heights = c(1,4))
 dev.off()
+
+###########################
+#### creating the DAGs ####
+###########################
+library(dagitty)
+library(ggdag)
+
+#-------------#
+#### DAG 1 ####
+#-------------#
+dag <- dagify(gov ~ u1 + u2 + ntri,
+              out ~ u1 + u3 + gov,
+              ass ~ u2 + u3 + ntri,
+              exposure = "gov",
+              outcome = "out",
+              latent = c("u1","u2","u3"),
+              coords = list(
+                x = c(u1 = 4, u2 = 2, u3 = 3, gov = 3, out = 5, ass = 1, ntri = 1),
+                y = c(u1 = 3, u2 = 0, u3 = 0, gov = 2, out = 2, ass = 0.75, ntri = 2)
+              )
+)
+
+p_dag1 <- dag %>% 
+  tidy_dagitty(layout = "auto", seed = 123) %>%
+  arrange(name) %>% # sort them alphabetically
+  mutate(type = 
+           case_when(
+             name %in% c("u1", "u2", "u3") ~ "unobserved",
+             name %in% c("out", "gov") ~ "target",
+             name %in% c("ntri", "ass") ~ "select"
+           )) %>% 
+  mutate(
+    # adjust for boxes
+    xend_for_edges = ifelse(to == "ass" & name != "ntri", xend + 1/6, xend),
+    yend_for_edges = ifelse(to == "ass" & name == "ntri", yend + 1/5, yend),
+    y_for_edges    = ifelse(to == "ass" & name == "ntri", y - 1/6, y),
+    x_for_edges    = ifelse(to == "gov" & name == "ntri", x + 1/8, x)
+  ) %>%
+  ggplot(
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    )
+  ) + 
+  theme_dag_blank(14) + 
+  geom_dag_point(           aes(shape = type,
+                                stroke = type == "select",
+                                size = type == "select"),
+                            show.legend = FALSE) +
+  geom_dag_edges(
+    aes(
+      xend = xend_for_edges,
+      yend = yend_for_edges,
+      y = y_for_edges,
+      x = x_for_edges
+    ),
+    edge_width = 1/2
+  ) +
+  geom_dag_text(
+    aes(color = type == "target"),
+    # sort them alphabetically
+    label = c( ass  = expression(Assessment),
+               gov  = expression(italic(theta^'Gov')),
+               ntri = expression(NTRI),
+               out  = expression(italic(theta^'Out')),
+               u1   = expression(italic(U[1])),
+               u2   = expression(italic(U[2])),
+               u3   = expression(italic(U[3]))),
+    parse = TRUE,
+    show.legend = FALSE,
+    family = fontfam
+  ) +
+  scale_color_manual(values = c("black", onecolor)) + 
+  scale_shape_manual(values = c(0, NA, 1)) + 
+  scale_size_manual(values = c(20, 30))
+
+png("outputs/dag1.png", width = 1800, height = 900, res = 235)
+p_dag1 
+dev.off()
+
+#-------------#
+#### DAG 2 ####
+#-------------#
+dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
+              cropPost ~ cropPre + gov + rain,
+              inv      ~ gov,
+              rain     ~ u1,
+              gov      ~ u1,
+              inv      ~ u2,
+              gov      ~ u2,
+              barePre  ~ u3 + cropPre,
+              gov      ~ u3,
+              cropPre  ~ u4,
+              gov      ~ u4,
+              exposure = "gov",
+              outcome = "barePost",
+              latent = c("u1","u2","u3","u4"),
+              labels = c("inv" = "invasives",
+                         "barePost"="barePost",
+                         "cropPost"="cropPost",
+                         "barePre"="barePre",
+                         "cropPre"="cropPre",
+                         "rain"="rainfall",
+                         "gov"="governance",
+                         "u1"="U1",
+                         "u2"="U2",
+                         "u3"="U3",
+                         "u4"="U4")
+)
+ggdag(dag, layout = "circle",
+      text = FALSE, use_labels = "label",
+      edge_type = "diagonal") + 
+  theme_dag_blank(14)
+
+dag %>% ggdag_adjustment_set(effect = "direct")
