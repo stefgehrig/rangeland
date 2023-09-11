@@ -84,6 +84,28 @@ d_het <- df_codescores %>%
   filter(grepl("economic.hetero", dimension)) %>% 
   select(village, val = score) %>% 
   mutate(var = "econ_het")
+
+# # ... wealth median household (just to show correlation)
+# df_hhsurv_temp <- df_hhsurv %>%
+#   select(village,
+#          improvedtoilet,
+#          housewalltype,
+#          housefloortype,
+#          houserooftype,
+#          num_mobile_phone,
+#          num_motorcycle,
+#          num_modernbed
+#   ) %>%
+#   mutate(across(.cols=everything(), ~ifelse(is.na(.x), 0, .x)),
+#          across(where(is.numeric), ~scale(.x)))
+# 
+# pca_econ <- principal(df_hhsurv_temp %>% select(-village), nfactors = 1)
+# pca_econ$loadings # high correlations consistently with PC1
+# d_lev <- df_hhsurv_temp %>% select(village) %>%
+#   bind_cols(wealth = pca_econ$scores) %>%
+#   group_by(village) %>% 
+#   summarise(median_hh_wealth = median(wealth))
+
 # ... gis
 d_gis <- df_landuse_area %>% 
   mutate(var = 
@@ -374,25 +396,26 @@ formula <- bf(
   score ~ 1 + (1 |i| tier3) + (0 + itemtype | village),
   disc  ~ 1 + (1 |i| tier3))
 
-fit_irt_2par <- brm( # RTOOLS! warum is 4.3 nicht genug?
-  formula = formula,
-  data = df_items,
-  family = family,
-  prior = priors,
-  control   = list(adapt_delta = 0.999, max_treedepth = 15),
-  warmup    = 2e3,
-  iter      = 6e3,
-  thin      = 1,
-  chains    = 5,
-  cores     = 5,
-  seed      = 1234,
-  backend   = "cmdstanr"
-)
-
-summary(fit_irt_2par)
-prior_summary(fit_irt_2par)
-# export model results
-saveRDS(fit_irt_2par, file = "outputs/fit_irt_2par.rds")
+# fit_irt_2par <- brm( # RTOOLS! warum is 4.3 nicht genug?
+#   formula = formula,
+#   data = df_items,
+#   family = family,
+#   prior = priors,
+#   control   = list(adapt_delta = 0.999, max_treedepth = 15),
+#   warmup    = 2e3,
+#   iter      = 6e3,
+#   thin      = 1,
+#   chains    = 5,
+#   cores     = 5,
+#   seed      = 1234,
+#   backend   = "cmdstanr"
+# )
+# 
+# summary(fit_irt_2par)
+# prior_summary(fit_irt_2par)
+# # export model results
+# saveRDS(fit_irt_2par, file = "outputs/fit_irt_2par.rds")
+fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
 cat(stancode(fit_irt_2par), file = "outputs/fit_irt_2par_stancode.txt")
 sink("outputs/fit_irt_2par_modsummary.txt")
 summary(fit_irt_2par)
@@ -400,7 +423,7 @@ sink()
 sink("outputs/fit_irt_2par_priorsummary.txt")
 prior_summary(fit_irt_2par)
 sink()
-fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
+
 
 # understand parametrization of discrimination by manually creating predictions
 # ... auto predict
@@ -872,38 +895,38 @@ png("outputs/dag1.png", width = 1800, height = 900, res = 235)
 p_dag1 
 dev.off()
 
-#-------------#
-#### DAG 2 ####
-#-------------#
-dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
-              cropPost ~ cropPre + gov + rain,
-              inv      ~ gov,
-              rain     ~ u1,
-              gov      ~ u1,
-              inv      ~ u2,
-              gov      ~ u2,
-              barePre  ~ u3 + cropPre,
-              gov      ~ u3,
-              cropPre  ~ u4,
-              gov      ~ u4,
-              exposure = "gov",
-              outcome = "barePost",
-              latent = c("u1","u2","u3","u4"),
-              labels = c("inv" = "invasives",
-                         "barePost"="barePost",
-                         "cropPost"="cropPost",
-                         "barePre"="barePre",
-                         "cropPre"="cropPre",
-                         "rain"="rainfall",
-                         "gov"="governance",
-                         "u1"="U1",
-                         "u2"="U2",
-                         "u3"="U3",
-                         "u4"="U4")
-)
-ggdag(dag, layout = "circle",
-      text = FALSE, use_labels = "label",
-      edge_type = "diagonal") + 
-  theme_dag_blank(14)
-
-dag %>% ggdag_adjustment_set(effect = "direct")
+# #-------------#
+# #### DAG 2 ####
+# #-------------#
+# dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
+#               cropPost ~ cropPre + gov + rain,
+#               inv      ~ gov,
+#               rain     ~ u1,
+#               gov      ~ u1,
+#               inv      ~ u2,
+#               gov      ~ u2,
+#               barePre  ~ u3 + cropPre,
+#               gov      ~ u3,
+#               cropPre  ~ u4,
+#               gov      ~ u4,
+#               exposure = "gov",
+#               outcome = "barePost",
+#               latent = c("u1","u2","u3","u4"),
+#               labels = c("inv" = "invasives",
+#                          "barePost"="barePost",
+#                          "cropPost"="cropPost",
+#                          "barePre"="barePre",
+#                          "cropPre"="cropPre",
+#                          "rain"="rainfall",
+#                          "gov"="governance",
+#                          "u1"="U1",
+#                          "u2"="U2",
+#                          "u3"="U3",
+#                          "u4"="U4")
+# )
+# ggdag(dag, layout = "circle",
+#       text = FALSE, use_labels = "label",
+#       edge_type = "diagonal") + 
+#   theme_dag_blank(14)
+# 
+# dag %>% ggdag_adjustment_set(effect = "direct")
