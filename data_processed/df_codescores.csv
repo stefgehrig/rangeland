@@ -30,7 +30,7 @@ Kakoi,o1.1.compliance,2,coded from qualitative interviews and focus groups,ordin
 Kakoi,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Kakoi,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
 Kakoi,a2.1.economic.heterogeneity,1.4085552238595451,household items elicited in household survey,"continuous: SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
-Kakoi,eco1.01.rainfall.patterns,693,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
+Kakoi,eco1.01.rainfall.patterns,699.1,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Kakoi,rs3.1.commons.spatial.extent.(ha),5050.077434,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Kakoi,s1.1.human.population.size.change.(annual.increase),0.01836057829711324,combination of censuses and officials' estimates,"continuous: annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Katikati,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
@@ -234,7 +234,7 @@ Sangaiwe,o1.1.compliance,3,coded from qualitative interviews and focus groups,or
 Sangaiwe,o2.1.commons.condition.trend,1,coded from qualitative interviews and focus groups,ordinal: more improvement
 Sangaiwe,o2.3.invasives,1,coded from qualitative interviews and focus groups,ordinal: less problems due to invasives
 Sangaiwe,a2.1.economic.heterogeneity,0.8555864244557975,household items elicited in household survey,"continuous: SD of first PCA for toilet, wall, floor, roof, pikipiki, phones"
-Sangaiwe,eco1.01.rainfall.patterns,731.44,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
+Sangaiwe,eco1.01.rainfall.patterns,781.1,extracted from PERSIANN-CCS database,continuous: average of mean annual precipitation 2016-2020 (mm)
 Sangaiwe,rs3.1.commons.spatial.extent.(ha),7694.564114,total village area estimate from GIS-based land use analysis,continuous: area bare land (ha)
 Sangaiwe,s1.1.human.population.size.change.(annual.increase),0.03293242205603053,combination of censuses and officials' estimates,"continuous: annual relative increase from 2012 to 2020 (i.e., less strong increase)"
 Kimana,s1.2.changes.in.ethnic.composition.(village.leader.data),3,coded from qualitative interviews (village leader data),ordinal: less rapid change in ethnic composition
