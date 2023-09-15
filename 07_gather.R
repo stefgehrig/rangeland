@@ -860,10 +860,10 @@ p_dag1 <- dag %>%
     )
   ) + 
   theme_dag_blank(14) + 
-  geom_dag_point(           aes(shape = type,
-                                stroke = type == "select",
-                                size = type == "select"),
-                            show.legend = FALSE) +
+  geom_dag_point(aes(shape = type,
+                     stroke = type == "select",
+                     size = type == "select"),
+                 show.legend = FALSE) +
   geom_dag_edges(
     aes(
       xend = xend_for_edges,
@@ -895,38 +895,206 @@ png("outputs/dag1.png", width = 1800, height = 900, res = 235)
 p_dag1 
 dev.off()
 
-# #-------------#
-# #### DAG 2 ####
-# #-------------#
-# dag <- dagify(barePost ~ barePre + rain + inv + cropPost + gov,
-#               cropPost ~ cropPre + gov + rain,
-#               inv      ~ gov,
-#               rain     ~ u1,
-#               gov      ~ u1,
-#               inv      ~ u2,
-#               gov      ~ u2,
-#               barePre  ~ u3 + cropPre,
-#               gov      ~ u3,
-#               cropPre  ~ u4,
-#               gov      ~ u4,
-#               exposure = "gov",
-#               outcome = "barePost",
-#               latent = c("u1","u2","u3","u4"),
-#               labels = c("inv" = "invasives",
-#                          "barePost"="barePost",
-#                          "cropPost"="cropPost",
-#                          "barePre"="barePre",
-#                          "cropPre"="cropPre",
-#                          "rain"="rainfall",
-#                          "gov"="governance",
-#                          "u1"="U1",
-#                          "u2"="U2",
-#                          "u3"="U3",
-#                          "u4"="U4")
-# )
-# ggdag(dag, layout = "circle",
-#       text = FALSE, use_labels = "label",
-#       edge_type = "diagonal") + 
-#   theme_dag_blank(14)
-# 
-# dag %>% ggdag_adjustment_set(effect = "direct")
+#-------------#
+#### DAG 2 ####
+#-------------#
+dag2 <- dagify(gov ~ u123 + u4 + u5,
+               rain ~ u4,
+               bare ~ u123 + gov + rain + inv,
+               inv ~ gov + u5,
+               exposure = "gov",
+               outcome = "bare",
+               latent = c("u123","u4"),
+               coords = list(
+                x = c(u123 = 3, gov = 1, bare = 5, inv = 3, u4 = 3, rain = 4, u5 = 2),
+                y = c(u123 = 3, gov = 2, bare = 2, inv = 1, u4 = 4, rain = 3, u5 = 0)
+              )
+)
+
+p_dag2 <- dag2 %>% 
+  tidy_dagitty(layout = "auto", seed = 123) %>%
+  arrange(name) %>% # sort them alphabetically
+  mutate(type = 
+           case_when(
+             name %in% c("u123", "u4", "u5") ~ "unobserved",
+             name %in% c("gov", "bare") ~ "target",
+             name %in% c("inv", "rain") ~ "observed"
+           )) %>% 
+  ggplot(
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    )
+  ) + 
+  theme_dag_blank(14) + 
+  geom_dag_point(aes(shape = type),
+                 show.legend = FALSE) +
+  geom_dag_edges(
+    edge_width = 1/2
+  ) +
+  geom_dag_text(
+    aes(color = type == "target"),
+    # sort them alphabetically
+    label = c( bare  = expression(italic(Delta['bare'])),
+               gov  = expression(italic(theta^'Gov')),
+               invasives = expression('Invasives'),
+               rain = expression('Rainfall'),
+              
+               u123   = expression(italic(U[123])),
+               u4   = expression(italic(U[4])),
+               u5   = expression(italic(U[5]))),
+    parse = TRUE,
+    show.legend = FALSE,
+    family = fontfam
+  ) +
+  scale_color_manual(values = c("black", onecolor)) + 
+  scale_shape_manual(values = c(NA, NA, 1))
+
+png("outputs/dag2.png", width = 1800, height = 900, res = 235)
+p_dag2
+dev.off()
+
+
+######################
+#### map plotting ####
+######################
+library(sf)
+library(ggmap)
+library(ggsn)
+
+shp_projvill <- st_read("data/tnc/Assessment_Villages_2/Assessment_villages_excl_NP.shp") 
+shp_projvill <- shp_projvill %>% #choose correct Losirwa: Esilalei ward
+  filter(!(Village == "Losirwa" & Ward_Name != "Esilalei"))
+
+# cut the satellite artefact piece off Sangaiwe 
+pol <- shp_projvill[shp_projvill$Village == "Sangaiwe",]
+box = c(xmin = 35, ymin = -6, xmax = 36, ymax = -2)
+shp_projvill[shp_projvill$Village == "Sangaiwe",] <- st_crop(pol, box)
+
+# define excerpt
+bbox = c(35, # left
+         -6, # bottom
+         38, # right
+         -2) # top
+#### geographical map ####
+maptanz <- get_stamenmap(bbox = bbox,
+                         maptype = "terrain-background")
+
+# add country borders; add village borders and names;
+pm <- ggmap(maptanz) +
+  labs(x = "", y = "") + 
+  theme(text = element_text(family = fontfam),
+        plot.margin = unit(c(1,1,1/10,1/10),"lines"))
+
+# ... scalebar
+pm <- pm + 
+  scalebar(
+    x.min = 35,
+    x.max = 38,
+    y.min = -6,
+    y.max = -2,
+    dist = 50,
+    dist_unit = "km",
+    st.size = 3,
+    anchor = c(x = 37.75, y = -2.15),
+    transform = TRUE,
+    model = "WGS84",
+    height = 0.01, st.dist = 0.01,
+    box.fill = c("black", "white"),
+    border.size = 1/2) 
+
+# ... add arusha and kenya border
+shp_border <- st_read("data/shapes_distr/ken_admbnda_adm0_iebc_20191031.shp")
+
+pm <- pm + 
+  geom_sf(data = shp_border, inherit.aes = FALSE, fill = NA) + 
+  geom_text(data = tibble(x=37.5, y = -2.4), aes(x = x,y = y, label = "Kenya"), size = 6, family = fontfam) + 
+  geom_text(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y, label = "Arusha"), size = 4, family = fontfam,
+            hjust = -1/10, fontface = "bold") + 
+  geom_point(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y), size = 2)
+
+# ... village borders
+df_projvill_for_plot <- shp_projvill %>% 
+  mutate(CENTROID = map(geometry, st_centroid),
+         COORDS = map(CENTROID, st_coordinates),
+         COORDS_X = map_dbl(COORDS, 1),
+         COORDS_Y = map_dbl(COORDS, 2))
+
+df_projvill_for_plot <- df_projvill_for_plot %>% 
+  mutate(Village = case_when(
+    grepl("Eleng", Village)   ~ "Eleng'ata Dapash",
+    grepl("ngaruka", Village) ~ "Engaruka Chini",
+    grepl("Ngoswak", Village) ~ "Ngoswaki",
+    grepl("lchor", Village)   ~ "Olchoro Onyokie",
+    TRUE ~ Village
+  ))
+
+pm <- pm + 
+  geom_sf(data = df_projvill_for_plot, fill = "grey", alpha = 1/2, 
+          show.legend = FALSE,inherit.aes = FALSE, lwd = 0.25) + 
+  geom_text_repel(data = df_projvill_for_plot,
+                  aes(x = COORDS_X, y = COORDS_Y, label = Village),
+                  size = 3,
+                  seed = 1,
+                  box.padding = 0.5,
+                  segment.size = 1/4,
+                  family = fontfam)
+
+png("outputs/map_terr_vills.png", width = 2000, height = 2450, res = 350)
+print(pm)
+dev.off()
+
+####################
+#### model gis #####
+####################
+dfgov <- df_items %>% 
+  filter(tier1 != "Outcomes (O)") %>% 
+  group_by(village) %>% 
+  summarise(gov = mean(as.numeric(as.character(score))))
+
+dfgis <- df_landuse_area %>%
+  select(-total_area, -measurement_time) %>% 
+  pivot_wider(names_from = period, values_from = area_ha) %>% 
+  pivot_wider(names_from = type, values_from = c(Pre, Post)) %>% 
+  left_join(d_rain %>% select(village, rain = val)) %>% 
+  left_join(
+    df_codescores %>% 
+      filter(grepl("invasiv", dimension)) %>% 
+      select(village, invasive = score)
+  ) %>% 
+  left_join(dfgov) %>% 
+  left_join(df_threats %>% 
+            # Analytical question: "Please name and describe the major threats that are affecting this rangeland.
+            # A threat is a process/event that has the potential to severely damage an important function of a system.
+            # The governance activities within a social-ecological system can be undermined by threats and disturbances that occur."
+              filter(grepl("specie", threat)) %>% 
+              select(village, invasive_binary = present))
+
+# with(dfgis, plot(Post_bare/Pre_bare))
+# with(dfgis, plot(log(Post_bare/Pre_bare)))
+
+# exploration
+summary(lm(
+  I(log(Post_bare/Pre_bare)) ~ gov + rain + invasive_binary,
+  data = dfgis
+)) # -0.3428614
+
+# summary(lm(
+#   I(log(Post_crop/Pre_crop)) ~ gov + rain + invasive_binary,
+#   data = dfgis
+# )) # +1.197543
+# cor.test(
+#   dfgis$Pre_bare,
+#   dfgis$Pre_crop
+# ) # > 0
+# cor.test(
+#   dfgis$Post_bare,
+#   dfgis$Post_crop
+# ) # > 0
+
+#### bayesian gaussian regression with measurement error ####
+
+
+
