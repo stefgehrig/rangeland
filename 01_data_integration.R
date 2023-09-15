@@ -49,7 +49,7 @@ df9 <- read_csv2("data/populations.csv") # retrieved from Majory's updated file 
 # shp_distr <- st_read("data/shapes_distr/tza_admbnda_adm2_20181019.shp")
 # shp_distr <- shp_distr  %>% 
 #   filter(ADM1_EN %in% c("Manyara", "Arusha")) # reduce roughly to necessary areas
-# write_sf(shp_distr, "data_processed/shp_proj_distr.geojson") # export wards only to get rainfall on ward-level from PERSIANN-CDR
+# write_sf(shp_distr, "data_processed/shp_proj_distr.geojson") # export wards only to get rainfall on ward-level
 
 # to extract from netcdf: mm per annum for each year 2010 to 2020 for each ward
 # from PERSIANN-CCS (https://chrsdata.eng.uci.edu/)
@@ -62,9 +62,14 @@ precipdata <- precipdata %>%
   select(lon, lat, datetime, precip) 
 precipdata <- st_as_sf(precipdata, coords = c("lon", "lat"))
 
-shp_projvill <- st_read("data/tnc/Assessment_Villages_2/assessment_villages.shp") # need to match polygons from district rainfall to villages
+shp_projvill <- st_read("data/tnc/Assessment_Villages_2/Assessment_villages_excl_NP.shp") 
 shp_projvill <- shp_projvill %>% #choose correct Losirwa: Esilalei ward
   filter(!(Village == "Losirwa" & Ward_Name != "Esilalei"))
+
+# cut the satellite artefact piece off Sangaiwe 
+pol <- shp_projvill[shp_projvill$Village == "Sangaiwe",]
+box = c(xmin = 35, ymin = -6, xmax = 36, ymax = -2)
+shp_projvill[shp_projvill$Village == "Sangaiwe",] <- st_crop(pol, box)
 
 st_crs(precipdata) <- st_crs(shp_projvill)
 plan(multisession, workers = 15)
@@ -87,6 +92,7 @@ stars_object <- raster("data/rainfall/CCS_shp_proj_distr_2022-08-13053147am.nc")
 sf_object    <- shp_projvill
 stars_object$precip[stars_object$precip==-99] <- NA
 sf::st_crs(stars_object) <- sf::st_crs(stars_object)
+
 rain_vills <- ggplot() +
   geom_sf(data = sf_object) + 
   geom_stars(data = stars_object, alpha = 0.75)
