@@ -979,14 +979,17 @@ bbox = c(35, # left
          38, # right
          -2) # top
 #### geographical map ####
-maptanz <- get_stamenmap(bbox = bbox,
-                         maptype = "terrain-background")
+# maptanz <- get_stamenmap(bbox = bbox,
+#                          maptype = "terrain-background")
+
+#saveRDS(maptanz, file = "data/maptanz.RDS")
+maptanz <- readRDS("data/maptanz.RDS")
 
 # add country borders; add village borders and names;
 pm <- ggmap(maptanz) +
   labs(x = "", y = "") + 
   theme(text = element_text(family = fontfam),
-        plot.margin = unit(c(1,1,1/10,1/10),"lines"))
+        plot.margin = unit(c(1,6,1/10,-2),"lines"))
 
 # ... scalebar
 pm <- pm + 
@@ -1011,6 +1014,7 @@ shp_border <- st_read("data/shapes_distr/ken_admbnda_adm0_iebc_20191031.shp")
 pm <- pm + 
   geom_sf(data = shp_border, inherit.aes = FALSE, fill = NA) + 
   geom_text(data = tibble(x=37.5, y = -2.4), aes(x = x,y = y, label = "Kenya"), size = 6, family = fontfam) + 
+  geom_text(data = tibble(x=35.75, y = -5.75), aes(x = x,y = y, label = "Tanzania"), size = 6, family = fontfam) + 
   geom_text(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y, label = "Arusha"), size = 4, family = fontfam,
             hjust = -1/10, fontface = "bold") + 
   geom_point(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y), size = 2)
@@ -1042,8 +1046,44 @@ pm <- pm +
                   segment.size = 1/4,
                   family = fontfam)
 
-png("outputs/map_terr_vills.png", width = 2000, height = 2450, res = 350)
-print(pm)
+# png("outputs/map_terr_vills.png", width = 2000, height = 2450, res = 350)
+# print(pm)
+# dev.off()
+
+# continent map
+afrimap <- map_data(map = "world")
+
+pafri <- ggplot() + 
+  coord_fixed(xlim = c(-20, 55),
+              ylim = c(-35, 40))  + 
+  geom_polygon(
+    data = afrimap,
+    aes(x = long, y = lat, group = group),
+    color = "black", fill = "grey", alpha = 1/10, lwd = 0.25) +
+  labs(x = "", y = "")+ 
+  theme_bw() + 
+  geom_rect(
+    aes(
+      xmin = bbox[1],
+      xmax = bbox[3],
+      ymin = bbox[2],
+      ymax = bbox[4]
+    ),
+    fill = NA,
+    color = "red"
+  ) + 
+  theme(text = element_text(family = fontfam),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank(),
+        plot.margin = unit(c(-1,-1,-2,-1), "cm"))
+
+png("outputs/map_terr_vills.png", width = 2150, height = 2200, res = 350)
+print(
+  pm + 
+    inset_element(pafri, 
+                  left = 0.65, bottom = 0.15, right = 1.4, top = 0.3)
+)
 dev.off()
 
 ####################
