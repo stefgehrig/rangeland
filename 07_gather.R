@@ -5,6 +5,7 @@ library(tidybayes)
 library(bayesplot)
 library(extrafont)
 library(patchwork)
+library(marginaleffects)
 library(ggrepel)
 library(ggtext)
 library(ggcorrplot)
@@ -119,12 +120,12 @@ df_others <- bind_rows(
 ) %>% 
   mutate(source = 
            case_when(
-             var == "bare pre" ~ "Landsat imagery 2010-2015",
-             var == "bare post" ~ "Landsat imagery 2016-2021",
-             var == "crop pre" ~ "Landsat imagery 2015",
-             var == "crop post" ~ "Landsat imagery 2019",
-             var == "econ_het" ~ "Household survey 2020",
-             var == "rainfall" ~ "Satellite precipitation data 2016-2020",
+             var == "bare pre" ~ "MODIS vegetation continuous fields (2015-2015)",
+             var == "bare post" ~ "MODIS vegetation continuous fields (2016-2021)",
+             var == "crop pre" ~ "Global cropland extent data set (2015)",
+             var == "crop post" ~ "Global cropland extent data set (2019)",
+             var == "econ_het" ~ "Household survey",
+             var == "rainfall" ~ "PERSIANN-CCS (2016-2020)",
            )) %>% 
   mutate(
     var = case_when( 
@@ -155,6 +156,11 @@ gat_tab2 <- df_others %>%
   )
 
 saveRDS(gat_tab2, "outputs/gat_tab2.rds")
+
+# naming variables
+df_landuse_area <- df_landuse_area %>% 
+  mutate(period = str_to_title(period)) %>% 
+  mutate(period = factor(period, ordered = TRUE, levels = c("Pre", "Post")))
 
 #################################
 #### figures for description ####
@@ -265,10 +271,6 @@ dev.off()
 # dev.off()
 
 # raincloud plots
-df_landuse_area <- df_landuse_area %>% 
-  mutate(period = str_to_title(period)) %>% 
-  mutate(period = factor(period, ordered = TRUE, levels = c("Pre", "Post")))
-  
 p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>% 
   ggplot(aes(period, area_ha)) + 
   geom_rain(rain.side = 'f1x1', id.long.var = "village", fill = "grey20", alpha = 0.2) + 
@@ -877,9 +879,9 @@ p_dag1 <- dag %>%
     aes(color = type == "target"),
     # sort them alphabetically
     label = c( ass  = expression(Assessment),
-               gov  = expression(italic(theta^'Gov')),
+               gov  = expression(theta^'Gov'),
                ntri = expression(NTRI),
-               out  = expression(italic(theta^'Out')),
+               out  = expression(theta^'Out'),
                u1   = expression(italic(U[1])),
                u2   = expression(italic(U[2])),
                u3   = expression(italic(U[3]))),
@@ -937,8 +939,8 @@ p_dag2 <- dag2 %>%
   geom_dag_text(
     aes(color = type == "target"),
     # sort them alphabetically
-    label = c( bare  = expression(italic(Delta['bare'])),
-               gov  = expression(italic(theta^'Gov')),
+    label = c( bare  = expression(italic(d)['bare']),
+               gov  = expression(theta^'Gov'),
                invasives = expression('Invasives'),
                rain = expression('Rainfall'),
               
@@ -955,7 +957,6 @@ p_dag2 <- dag2 %>%
 png("outputs/dag2.png", width = 1800, height = 900, res = 235)
 p_dag2
 dev.off()
-
 
 ######################
 #### map plotting ####
@@ -1110,16 +1111,37 @@ dfgis <- df_landuse_area %>%
             # A threat is a process/event that has the potential to severely damage an important function of a system.
             # The governance activities within a social-ecological system can be undermined by threats and disturbances that occur."
               filter(grepl("specie", threat)) %>% 
-              select(village, invasive_binary = present))
+              select(village, invasive_binary = present))%>% 
+  mutate(rain_std = as.numeric(scale(rain)))
 
 # with(dfgis, plot(Post_bare/Pre_bare))
 # with(dfgis, plot(log(Post_bare/Pre_bare)))
-
-# exploration
-summary(lm(
-  I(log(Post_bare/Pre_bare)) ~ gov + rain + invasive_binary,
-  data = dfgis
-)) # -0.3428614
+# 
+# # exploration
+# dfgis <- dfgis %>%
+#   mutate(
+#     delta_bare = Post_bare-Pre_bare,
+#     y = log((delta_bare)/Pre_bare + 1), # equivalent with: log(Post_bare/Pre_bare)
+#     gov = as.numeric(scale(gov))
+#   )
+# # 
+# m <- lm(
+#   y ~ gov + rain_std + invasive_binary,
+#   data = dfgis
+# )
+# summary(m) # -0.1295568
+# # 
+# x <- seq(-4,4,0.1)
+# pred = predict(
+#   m, newdata = tibble(
+#     gov = x,
+#     rain_std = 0,
+#     invasive_binary = 1
+#   ))
+# plot(x,
+#      exp(pred),
+#      type = "l")
+# abline(h = 1, lty = 2)
 
 # summary(lm(
 #   I(log(Post_crop/Pre_crop)) ~ gov + rain + invasive_binary,
@@ -1134,7 +1156,149 @@ summary(lm(
 #   dfgis$Post_crop
 # ) # > 0
 
+# tabulate invasives. which to use? do they agree?
+df_codescores %>% 
+  filter(grepl("o2.3", dimension)) %>% 
+  left_join(df_threats %>% filter(grepl("nvasive", threat))) %>% 
+  select(village, dimension, score, threat, present)
+
+#############################################################
 #### bayesian gaussian regression with measurement error ####
+#############################################################
+# get the probabilistic version of governance trait
+fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
+df_gov_posteriors <- gather_draws(fit_irt_2par, r_village[village,dimension]) %>% 
+  filter(dimension == "itemtypeGovernance") %>% 
+  mutate(village = str_replace(village, "\\.", " ")) %>% 
+  as_tibble() %>%
+  group_by(village) %>% 
+  summarise(
+    gov_post_mean = mean(.value),
+    gov_post_sd = sd(.value)
+  )
+dfgis <- dfgis %>% 
+  left_join(df_gov_posteriors)
+
+# family, formula, priors
+family_bare <- brmsfamily("gaussian", "identity")
+formula_bare <- 
+  bf(y ~  rain_std + invasive + me(gov_post_mean, gov_post_sd))
+prior_bare <-
+  prior("normal(0, 1.5)",  class = "b") +
+  prior("constant(0)", class = "meanme") +
+  prior("constant(1)", class = "sdme") + 
+  prior("exponential(1)", class = "sigma")
+
+# run sampling
+fit_bare <- brm(
+  formula = formula_bare,
+  data = dfgis,
+  family = family_bare,
+  prior = prior_bare,
+    control   = list(adapt_delta = 0.999, max_treedepth = 15),
+    warmup    = 2e3,
+    iter      = 6e3,
+    thin      = 1,
+    chains    = 5,
+    cores     = 5,
+    seed      = 1234,
+    backend   = "cmdstanr"
+)
+
+# export
+prior_summary(fit_bare)
+summary(fit_bare)
+saveRDS(fit_bare, file = "outputs/fit_bare.rds")
+fit_bare <- readRDS("outputs/fit_bare.rds")
+
+# trace plots
+mcmc_trace(fit_bare, regex_pars = "b_")
+
+#####################################
+#### regression table (all pars) ####
+#####################################
+# table with other parameters posteriors
+all_pars <- get_variables(fit_bare)[grepl("b_|megov|sigma",  get_variables(fit_bare))]
+all_pars_tab <- map_dfr(all_pars, function(x){
+  gather_draws(fit_bare, !!as.symbol(x)) %>% 
+    summarise(mean = mean(.value),
+              sd = sd(.value),
+              q05 = quantile(.value, 0.05),
+              q50 = median(.value),
+              q95 = quantile(.value, 0.95))
+})  %>% 
+  mutate(varlabel = 
+           case_when(
+             .variable == "b_Intercept"                       ~ "$\\gamma_0$",
+             .variable == "b_rain_std"                        ~ "$\\gamma_1$",
+             .variable == "b_invasive"                        ~ "$\\gamma_2$",
+             .variable == "bsp_megov_post_meangov_post_sd"    ~ "$\\gamma_3$",
+             .variable == "sigma"                             ~ "$\\sigma$",
+             .variable == "meanme_megov_post_mean"            ~ "meanlatents",
+             .variable == "sdme_megov_post_mean"              ~ "sdlatents"
+           ), .before = ".variable"
+  ) %>% 
+  mutate(across(where(is.numeric), ~style_number(.x))) %>% 
+  select(-.variable)
+
+saveRDS(all_pars_tab, file = "outputs/fit_bare_parstab.rds")
+
+#########################
+#### prediciton plot ####
+#########################
+dg <- datagrid(model = fit_bare,
+               gov_post_mean = seq(-4,4,0.1),
+               FUN_numeric = median) # grid with covariates at median
+
+df_pred <- spread_draws(fit_bare, # extract posterior samples
+             b_Intercept,
+             b_rain_std,
+             b_invasive,
+             bsp_megov_post_meangov_post_sd) %>% 
+  expand_grid(
+    dg) %>% 
+  mutate( # calculate linear predictor and transform
+    yexp = exp(
+        b_Intercept + 
+        b_rain_std * rain_std + 
+        b_invasive * invasive + 
+        bsp_megov_post_meangov_post_sd * gov_post_mean))
+
+df_pred_smry <- df_pred %>% 
+  group_by(gov_post_mean) %>% 
+  summarise(
+    mean = mean(yexp),
+    lwr = quantile(yexp, 0.05),
+    upr = quantile(yexp, 0.95)
+  )
+
+p_pred <- df_pred_smry %>% 
+  ggplot() + 
+  geom_ribbon(aes(x = gov_post_mean, ymin = lwr, ymax = upr), alpha = 1/10) +
+  geom_line(aes(x = gov_post_mean, y = mean),
+                lwd = 1) +
+  geom_hline(yintercept = 1, linetype = 2) +
+  theme_classic(14) +
+  theme(text = element_text(family = fontfam),
+        axis.title.x  = element_markdown()) + 
+  scale_color_manual(values = gradcolors) + 
+  scale_fill_manual(values = gradcolors) + 
+  labs(y = "Expected factor change\nin bare ground area",
+       x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
+       fill = "Response\ncategory")
+
+png("outputs/pred_bareground.png", width = 2800, height = 1800, res = 360)
+p_icc2 / p_pred + plot_layout(heights = c(1,4))
+dev.off()
+
+
+
+
+
+
+
+
+
 
 
 

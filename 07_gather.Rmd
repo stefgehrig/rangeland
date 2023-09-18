@@ -80,6 +80,7 @@ knitr::opts_chunk$set(echo = FALSE)
 gat_tab1     <- readRDS("outputs/gat_tab1.rds")
 gat_tab2     <- readRDS("outputs/gat_tab2.rds")
 pars_tab     <- readRDS("outputs/pars_tab.rds")
+pars_tab2    <- readRDS("outputs/fit_bare_parstab.rds")
 fit_irt_2par <- readRDS(file = "outputs/fit_irt_2par.rds")
 ```
 
@@ -170,7 +171,7 @@ Fitting the IRT model in a Bayesian framework provides a natural way to induce r
 
 Response of village $j = 1,...,J$ on item $i = 1, ..., I$ shall be denoted as $Y_{i,j}$. Since these scores can take discrete values $k = 1,2,3$, we assume a multinomial distribution of item responses 
 
-$$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j})$$
+$$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j}),$$
 
 where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response $k$ on item $i$. Note that $\pi_{1, i, j} + \pi_{2, i, j}+ \pi_{3, i, j} = 1$ for all $i,j$.
 
@@ -271,7 +272,6 @@ pars_tab %>%
   )%>%
   kable_styling(latex_options = "HOLD_position") %>%
   footnote(general = "'P' refers to percentile.")
-  
 ```
 
 It is apparent from the rather wide quantile-based intervals that uncertainty about the model parameters is generally high. It is a consequence of the small sample size of villages and the many parameters of the IRT model. Nevertheless, as discernible from Figure \ref{fig:cor}, we can be very certain about the positive relationship between quality of governance processes and governance outcomes on the village level as characterized by Ostrom's Diagnostic Framework variables.
@@ -307,70 +307,59 @@ This whole section is more or less completely drafted and open to discussion (e.
 
 ## Motivation
 
-The analyzed outcome in the previous section was based on the synthesis from multiple qualitative data sources that elicited detailed perceptions and interpretations across different actor groups. Arguably, these provide rather accurate judgments of governance outcomes from local observers. These judgments are encoded by the scores in the DF variables of the first-tier category *Outcomes (O)*. As a potential downside, the response scores are "subjective" in the sense that they are self-reported. Therefore, as an alternative measure of commons outcomes, in this section we use remote sensing data of village grazing land areas. The outcome measure is area of bare ground and obtained from the MODIS Vegetation Continuous Fields data set with 250 m spatial resolution [@dimiceli_annual_2017]. The data contains annual estimates of percent non-vegetated area. By averaging over the years 2010 to 2015 and 2016 to 2021, we obtain pre- and post-project estimates, respectively, of the area that is bare ground for each village (data shown in Figure \ref{fig:boxes}). 
+The analyzed outcome in the previous section was based on the synthesis from multiple qualitative data sources that elicited detailed perceptions and interpretations across different actor groups. Arguably, these provide rather accurate judgments of governance outcomes from local observers. These judgments are encoded by the scores in the DF variables of the first-tier category *Outcomes (O)*. As a potential downside, the response scores are "subjective" in the sense that they are self-reported. Therefore, as an alternative measure of commons outcomes, in this section we use remote sensing data of village grazing land areas. The outcome measure is area of bare ground and obtained from the MODIS Vegetation Continuous Fields data set with 250 m spatial resolution [@dimiceli_modisterra_2022]. The data contains annual estimates of tree cover, percent non-vegetated area. By averaging over the years 2010 to 2015 and 2016 to 2021, we obtain pre- and post-project estimates, respectively, of the area that is bare ground for each village (data shown in Figure \ref{fig:boxes}). The outcome of interest is defined as log factor change in bare ground from pre- to post-period $d_{\text{bare}} = \text{log} \left( \text{bare}_{\text{post}} / \text{bare}_{\text{pre}} \right)$.^[Normalizing by pre-project bare ground is necessary due to the widely ranging baseline variation in bare ground and size across villages. The logarithmic transformation ensures useful properties for Gaussian modeling, like a more symmetric and unbounded outcome distribution.]
 
-Bare ground is an indicator for low quality of grazing land and the expansion of bare ground is a threat to local pastoralists [@mapinduzi_use_2003; @wiethase_pathways_2023]. Change in bare ground cover is hence a suitable proxy variable to measure success in commons management i nthe present context. Yet, it is not without caveats. First, all potential confounding and selection biases explained in the previous section and laid out in Figure \ref{fig:dagbig} *can in the same way affect the relationship between governance and outcomes when using remote sensing data*. For simplicity, they are summarized in one single node $U_{123}$ in the DAG in Figure \ref{fig:dagbig2}. Thus, we need to keep in mind that also the remote sensing analysis cannot credibly establish a causal path from variation in governance quality to variation in commons outcomes. Yet, it allows to check if our previous result on the positive association of governance processes and outcomes after the start of the NTRI project still holds when using an alternative, external data source. Second, bare ground cover is affected by other processes that should be accounted for when estimating the (conditional) association of quality of governance processes and commons outcome. A causal graph can guide analysis (Figure \ref{fig:dagbig2}).
+Bare ground is an indicator for low quality of grazing land and the expansion of bare ground is a threat to local pastoralists [@mapinduzi_use_2003; @wiethase_pathways_2023]. Decrease in bare ground cover after the start of the NTRI project ($d_{\text{bare}} < 0$) is hence a suitable proxy variable to measure success in commons management in the present context. Yet, it is not without caveats. First, all potential confounding and selection biases explained in the previous section and laid out in Figure \ref{fig:dagbig} *can in the same way affect the relationship between governance and outcomes when using remote sensing data*. For simplicity, they are summarized in one single node $U_{123}$ in the DAG in Figure \ref{fig:dagbig2}. Thus, we need to keep in mind that also the remote sensing analysis cannot credibly establish a causal path from variation in governance quality to variation in commons outcomes. Yet, it allows to check if our previous result on the positive association of governance processes and outcomes still holds when using an alternative, external data source for commons outcomes. Second, bare ground cover is affected by other processes that should be accounted for when estimating the (conditional) association of quality of governance processes and commons outcome. A respective causal graph can guide analysis (Figure \ref{fig:dagbig2}).
 
 ```{r dagbig2, fig.align='center', fig.cap='DAG for the effect of governance quality on change in bare ground cover. Circles indicate unobserved variables. The color indicates the two variables of interest. All variables are defined on the village level.', out.width="85%"}
 include_graphics("outputs/dag2.png")
 ```
 
-dag shows: if we want a comparable estimate to previous section (that goal must be mentioned! because u123 kann eh nicht geblockt werden, es eht nur darum zumindest zur selben assoziation zu kommen, die natürlich ganz die selbe ist, weil wir NUR, sttichwort narrow scopr, auf garzing land trends schauen, nicht zB compliance), we should adjust for these two.
+<!-- # add to caption: The node \\$U_{123}\\$ summarizes the effect of nodes \\$U_{1}\\\$, \\\$U_{2}\\\$ and \\\$U_{3}\\\$ from Figure \ref{}.  -->
 
-a) invasives
+Figure \ref{fig:dagbig2} highlights that we expect the change in bare ground to be affected by, among others, two observed variables. On the one hand, vegetation cover is strongly influenced by rainfall in the Tanzanian savannah [@wiethase_pathways_2023]. On the other hand, invasive plant species, which are a major threat to grazing lands in the region [@wiethase_pathways_2023; @obiri_invasive_2011], can cover bare ground. Even though they lead to vegetated patches, as they tend to colonize bare ground quickly, they are often toxic or suppress the growth of palatable grasses. Hence, rangeland management aims to limit their spread. This is why an item on invasive species pressure was explicitly elicited from communities in our study as part of the *Outcomes (O)* category (Table \ref{tab:dfsum}). 
 
-Invasive plant species constitute a major disturbance to grazing land health in Northern Tanzania.^[This also why an item on invasive species was elicited in our study as part of the *Outcomes (O)* category (Table \ref{tab:dfsum}).] 
-[REF]. Invasive plant species can increase vegetation cover while simultaneously degrading the rangeland. This is a shortcoming.
-invasives as mediator but NEGATIVE effect.
+Consequently, both rainfall intensity and invasive species pressure *after the onset of the NTRI project* can be expected to exert major influences on the remote sensing-based estimate of bare ground change. At the same time, both variables could be associated via third variables with the propensity to establish good governance processes, for example due to differences in ecology or ethnic composition across villages (captured by nodes $U_4$ and $U_5$ in Figure \ref{fig:dagbig2}). Pressure by invasive species could even be a direct consequence of the quality of governance processes (see the arrow from $\theta^{\text{Gov}}$ to invasives in Figure \ref{fig:dagbig2}). Still, the problem with this mediator variable is that we expect it to *reduce* bare ground, but nevertheless make the common rangeland *less* suitable for grazing, indicating a *worse* commons outcome.
 
-invasives: elicited from villagers (third tier outcome variable, see above, used previously)
+These considerations lead us to adjust the analysis of bare ground change for variables that capture extent of rainfall and of invasive species pressure during the years after the start of the NTRI project.^[Note that adding (plausible) paths from rainfall to governance or from rainfall to invasive species in Figure \ref{fig:dagbig2} would not affect this adjustment set.] The previous analysis (section XXX) of multidimensional outcomes based on detailed community responses (e.g., about compliance with rules) arguably did not require such adjustment. In contrast, remote sensing outcomes assess a more narrow picture of governance outcomes subject to strong idiosyncratic external forces like precipitation. Conditioning on these factors will help to eliminate some variation in outcomes that is not informative about the association of governance processes with governance outcomes (narrowly defined here as factor change in non-vegetated area), but certainly not all (see node $U_{123}$ in Figure \ref{fig:dagbig2}).
 
-TNC report: "It should also be noted that decreases in bare ground could be a result of improved rangeland condition or an increase in invasive species."
-
-b) rain
-
-rain very important for abre ground measure [@wiethase_pathways_2023]. Part of U_0 strictly speaking, i.e. U_0 subsumes rain ,  yet we show it. dueto strength of effecta dn ebcuase we can!
-
-The PERSIANN-CCS remote sensing rainfall data was used [@nguyen_chrs_2019] and averaged for years 2016 to 2020, yielding a mean precipitation estimate for each village for the period after project start (data shown in Figure \ref{fig:boxes}).
-
-https://www.nature.com/articles/s41598-023-29358-6:
-Heavy, year-round grazing in savannas reduces grazing potential (i.e. quantity of vegetation palatable to grazers) through two pathways that result in either land invaded by toxic and unpalatable plants, including bush encroachment8,17, or in bare ground experiencing soil loss18. Rangeland degradation has been defined as a long-term decline in productivity resulting in rangelands unsuitable for grazing (IPBES19), rather than short-term declines driven by temporal variability of environmental conditions (e.g. rainfall, grazing pressure). Such degradation has been linked to rainfall patterns20, and might be exacerbated by climate-change driven changes in annual rainfall variability, already widely observed across African savannas21. 
-Since this study focused on rangeland habitats, we chose degradation parameters from a grazing potential perspective. We followed the Intergovernmental Science-Policy Platform on Biodiversity and Ecosystem Services (IPBES) definition of rangeland degradation, as “persistent loss of vegetation productivity cover, especially of those plants which support herbivores.”19. Our proposed parameters consisted of an index of bare ground cover (absence of grazeable vegetation cover) and the number of individual ITP, which replace plants palatable to herbivores.
-
-<!-- Otelelmet/Ilteremet (Ipomea hildebrandtii), Gugu Karoti (“Carrot Weed”) (Parthenium hysterophorus), Endundulu (Dichrostachys cinerea), and Oldule (Ricinus communis). -->
-<!-- Agriculture threat BUT CROPLAND INDICATOR > POSITIVE CORRELATION WITH BAREGROUND PERCENT. Also ist beides ein indicator für schlechten boden. Brauche agriculture nicht im DAG. -->
-<!-- ... -->
-
-<!-- adjust for pre: total area variation and variation population for example (which affects land use) -->
-
-<!-- aber es gibt ja shcon auch einen vorteil hier oder?! denn alle zeit-konstanten confounder zwischen governance processes und outcomes werden rausgehalten durch das betrachten des deltas (multiplikativ, aufgrund der annahme, dass faktor-veränderung realistischer ist)?! > ne, weil wir ja kein impact assessment machen. es geht ja um faktoren die damit zu tun haben  -->
-
-<!-- ... -->
-<!-- Data sources from additional variables in DAG: -->
-
-<!-- For information on cropland cover, we rely on the global data set by @potapov_global_2022, who classified 30 m resolution Landsat satellite imagery into presence and absence of cropland. Their data set is split into epochs, two of which (2012–2015 and 2016–2019) well align with the periods before and after the start of the NTRI project. This allows to extract pre- and post-project estimates of cropland area separately for each village in the assessment (data shown in Figure \ref{fig:boxes}; in line with regional and global trends, cropland area increased over time in the studied villages). -->
-
-<!-- ------- -->
-<!-- 2.	The village polygons overlap the NP.  For the map and the data analysis, we excluded the areas that were within the NP.   -->
-<!-- This now includes the raster data: (13.8.23) -->
-<!-- Image	Resolution	Values	Source -->
-<!-- Crop_pre.tif	30m	1 crop; 0 no crop	https://glad.umd.edu/dataset/croplands -->
-<!-- Crop_pre.tif	30m	1 crop; 0 no crop	https://glad.umd.edu/dataset/croplands -->
-<!-- Bare_pre.tif	250m	% pixel bare	https://modis.gsfc.nasa.gov/data/dataprod/mod44.php -->
-<!-- Bare_post.tif	250m	% pixel bare	https://modis.gsfc.nasa.gov/data/dataprod/mod44.php -->
-
-
-
+We rely on PERSIANN-CCS precipitation data [@nguyen_chrs_2019] and create a mean annual precipitation estimate for each village by averaging over the years 2016 to 2020 (data shown in Figure \ref{fig:boxes}). \textcolor{red}{As a coarse measure of prevalence of invasive species ... -> note that this must conceptually be a measure for prevalence/pressure FOR THE POST PERIOD, see explanations above. Since I model the CHANGE.}
 
 
 ## Formal model definition
 
-see https://math.stackexchange.com/questions/44771/is-there-an-analogue-to-the-delta-symbol-for-ratios
-if I want to use Delta indeed for difference as symbol, but then perceive the log ratio simply as modeling data procession
+\textcolor{red}{effect of governacne processes (effect not meaning cauasl, see previous) leading to:}
 
+$$d_{\text{bare}_j} = \gamma_0 + \gamma_1 \text{Rainfall}_j + \gamma_2 \text{Invasives}_j + \gamma_3 \theta_j^{\text{Gov}} + \epsilon_j,$$
+
+with $\epsilon_j \sim N(0, \sigma)$. The parameter $\theta_j^{\text{Gov}}$, however, is latent. However, we have obtained posterior distributions of $\theta_j^{\text{Gov}}$ for each village $j$ based on the IRT model in section XXX. Rather than treating the expected value of those distributions as fixed data, \textcolor{red}{the Bayesian modeling framework allows to ..}
+
+measurement error notation
+
+priors parameters notation
 
 ## Results
 
+```{r postpar2}
+pars_tab2 %>% 
+  kable(
+    escape = FALSE,
+     caption = "xxx.",
+    booktabs = TRUE,
+    linesep = "",
+    col.names =
+      c("Parameter", "Mean", "SD", "P05", "Median", "P95"),
+    align = c("l", rep("r", ncol(pars_tab) - 1))
+  )%>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  footnote(general = "'P' refers to percentile.")
+```
+
+two covariates held at median
+
+```{r predbare, fig.align='center', fig.cap='xxx.', out.width="70%"}
+include_graphics("outputs/pred_bareground.png")
+```
 
 <!-- - First acknowledge that previous outcomes measure is BETTER. And needs NO adjustment. -->
 
@@ -381,25 +370,26 @@ if I want to use Delta indeed for difference as symbol, but then perceive the lo
 
 <!--     - to include the relationship modelled above in previous section. So there is one effect from GOV to outcome Remote Sensing, and one to outcome Item Responses -->
 
-- confounding arrows for BOTH of these relationships, and explain that we will never be able to resolve these. --> but we can use the DAG to de-bias the second estimation from other influenes (e.g., invasices [Majory: " reduction in bare ground could be a result of increased invasives, since they tend to colonize bare ground fast."], agriculture), just not from the fundamental problem of endogeneity of treatment assignment (selection of program villages by outsiders + "selection" of governance quality by villagers)
+<!-- - confounding arrows for BOTH of these relationships, and explain that we will never be able to resolve these. -> but we can use the DAG to de-bias the second estimation from other influenes (e.g., invasices [Majory: " reduction in bare ground could be a result of increased invasives, since they tend to colonize bare ground fast."], agriculture), just not from the fundamental problem of endogeneity of treatment assignment (selection of program villages by outsiders + "selection" of governance quality by villagers) -->
 
-- make sure that these are (mostly) mututally exclusive, which is an assumption I used and monique shares: "I assume maize wheat and bean fields dont look bare in a satelite image". We asked Nathaniel. Maybe we need to look into the polygon files. also see moniques references and paper sent via mail
+<!-- - make sure that these are (mostly) mututally exclusive, which is an assumption I used and monique shares: "I assume maize wheat and bean fields dont look bare in a satelite image". We asked Nathaniel. Maybe we need to look into the polygon files. also see moniques references and paper sent via mail -->
 
-- add to dag an edge from rainfall to governance: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing."
+<!-- - add to dag an edge from rainfall to governance: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing." -->
 
-    - but majoy points that the high-rainfall villages are ethnically different: "I think the other issue we see here is the ethnic composition of villages with more rainfall (mainly two of them). The villages with more rainfall tend to be more agricultural but also occupied by more non-Maasai." And Monioque agrees that THIS is the reason probably: "interesting, and of cours right! it is th ethnic heterogeneity, not th rainfall, that is driving this result" --> such a thing should be implied by a confounding node between rainfall and governance. Good example of it.
+<!-- - but majoy points that the high-rainfall villages are ethnically different: "I think the other issue we see here is the ethnic composition of villages with more rainfall (mainly two of them). The villages with more rainfall tend to be more agricultural but also occupied by more non-Maasai." And Monioque agrees that THIS is the reason probably: "interesting, and of cours right! it is th ethnic heterogeneity, not th rainfall, that is driving this result" -> such a thing should be implied by a confounding node between rainfall and governance. Good example of it. -->
 
-- maybe extend dag: "The DAG starting page 20 on bare ground looks pretty good to me, but I think we’d need a zoom session with Majory and Susan where you explain it, as they are more likely to think of additional paths/variables than I am."
+<!-- - maybe extend dag: "The DAG starting page 20 on bare ground looks pretty good to me, but I think we’d need a zoom session with Majory and Susan where you explain it, as they are more likely to think of additional paths/variables than I am." -->
 
-    - Majory: Invasives können auch unter good governance gedeihen, v.a. als effekt von wenig rainfall: "One could also assume that invasives may have been increasing at a fast rate (as witnessed in some villages), colonizing bare areas, and thus reducing the bareground - this may happen even with good commons governance efforts, partly due to long droughts." --> additional arrow?
+<!-- - Majory: Invasives können auch unter good governance gedeihen, v.a. als effekt von wenig rainfall: "One could also assume that invasives may have been increasing at a fast rate (as witnessed in some villages), colonizing bare areas, and thus reducing the bareground - this may happen even with good commons governance efforts, partly due to long droughts." -> additional arrow? -->
     
-    - Majory agrees that good governacne implies negative effect on agricultural conversion: "I would expect conversion at a slower rate to imply better governance. "
-    
-    - Majory schlägt nochmal das Delta als Outcome vor: "Do you have to add pre- and post-bare or just change in bare ground?"
-    
-    - Monique daraufhin: "I am not sure I quite understand this bullet point. Do we have data on disturbnaces (demog or other) at a scale that would likely affect before/after comparisons?"
-    
-    - Majory daraufhin: "My interpretation was that he would look a the various reported external threats I shared in a Table. We also have two variables asked in the household survey, ethnic composition and economic activities, but have only one data point."
+auch was zu agricutlural conversion???
+
+- Majory agrees that good governacne implies negative effect on agricultural conversion: "I would expect conversion at a slower rate to imply better governance."
+
+Agriculture threat BUT CROPLAND INDICATOR > POSITIVE CORRELATION WITH BAREGROUND PERCENT. Also ist beides ein indicator für schlechten boden. Brauche agriculture nicht im DAG.
+...
+
+For information on cropland cover, we rely on the global data set by @potapov_global_2022, who classified 30 m resolution Landsat satellite imagery into presence and absence of cropland. Their data set is split into epochs, two of which (2012–2015 and 2016–2019) well align with the periods before and after the start of the NTRI project. This allows to extract pre- and post-project estimates of cropland area separately for each village in the assessment (data shown in Figure \ref{fig:boxes}; in line with regional and global trends, cropland area increased over time in the studied villages).
 
 # Modeling wealth outcomes as a result of governance processes
 
@@ -410,6 +400,8 @@ if I want to use Delta indeed for difference as symbol, but then perceive the lo
 - "but I did think (again initially) it would be nice to have a measure of wealth (averaged across households) and inequality in wealth. I could think about this more if I wer to turn back to the original data, but now. But having wealth and inequality in wealth as an outcomes measure woud be kind of cool. I know its weak, as it is also something of a predictor variable f success (presumably), and without a longitudinal perspective inference is weak, but even with those prosvisos it might be worth including in the current modelling structure as a village level “outcome”."
 
 # Governance processes and outcomes under disturbances
+
+- Majory daraufhin: "My interpretation was that he would look a the various reported external threats I shared in a Table. We also have two variables asked in the household survey, ethnic composition and economic activities, but have only one data point."
 
 - "it would be good to look at interactins and/or mediations with disturbances, and I agree rainfall, ethnic/econ heterogeneity, and pop growth are all good candidates, if handled separately"
 
@@ -453,7 +445,7 @@ Analytical question: Please name and describe the major threats that are affecti
 
 - Majory against this: "I wonder if its useful to address whether NTRI was a success considering this would be based solely on GIS data. I don't think we have to for this analysis, just a thought."
 
-    - Monique: "Success/not success - a difficult decision to call. i think we keep OFF direct evaluation of their intervention, indeed they never provided us enough detail of what they did where."
+- Monique: "Success/not success - a difficult decision to call. i think we keep OFF direct evaluation of their intervention, indeed they never provided us enough detail of what they did where."
 
 - Majory on village selection for assessment: "During study design is when we decided it was first necessary to have at least an equal number of villages considered as "successful" and "not successful" purely based on GIS analysis performed by Colin and not whether the group was a treated or control. "
 
