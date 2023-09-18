@@ -1112,24 +1112,38 @@ dfgis <- df_landuse_area %>%
             # The governance activities within a social-ecological system can be undermined by threats and disturbances that occur."
               filter(grepl("specie", threat)) %>% 
               select(village, invasive_binary = present))%>% 
-  mutate(rain_std = as.numeric(scale(rain)))
+  mutate(rain_std = as.numeric(scale(rain))) %>% 
+  left_join(
+    df_popul %>% select(village, pop2012 = `2012`,
+                     pop2020 = `2020`)
+  )
+
+# outcome
+dfgis <- dfgis %>%
+  mutate(
+    delta_bare = Post_bare-Pre_bare,
+    y = log((delta_bare)/Pre_bare + 1), # equivalent with: log(Post_bare/Pre_bare)
+    gov = as.numeric(scale(gov))
+  )
 
 # with(dfgis, plot(Post_bare/Pre_bare))
 # with(dfgis, plot(log(Post_bare/Pre_bare)))
 # 
 # # exploration
-# dfgis <- dfgis %>%
+# df_popul %>% 
 #   mutate(
-#     delta_bare = Post_bare-Pre_bare,
-#     y = log((delta_bare)/Pre_bare + 1), # equivalent with: log(Post_bare/Pre_bare)
-#     gov = as.numeric(scale(gov))
+#     diff = `2020`-`2012`,
+#     rat = `2020`/`2012`,
+#     lograt = log(rat)
 #   )
 # # 
-# m <- lm(
-#   y ~ gov + rain_std + invasive_binary,
-#   data = dfgis
-# )
-# summary(m) # -0.1295568
+
+m <- lm(
+  y ~ gov + rain_std + invasive_binary,
+  data = dfgis
+)
+summary(m) # -0.1295568
+
 # # 
 # x <- seq(-4,4,0.1)
 # pred = predict(
@@ -1144,9 +1158,14 @@ dfgis <- df_landuse_area %>%
 # abline(h = 1, lty = 2)
 
 # summary(lm(
-#   I(log(Post_crop/Pre_crop)) ~ gov + rain + invasive_binary,
+#   I(Post_bare-Pre_bare) ~ gov + rain_std + Pre_bare,
 #   data = dfgis
-# )) # +1.197543
+# ))
+
+summary(lm(
+  I(log(Post_crop/Pre_crop)) ~ gov + rain_std + I(log(pop2020/pop2012)),
+  data = dfgis
+)) # +0.46
 # cor.test(
 #   dfgis$Pre_bare,
 #   dfgis$Pre_crop
@@ -1178,6 +1197,8 @@ df_gov_posteriors <- gather_draws(fit_irt_2par, r_village[village,dimension]) %>
   )
 dfgis <- dfgis %>% 
   left_join(df_gov_posteriors)
+
+
 
 # family, formula, priors
 family_bare <- brmsfamily("gaussian", "identity")
