@@ -721,85 +721,77 @@ df_theta_gov <- gather_rvars(
 ##### ICC for one item #####
 ############################
 # two versions: one with itemtypeOutcome (standard ICC) and one with itemtytepGovernance (should be possible due to correlation parameter?)
-icc_item = "O1.1: Compliance"
+outcome_items <- df %>% 
+  filter(grepl("Outcome", tier1)) %>% 
+  pull(tier3) %>% unique
 
-draws_icc <- spread_draws(fit_irt_2par,
-             b_Intercept[threshold],
-             b_disc_Intercept,
-             r_tier3[item, par],
-             r_tier3__disc[item, par]#,
-             #seed = 1234,
-             #ndraws = 5
-             ) %>% 
-  mutate(item = str_replace_all(item, "\\.(?=[A-Za-z])", " ")) %>% 
-  filter(item == icc_item) %>% 
-  pivot_wider(names_from = "threshold", values_from = "b_Intercept", names_prefix = "threshold") 
+draws <- spread_draws(fit_irt_2par,
+                          b_Intercept[threshold],
+                          b_disc_Intercept,
+                          r_tier3[item, par],
+                          r_tier3__disc[item, par]) %>% 
+  mutate(item = str_replace_all(item, "\\.(?=[A-Za-z])", " "))
 
-df_icclines <- expand_grid(
-  draws_icc,
-  x = seq(-4,4,0.01)
-) %>% 
-  mutate(
-    pi_1 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold1 - (r_tier3 + x))),
-    pi_2 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold2 - (r_tier3 + x))) - pi_1,
-    pi_3 = 1 - pi_1 - pi_2
+icc_plots <- map(outcome_items, function(icc_item){
+  
+  draws_icc <- draws %>% 
+    filter(item == icc_item) %>% 
+    pivot_wider(names_from = "threshold", values_from = "b_Intercept", names_prefix = "threshold") 
+  
+  df_icclines <- expand_grid(
+    draws_icc,
+    x = seq(-4,4,0.01)
   ) %>% 
-  pivot_longer(
-    cols = contains("pi_"),
-    names_to = "response",
-    values_to = "prob"
-  ) %>% 
-  mutate(response = str_remove(response, "pi_"))
+    mutate(
+      pi_1 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold1 - (r_tier3 + x))),
+      pi_2 = plogis(exp(b_disc_Intercept + r_tier3__disc) * (threshold2 - (r_tier3 + x))) - pi_1,
+      pi_3 = 1 - pi_1 - pi_2
+    ) %>% 
+    pivot_longer(
+      cols = contains("pi_"),
+      names_to = "response",
+      values_to = "prob"
+    ) %>% 
+    mutate(response = str_remove(response, "pi_"))
+  
+  df_icclines_smry <- df_icclines %>% 
+    group_by(response, x) %>% 
+    summarise(
+      point = median(prob),
+      lwr = quantile(prob, 0.05),
+      upr = quantile(prob, 0.95)
+    )
+  
+  p_icc1 <- df_icclines_smry %>% 
+    ggplot() + 
+    geom_ribbon(aes(x = x, ymin = lwr, ymax = upr, fill = response), alpha = 1/10) +
+    geom_textline(aes(x = x, y = point, col = response, label = response),
+                  lwd = 1, hjust = 0.1, size = 5) +
+    theme_classic(14) +
+    theme(text = element_text(family = fontfam),
+          axis.title.x  = element_markdown(),
+          legend.position = "none",
+          axis.title.y = element_markdown()) + 
+    scale_color_manual(values = gradcolors) + 
+    scale_fill_manual(values = gradcolors) + 
+    labs(y = paste0("Expected response probability for item<br>", "*", icc_item, "*"),
+         x = "Quality of governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
+         fill = "Response\ncategory")
 
-df_icclines_smry <- df_icclines %>% 
-  group_by(response, x) %>% 
-  summarise(
-    point = median(prob),
-    lwr = quantile(prob, 0.05),
-    upr = quantile(prob, 0.95)
-  )
-
-p_icc1 <- df_icclines_smry %>% 
-  ggplot() + 
-  geom_ribbon(aes(x = x, ymin = lwr, ymax = upr, fill = response), alpha = 1/10) +
-  geom_textline(aes(x = x, y = point, col = response, label = response),
-            lwd = 1, hjust = 0.1, size = 5) +
-  theme_classic(14) +
-  theme(text = element_text(family = fontfam),
-        axis.title.x  = element_markdown(),
-        legend.position = "none",
-        axis.title.y = element_markdown()) + 
-  scale_color_manual(values = gradcolors) + 
-  scale_fill_manual(values = gradcolors) + 
-  labs(y = paste0("Expected response probability for item<br>", "*", icc_item, "*"),
-       x = "Quality of governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
-       fill = "Response\ncategory")
-
-# p_icc1 <- df_icclines %>% 
-#   ggplot() + 
-#   geom_line(aes(x = x, y = prob, col = response, 
-#                     label = response,
-#                     group = paste0(.draw, response)),
-#             lwd = 1, alpha = 1/2) + 
-#   theme_classic(14) +
-#   theme(text = element_text(family = fontfam),
-#         axis.title.x  = element_markdown(),
-#         axis.title.y = element_markdown()) + 
-#   scale_color_manual(values = gradcolors) + 
-#   labs(y = paste0("Response probability for item<br>", "*", icc_item, "*"),
-#        x = "*&#952;<sub>j</sub><sup>Out</sup>*",
-#        color = "Response\ncategory")
+  return(p_icc1)
+  
+})
 
 p_icc2 <- spread_draws(fit_irt_2par,
-             r_village[village, itemtype]) %>% 
+                       r_village[village, itemtype]) %>% 
   group_by(village) %>% 
   mutate(hjust_par = runif(1,0,1)) %>% 
   filter(itemtype == "itemtypeOutcome") %>% 
   ggplot() + 
   geom_density(aes(x = r_village, fill = village), 
                col = NA,
-                   alpha = 0.2, 
-                   show.legend = FALSE,
+               alpha = 0.2, 
+               show.legend = FALSE,
   ) +
   # geom_textdensity(aes(x = r_village, 
   #                      label = village,
@@ -808,12 +800,14 @@ p_icc2 <- spread_draws(fit_irt_2par,
   theme_void(14) +
   theme(text = element_text(family = fontfam)) + 
   scale_fill_manual(values = palcolors,
-                     labels = function(x) 
-                       str_replace_all(x, "\\.", " ")) + 
+                    labels = function(x) 
+                      str_replace_all(x, "\\.", " ")) + 
   coord_cartesian(xlim = c(-4,4))
 
+composed_plot <- p_icc2 / icc_plots[[1]] + plot_layout(heights = c(1,4))
+
 png("outputs/icc_fit_irt_2par.png", width = 2800, height = 1800, res = 360)
-p_icc2 / p_icc1 + plot_layout(heights = c(1,4))
+composed_plot
 dev.off()
 
 ###########################
@@ -900,16 +894,16 @@ dev.off()
 #-------------#
 #### DAG 2 ####
 #-------------#
-dag2 <- dagify(gov ~ u123 + u4 + u5,
-               rain ~ u4,
-               bare ~ u123 + gov + rain + inv,
-               inv ~ gov + u5,
+dag2 <- dagify(gov ~ u123 + u4 + u5 + u6,
+               rain ~ u5,
+               barepost ~ u123 + gov + rain + inv + barepre,
+               barepre ~ u4,
+               inv ~ gov + u6,
                exposure = "gov",
-               outcome = "bare",
-               latent = c("u123","u4"),
+               outcome = "barepost",
                coords = list(
-                x = c(u123 = 3, gov = 1, bare = 5, inv = 3, u4 = 3, rain = 4, u5 = 2),
-                y = c(u123 = 3, gov = 2, bare = 2, inv = 1, u4 = 4, rain = 3, u5 = 0)
+                x = c(u123 = 3, gov = 1, barepost = 5, inv = 3, u4 = 3, rain = 4, barepre = 4, u5 = 3, u6 = 2),
+                y = c(u123 = 3, gov = 2, barepost = 2, inv = 1, u5 = 4, rain = 3, barepre = 3.5, u4 = 5, u6 = 0.5)
               )
 )
 
@@ -918,9 +912,9 @@ p_dag2 <- dag2 %>%
   arrange(name) %>% # sort them alphabetically
   mutate(type = 
            case_when(
-             name %in% c("u123", "u4", "u5") ~ "unobserved",
-             name %in% c("gov", "bare") ~ "target",
-             name %in% c("inv", "rain") ~ "observed"
+             name %in% c("u123", "u4", "u5", "u6") ~ "unobserved",
+             name %in% c("gov", "barepost") ~ "target",
+             name %in% c("inv", "rain", "barepre") ~ "observed"
            )) %>% 
   ggplot(
     aes(
@@ -939,14 +933,15 @@ p_dag2 <- dag2 %>%
   geom_dag_text(
     aes(color = type == "target"),
     # sort them alphabetically
-    label = c( bare  = expression(italic(d)['bare']),
+    label = c( barepost  = expression('Bare'['post']),
+               barepre  = expression('Bare'['pre']),
                gov  = expression(theta^'Gov'),
                invasives = expression('Invasives'),
                rain = expression('Rainfall'),
-              
                u123   = expression(italic(U[123])),
                u4   = expression(italic(U[4])),
-               u5   = expression(italic(U[5]))),
+               u5   = expression(italic(U[5])),
+               u6   = expression(italic(U[6]))),
     parse = TRUE,
     show.legend = FALSE,
     family = fontfam
@@ -1015,7 +1010,10 @@ shp_border <- st_read("data/shapes_distr/ken_admbnda_adm0_iebc_20191031.shp")
 pm <- pm + 
   geom_sf(data = shp_border, inherit.aes = FALSE, fill = NA) + 
   geom_text(data = tibble(x=37.5, y = -2.4), aes(x = x,y = y, label = "Kenya"), size = 6, family = fontfam) + 
-  geom_text(data = tibble(x=35.75, y = -5.75), aes(x = x,y = y, label = "Tanzania"), size = 6, family = fontfam) + 
+  geom_text(data = tibble(x=35.75, y = -5.75), aes(x = x,y = y, label = "Tanzania"), size = 6, famipng("outputs/ppcs_fit_irt_2par.png", width = 4500, height = 6000, res = 380)
+            ppc1/ppc2 + plot_layout(heights = c(1,2/3)) +
+              plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
+            dev.off()ly = fontfam) + 
   geom_text(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y, label = "Arusha"), size = 4, family = fontfam,
             hjust = -1/10, fontface = "bold") + 
   geom_point(data = tibble(x = 36.682995, y = -3.386925), aes(x = x,y = y), size = 2)
@@ -1096,6 +1094,7 @@ dfgov <- df_items %>%
   summarise(gov = mean(as.numeric(as.character(score))))
 
 dfgis <- df_landuse_area %>%
+  mutate(area_ha = area_ha / total_area) %>% 
   select(-total_area, -measurement_time) %>% 
   pivot_wider(names_from = period, values_from = area_ha) %>% 
   pivot_wider(names_from = type, values_from = c(Pre, Post)) %>% 
@@ -1118,13 +1117,13 @@ dfgis <- df_landuse_area %>%
                      pop2020 = `2020`)
   )
 
-# outcome
-dfgis <- dfgis %>%
-  mutate(
-    delta_bare = Post_bare-Pre_bare,
-    y = log((delta_bare)/Pre_bare + 1), # equivalent with: log(Post_bare/Pre_bare)
-    gov = as.numeric(scale(gov))
-  )
+# # outcome
+# dfgis2 <- dfgis %>%
+#   mutate(
+#     delta_bare = Post_bare-Pre_bare,
+#     y = log((delta_bare)/Pre_bare + 1), # equivalent with: log(Post_bare/Pre_bare)
+#     gov = as.numeric(scale(gov))
+#   )
 
 # with(dfgis, plot(Post_bare/Pre_bare))
 # with(dfgis, plot(log(Post_bare/Pre_bare)))
@@ -1138,48 +1137,106 @@ dfgis <- dfgis %>%
 #   )
 # # 
 
-m <- lm(
-  y ~ gov + rain_std + invasive_binary,
-  data = dfgis
-)
-summary(m) # -0.1295568
+# m <- lm(
+#   y ~ gov + rain_std + invasive,
+#   data = dfgis2
+# )
+# summary(m) # -0.11637 
 
-# # 
-# x <- seq(-4,4,0.1)
-# pred = predict(
-#   m, newdata = tibble(
-#     gov = x,
-#     rain_std = 0,
-#     invasive_binary = 1
-#   ))
-# plot(x,
-#      exp(pred),
-#      type = "l")
-# abline(h = 1, lty = 2)
+# other models probably statistically better. See considerations in Word doc.
+# 
+# m2 <- lm(
+#   Post_bare ~ Pre_bare + govpostmean + rain + invasive,
+# 
+#   # 02.3 makes more sense to be used than binary invasive threat indicator:
+#   # post-period outcome from governance = mediator with effect on post bare
+#   data = dfgis_std %>% mutate(Post_bare = qlogis(Post_bare),
+#                               Pre_bare = qlogis(Pre_bare))
+# )
+#   # %>%
+#   #   mutate(
+#   #     across(contains("Pre_bare"), ~as.numeric(scale(.x)))
+#   #   )
+# #  )
+# summary(m2)
+# plot(m2)
 
-# summary(lm(
-#   I(Post_bare-Pre_bare) ~ gov + rain_std + Pre_bare,
+
+# m3 <- lm(
+#   Post_bare ~ Pre_bare * (gov + rain_std + invasive),
 #   data = dfgis
-# ))
+#   # %>% 
+#   #   mutate(
+#   #     across(contains("Pre_bare"), ~as.numeric(scale(.x)))
+#   #   )
+#   )
+# 
+# summary(m2)
+# summary(m3)
+# anova(m2, m3)
 
-summary(lm(
-  I(log(Post_crop/Pre_crop)) ~ gov + rain_std + I(log(pop2020/pop2012)),
-  data = dfgis
-)) # +0.46
-# cor.test(
-#   dfgis$Pre_bare,
-#   dfgis$Pre_crop
-# ) # > 0
-# cor.test(
-#   dfgis$Post_bare,
-#   dfgis$Post_crop
-# ) # > 0
+# both models imply basically the same gov effect. so main result won't depend on it.
+# but there are arguments for model m3 over m2!
+# - statistically (could find the same via WAIC and LOO score in bayesian variant to show it)
+# - substantively (multiplicativeness: a small absolute area will have less area ADDED than a large area, at same governance quality)
+#   indeed plausible estimates: all coeffients plausible direction; and they have same direction in "simple effects"
+# #   and "interaction effects" --> larger PRE area means larger - positive or negative - additive area effect. as it should be.
+# 
+# # yes, that is it!!
+# # then I can plot such stuff:
+# dg <- datagrid(model = m2,
+#          govpostmean = seq(-4,4,0.01),
+#          grid_type = "typical"
+#          )
+# plot_predictions(model = m2, newdata = dg, by = "govpostmean", transform = plogis)
+# # and include slopes for other PRE areas, to show that smaller area
+# # in beginning implies less steep effect slope of gov, of course.
+# 
+# # we even find the same tendency in agriculture when we use exact that model
+# # (but no invasives, obviously)
+# m4 <- lm(
+#   Post_crop ~ Pre_crop * (gov + rain_std),
+#   data = dfgis
+#   %>% 
+#     mutate(
+#       across(contains("Pre_crop"), ~as.numeric(scale(.x)))
+#     ))
+# 
+# summary(m4)
+# dg4 <- datagrid(model = m4,
+#                gov = seq(-3,3,0.01),
+#                grid_type = "typical"
+# )
+# plot_predictions(model = m4, newdata = dg4, by = "gov")
+# such directrionwould be nice story: in total clear increase from pre to post (see household data and GIS data)
+# but gov limits the agricultural conversion (as is also majory's theory)
+
+#... and, 
+# a) if rain cannot be motivated or its estimate plausibilzed as covariable
+# (--> more rain leads to less agriculture for fixed gov. plausible?), removing it
+# still reproduces this direction.
+# and, 
+# b) if we should adjust for populatino growth (2020/2012), still produces
+# this direction AND plausible direction for population growth (see also project report from Majory:
+# population growth and agircultural expansion are clearly linked)
+# but
+# c) CAREFUL: note that 'Post_crop ~ Pre_crop * gov + rain_std' (analogon model of m2 for crop).
+# produces opposite prediction direction. Need to understand that to not follow a weird artifact
 
 # tabulate invasives. which to use? do they agree?
-df_codescores %>% 
-  filter(grepl("o2.3", dimension)) %>% 
-  left_join(df_threats %>% filter(grepl("nvasive", threat))) %>% 
+df_codescores %>%
+  filter(grepl("o2.3", dimension)) %>%
+  left_join(df_threats %>% filter(grepl("nvasive", threat))) %>%
   select(village, dimension, score, threat, present)
+
+# -----------------------------------------------------------------------------------
+# SO und nun koennte ich noch statt den Metern einfach in area share [0,1] arbeiten.
+# erlaubt dann einfacher zB eine transformation machen, die zwischen 0 und 1 bounded (denn area
+# hat keine natuerlicher upper bound und ein modell wird immer ueber das groesste village
+# hinaus vorherasgen machen)
+# ABER: veraendert es (im multiplikativen modell) die schaetzung? oder liefert es äquivalentes modell?
+# immerhin wird ja jedes dorf mit einer anderen total area multipliziert/dividiert bei der umrechnung.
+#-----------------------------------------------------------------------------------
 
 #############################################################
 #### bayesian gaussian regression with measurement error ####
@@ -1192,54 +1249,102 @@ df_gov_posteriors <- gather_draws(fit_irt_2par, r_village[village,dimension]) %>
   as_tibble() %>%
   group_by(village) %>% 
   summarise(
-    gov_post_mean = mean(.value),
-    gov_post_sd = sd(.value)
+    govpostmean = mean(.value),
+    govpostsd = sd(.value)
   )
 dfgis <- dfgis %>% 
   left_join(df_gov_posteriors)
 
-
+dfgis_std <- dfgis %>% 
+  # logit trans
+  mutate(across(contains("bare"), qlogis))%>%
+  select(contains("bare"), govpostmean, govpostsd, rain, invasive) %>% 
+  # standardize rain and logits of cover
+  mutate(across(.cols = c(#contains("bare"), 
+                          rain
+                          ), ~as.numeric(scale(.x))))
 
 # family, formula, priors
-family_bare <- brmsfamily("gaussian", "identity")
-formula_bare <- 
-  bf(y ~  rain_std + invasive + me(gov_post_mean, gov_post_sd))
+# family_bare <- brmsfamily("gaussian", "identity")
+# family_bare <- brmsfamily("binomial", "logit")
 prior_bare <-
-  prior("normal(0, 1.5)",  class = "b") +
-  prior("constant(0)", class = "meanme") +
-  prior("constant(1)", class = "sdme") + 
-  prior("exponential(1)", class = "sigma")
+  prior("normal(0, 2)",  class = "Intercept", resp = "Postbare") +
+  prior("normal(0, 2)",  class = "b",         resp = "Postbare") +
+  prior("exponential(1)",  class = "sigma",     resp = "Postbare") +
+  #prior("constant(0)",     class = "Intercept", resp = "govpostmean") +
+  prior("constant(1)",     class = "sigma",     resp = "govpostmean")
 
-# run sampling
+# three models with different parametric form
+formula_bare1 <- bf(Post_bare ~ mi(govpostmean) + Pre_bare + rain + invasive) + gaussian(identity)
+formula_bare2 <- bf(govpostmean | mi(sdy = govpostsd) ~ 0) + gaussian(identity)
+  
+# formula_bare2 <- 
+#   bf(Post_bare ~ mi(govpostmean) * Pre_bare + rain + invasive) + 
+#   bf(govpostmean | mi(sdy = govpostsd) ~ 1)
+# formula_bare3 <- 
+#   bf(Post_bare ~ mi(govpostmean) * (Pre_bare + rain + invasive)) + 
+#   bf(govpostmean | mi(sdy = govpostsd) ~ 1)
+
+
+# # compare exponential and half T
+# x <- seq(0,5,0.01)
+# plot(x, LaplacesDemon::dhalft(x, scale = 2.5, nu = 3), type = "l", ylim = c(0, 1))
+# lines(x, dexp(x, rate = 1.5), type = "l", ylim = c(0, 1), col = "red")
+
+# map(c("bare1"#, 
+#       # "bare2", 
+#       # "bare3"
+#       ), function(x){
+
+  # run sampling
 fit_bare <- brm(
-  formula = formula_bare,
-  data = dfgis,
-  family = family_bare,
-  prior = prior_bare,
+    formula = formula_bare1 + formula_bare2 + set_rescor(FALSE),
+    data = dfgis_std,
+    prior = prior_bare,
     control   = list(adapt_delta = 0.999, max_treedepth = 15),
     warmup    = 2e3,
     iter      = 6e3,
     thin      = 1,
     chains    = 5,
-    cores     = 5,
+    cores     = 10,
     seed      = 1234,
+    save_pars = save_pars(latent = TRUE),
     backend   = "cmdstanr"
-)
+  )
 
 # export
-prior_summary(fit_bare)
+# prior_summary(fit_bare)
+# summary(fit_bare)
+saveRDS(fit_bare, file = paste0("outputs/fit_bare.rds"))
+cat(stancode(fit_bare), file = "outputs/fit_bare.txt")
+# fit_bare <- readRDS("outputs/fit_bare.rds")
+
 summary(fit_bare)
-saveRDS(fit_bare, file = "outputs/fit_bare.rds")
-fit_bare <- readRDS("outputs/fit_bare.rds")
+prior_summary(fit_bare)
 
 # trace plots
 mcmc_trace(fit_bare, regex_pars = "b_")
+mcmc_trace(fit_bare, regex_pars = "sigma_")
+# mcmc_trace(mod2, regex_pars = "b_")
+# mcmc_trace(mod3, regex_pars = "b_")
+
+# model comparison
+# loo(mod1)
+# loo(mod2)
+# loo(mod3)
+
+
+# loo::loo_compare(
+#   loo(mod1),
+#   loo(mod2),
+#   loo(mod3)
+# )
 
 #####################################
 #### regression table (all pars) ####
 #####################################
 # table with other parameters posteriors
-all_pars <- get_variables(fit_bare)[grepl("b_|megov|sigma",  get_variables(fit_bare))]
+all_pars <- get_variables(fit_bare)[grepl("Postbare_|govpost|sigma",  get_variables(fit_bare))]
 all_pars_tab <- map_dfr(all_pars, function(x){
   gather_draws(fit_bare, !!as.symbol(x)) %>% 
     summarise(mean = mean(.value),
@@ -1247,16 +1352,23 @@ all_pars_tab <- map_dfr(all_pars, function(x){
               q05 = quantile(.value, 0.05),
               q50 = median(.value),
               q95 = quantile(.value, 0.95))
-})  %>% 
+}) %>% 
+  filter(!grepl("Yl", .variable)) %>% # not the posteriors for the measurements. not of interest. why do they change slightly?
+# mcElreath: "A cool implication that will arise
+# here is that information flows in both directions—the uncertainty in measurement influences
+# the regression parameters in the linear model, and the regression parameters in the linear
+# model also influence the uncertainty in the measurements. There will be shrinkage."
+  filter(!grepl("_govpostmean", .variable)) # do not need again the variables I fixed via priors
+
+all_pars_tab <- all_pars_tab %>% 
   mutate(varlabel = 
            case_when(
-             .variable == "b_Intercept"                       ~ "$\\gamma_0$",
-             .variable == "b_rain_std"                        ~ "$\\gamma_1$",
-             .variable == "b_invasive"                        ~ "$\\gamma_2$",
-             .variable == "bsp_megov_post_meangov_post_sd"    ~ "$\\gamma_3$",
-             .variable == "sigma"                             ~ "$\\sigma$",
-             .variable == "meanme_megov_post_mean"            ~ "meanlatents",
-             .variable == "sdme_megov_post_mean"              ~ "sdlatents"
+             .variable == "b_Postbare_Intercept"                  ~ "$\\gamma_0$",
+             .variable == "b_Postbare_Pre_bare"                   ~ "$\\gamma_1$",
+             .variable == "b_Postbare_rain"                       ~ "$\\gamma_2$",
+             .variable == "b_Postbare_invasive"                   ~ "$\\gamma_3$",
+             .variable == "bsp_Postbare_migovpostmean"            ~ "$\\gamma_4$",
+             .variable == "sigma_Postbare"                        ~ "$\\sigma$",
            ), .before = ".variable"
   ) %>% 
   mutate(across(where(is.numeric), ~style_number(.x))) %>% 
@@ -1264,52 +1376,102 @@ all_pars_tab <- map_dfr(all_pars, function(x){
 
 saveRDS(all_pars_tab, file = "outputs/fit_bare_parstab.rds")
 
-#########################
-#### prediciton plot ####
-#########################
+#######################################
+#### prediciton and estimate plot ####
+######################################
+set.seed(1234)
+ppoverlay <- bayesplot::pp_check(fit_bare, resp = "Postbare", 
+                                 ndraws = 50) +
+  # y = as.numeric(as.character(df_items$score)),
+  # yrep = yrep_char,
+  # group = df_items$tier3,
+  # facet_args = list(ncol =4))+ 
+  labs(x = "logit(Bare<sub>post</sub>)") +
+  theme_classic(12) +
+  theme(#strip.text = element_text(size = 8.5),
+        text = element_text(family = fontfam),
+        axis.title.x = element_markdown(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+        #strip.background = element_blank()) + 
+  # scale_y_continuous(breaks = c(0,5,10), limits = c(0,13))+ 
+  # scale_x_continuous(limits = c(0,1))
+
+png("outputs/ppcs_fit_bare.png", width = 1750, height = 1500, res = 300)
+ppoverlay
+dev.off()
+
+# figure parameter estimates
+p_bare <- mcmc_intervals(fit_bare, pars = vars(contains("_Post")),
+                         prob = 0.5, prob_outer = 0.9, point_est = "median") +
+  theme_classic(12) +
+  # labs(subtitle = "*&#952;<sub>j</sub><sup>Gov</sup>*") +
+  theme(text = element_text(family = fontfam),
+        # plot.subtitle = element_markdown()
+        ) #+ 
+  # scale_y_discrete(
+  #   labels = function(x) 
+  #     str_replace_all(str_remove_all(str_remove_all(x, "r_village\\["), ",itemtypeGovernance\\]"), "\\.", " ")
+  # )
+p_bare
+
+# prediction plot
+# dg <- datagrid(model = fit_bare,
+#                govpostmean = seq(-4,4,0.1),
+#                grid_type = "counterfactual") %>% 
+#   bind_cols(govpostsd = rep(dfgis_std$govpostsd, length(seq(-4,4,0.1))),
+#             village = rep(dfgis$village, length(seq(-4,4,0.1))))
+
 dg <- datagrid(model = fit_bare,
-               gov_post_mean = seq(-4,4,0.1),
-               FUN_numeric = median) # grid with covariates at median
+               govpostmean = seq(-4,4,0.1),
+               govpostsd = median(fit_bare$data$govpostsd),
+               FUN_numeric = median)
 
-df_pred <- spread_draws(fit_bare, # extract posterior samples
-             b_Intercept,
-             b_rain_std,
-             b_invasive,
-             bsp_megov_post_meangov_post_sd) %>% 
-  expand_grid(
-    dg) %>% 
-  mutate( # calculate linear predictor and transform
-    yexp = exp(
-        b_Intercept + 
-        b_rain_std * rain_std + 
-        b_invasive * invasive + 
-        bsp_megov_post_meangov_post_sd * gov_post_mean))
+# grid with covariates at median
+# 
+# plot_predictions(model = fit_bare, newdata = dg, by = "govpostmean", resp = "Postbare",
+#                  transform = plogis)
+# 
 
-df_pred_smry <- df_pred %>% 
-  group_by(gov_post_mean) %>% 
+preds_bare <- posterior_predict(
+  object = fit_bare,
+  resp = "Postbare",
+  newdata = dg,
+  seed = 1234)
+
+preds_bare <- plogis(preds_bare) / plogis(unique(dg$Pre_bare))
+
+df_preds_bare <- as_tibble(preds_bare)
+names(df_preds_bare) <- as.character(seq(-4,4,0.1))
+
+df_preds_bare_grp <- df_preds_bare %>% 
+  pivot_longer(cols = everything(), names_to = "x", values_to = "y") %>% 
+  mutate(x = as.numeric(x)) %>% 
+  group_by(x) %>% 
   summarise(
-    mean = mean(yexp),
-    lwr = quantile(yexp, 0.05),
-    upr = quantile(yexp, 0.95)
+    mean = mean(y),
+    lwr = quantile(y, 0.05),
+    upr = quantile(y, 0.95)
   )
 
-p_pred <- df_pred_smry %>% 
+p_pred <- df_preds_bare_grp %>% 
   ggplot() + 
-  geom_ribbon(aes(x = gov_post_mean, ymin = lwr, ymax = upr), alpha = 1/10) +
-  geom_line(aes(x = gov_post_mean, y = mean),
-                lwd = 1) +
   geom_hline(yintercept = 1, linetype = 2) +
+  geom_ribbon(aes(x = x, ymin = lwr, ymax = upr), alpha = 1/10) +
+  geom_line(aes(x = x, y = mean),
+                lwd = 1) +
   theme_classic(14) +
   theme(text = element_text(family = fontfam),
         axis.title.x  = element_markdown()) + 
   scale_color_manual(values = gradcolors) + 
-  scale_fill_manual(values = gradcolors) + 
-  labs(y = "Expected factor change\nin bare ground area",
+  scale_fill_manual(values =  gradcolors) + 
+  #scale_y_continuous(limits = c(0,3)) +
+  labs(y = "Predicted factor change in bare ground cover",
        x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
        fill = "Response\ncategory")
 
 png("outputs/pred_bareground.png", width = 2800, height = 1800, res = 360)
-p_icc2 / p_pred + plot_layout(heights = c(1,4))
+p_pred
 dev.off()
 
 
