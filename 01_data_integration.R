@@ -261,12 +261,23 @@ df1_econ_smry_pca <- df1 %>%
   group_by(village) %>% 
   summarise(`a2.1.economic.heterogeneity` = sd(wealth))
 
+
+
 #   summarise(`a2.1.economic.heterogeneity` = 1/sd(wealth)) # HOMOGENEITY we need; higher values --> more homogeneity;
 # # correlates well with above out-commented approach by Monique (r = 0.7)
 # plot(df1_econ_smryB$a2.1.economic.heterogeneity,
 # df1_econ_smry_pca$a2.1.economic.heterogeneity)
 # cor(df1_econ_smryB$a2.1.economic.heterogeneity,
 #      df1_econ_smry_pca$a2.1.economic.heterogeneity) # -0.6945469
+
+png("outputs/wealth_pca.png", width = 800, height = 800, res = 200)
+df1 %>%
+  bind_cols(wealth = pca_econ$scores) %>%
+  group_by(village) %>% 
+  summarise(`wealth SD` = sd(wealth),
+            `wealth mean` = mean(wealth)) %>% 
+  {plot(.$`wealth mean`, .$`wealth SD`)}
+dev.off()
 
 df3 <- df3 %>%
   select(-`a2.1.economic.heterogeneity`) %>%

@@ -1,8 +1,6 @@
 ---
-title: "Gathering main findings, tables and figures  for TNC-NTRI rangeland management project publication"
-author: |
-  | Stefan Gehrig
-  | www.estimact.com / estimact@onmail.com
+title: "Analysis summary for TNC-NTRI rangeland management project publication"
+author: Stefan Gehrig
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   bookdown::pdf_document2:
@@ -34,8 +32,10 @@ header-includes:
   \usepackage{titling}
   \pretitle{\begin{center}
   \vspace{-2.5cm}
-  \includegraphics[height=1.25cm]{utils/estimact.png}
-    \vspace{0.85cm}\LARGE\\}
+  \includegraphics[height=1.15cm]{utils/estimact.png}\\
+  \vspace{-0.4cm}
+  www.estimact.com / estimact@onmail.com
+    \vspace{1.5cm}\LARGE\\}
   \posttitle{\end{center}}
   \usepackage{setspace}
   \singlespacing
@@ -58,9 +58,9 @@ geometry: top=1in, bottom=1in, left=1in, right=1in
 
 \vspace{0.25cm}
 
-In line with the comments received and discussions had (e-mail from Monique, 2023-08-05), here we are starting to collect and results, tables and figures which could make it into the main text or supplemental material (SM) of the manuscript that Monique et al. will be preparing. The previous delivery of results (my e-mail from 2023-07-24) contained a more diverse set of explorations and presentations, but at this stage, we are ready to zoom in again on the relevant paths of analysis to be pursued and a reduced set of ways to present the results. This helps to gain structure and reduce confusion.
+In line with the comments received and discussions had (e-mail from Monique, 2023-08-05), here we are starting to collect results, tables, figures and texts, which could make it into the main text or supplemental material of the manuscript that Monique et al. will be preparing. The previous delivery of results (my e-mail from 2023-07-24) contained a more diverse set of explorations and presentations, but at this stage, we are ready to zoom in again on the paths of analysis that we have agreed to focus on. So we get more structure and depth (all analyses are described with much technical detail already), but less breadth compared to the previous results report. Towards the end of the report, there are sections which only contain \textcolor{teal}{colored} comments, because it is unclear (to me) if such analyses really need to be done / should be done. They are meant to spur discussion, such that we can soon agree on if, and, if yes, how to proceed with them. My goal would be to rather quickly narrow down the set of analyses that we run and report for the (first?) publication. I'm sure we have methodologically and substantively interesting analyses in our hands already.
 
-\vspace{0.25cm}
+\newpage
 
 ```{=latex}
 \tableofcontents
@@ -86,45 +86,45 @@ fit_bare <- readRDS(file = "outputs/fit_bare.rds")
 ```
 
 
-\textcolor{red}{schau nochmal in den NTRI (!) report, das Word doc. Da sind viele wertvolle richtungen zu denken drin mit dem ganzen substantivem wissen über den Ort und so und den Fragen die sie analysieren.}
+<!-- \textcolor{red}{schau nochmal in den NTRI (!) report, das Word doc. Da sind viele wertvolle richtungen zu denken drin mit dem ganzen substantivem wissen über den Ort und so und den Fragen die sie analysieren.} -->
 
 # Descriptive tables and figures
 
-It would make sense to split the data we use in two "types" and also present them in that way, to be very clear to readers. The first type are those Diagnostic Framework (DF) variables that are constructed from interviews and focus groups and coded in binary / ordinal manner (and used as outcome or predictor). These are noisy measurements of underlying latent traits and that is also the way we treat them in the analysis. One way to present them (main text or SM) is for example Table \ref{tab:dfsum}. The variables are based on the DF in the version from @mcginnis_social-ecological_2014 and measured in line with definitions from the Social-ecological systems meta-analysis database
-(SESMAD) project [@cox_concepts_2020]. I'd suggest to only present the DF variables which actually use for the analysis, which is the logic I followed here.^[Of course, a full list of DF variables collected during the project could still go in the SM. But there are some variables that we cannot make good use of for the current analysis and they would maybe distract.] This reduction of DF variables from the full set to a reduced set could become a methodological side-story of the manuscript: The full DF is a very mixed bag and not per se a suitable tool for impact assessments or analyzing pathways of change -- but it a quite massively filled bag from which one can draw subsets for more targeted research questions. That would point to the recommendation that scholars use the tool to develop their own causal hypotheses and select own subsets of variables (e.g., those believed to be most accurate and/or showing most variation).
+It would make sense to split the data we use in two "types" and also present them in that way, to be very clear to readers. The first type are those Diagnostic Framework (DF) variables that are constructed from interviews and focus groups and coded in binary / ordinal manner (only if used in any of the presented analyses). These are noisy measurements of underlying latent traits and that is also the way we treat them in the analysis. One way to present them (main text or SM) is for example Table \ref{tab:dfsum}. The variables are based on the DF in the version from @mcginnis_social-ecological_2014 and measured in line with definitions from the Social-ecological systems meta-analysis database
+(SESMAD) project [@cox_concepts_2020]. I'd suggest to only present the DF variables which are actually used for analysis, which is the logic I followed here.^[Of course, a full list of DF variables collected during the project could still go in the SM. But there are some variables that we cannot make good use of for the current analysis and they would therefore distract.] This reduction of DF variables from the full set to a reduced set could become a methodological side-story of the manuscript: The full DF is a very mixed bag and not per se a suitable tool for impact assessments or analyzing pathways of change -- but it a quite massively filled bag from which one can draw subsets for more targeted research questions. That would point to the recommendation that scholars use the tool to develop their own causal hypotheses and select own subsets of variables (e.g., those relevant to the question, or those believed to be most accurate and/or showing most variation).
 
 ```{r dfsum}
-dfsum <- gat_tab1 %>% 
+dfsum <- gat_tab1 %>%
   mutate(bin = ifelse(bin==TRUE, "*", " "),
-         tier1 = droplevels(tier1)) 
+         tier1 = droplevels(tier1))
 
-dfsum %>% 
-  select(-tier1) %>% 
+dfsum %>%
+  select(-tier1) %>%
   kable(
     booktabs = TRUE,
      linesep = "",
     caption = "Third-tier DF variables and their response distributions in the 12 villages, grouped by first-tier variables. Only DF variables used in the analysis are shown. The asterik indicates whether a variable has originally been coded as binary and was therefore transformed to only have response options 1 and 3 (i.e., no middle option).",
     col.names = c("Third-tier variable", "1", "2", "3", " ", "Explanation of highest score"),
-    ) %>% 
-  kable_styling(font_size = 5.5, latex_options = "HOLD_position") %>% 
-  add_header_above(c(" " = 1, "Score\nfrequency" = 3, " " = 2)) %>% 
+    ) %>%
+  kable_styling(font_size = 5.5, latex_options = "HOLD_position") %>%
+  add_header_above(c(" " = 1, "Score\nfrequency" = 3, " " = 2)) %>%
   kableExtra::group_rows(index = table(dfsum$tier1))
 ```
 
 
-Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale* (and used as outcome or predictor). These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspondent to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis (that will become clearer in the sections below). They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [following @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
+Then, there is the second type of data we use in the current analysis, which is *everything measured on a continuous scale*. These data cannot be easily pooled with the data from Table \ref{tab:dfsum}, because they live on a different scale. The different ways I tried to bring them on comparable scales for presentations (see previous reports) are not really ideal. Some of these other variables might correspond to a DF dimension, but we separate them conceptually from the variables in Table \ref{tab:dfsum} due to the way they are measured and due to the role they play in the analysis (that will become clearer in the sections below). They are summarized in Table \ref{tab:othersum}.^[For economic inequality, we estimate the within-village SD from the first PC of a PCA on household assets based on the household survey [following @sharma_escalation_2023]. These assets include the availability/quality of wall, floor, roof, toilet, mobile phone, motorcycle and bed. As quick check of validity, the resuling score strongly correlates with the proportion of people in a village having a motorcycle ($r \approx 0.7$), which in this local context could be a simple indicator of wealth inequality.]
 
 ```{r othersum}
-gat_tab2 %>% 
+gat_tab2 %>%
   kable(
     booktabs = TRUE,
-    digits = 2,
+    digits = 3,
      linesep = "",
     caption = "Other, continuously measured variables used in the analysis and their response distributions in the 12 villages.",
     col.names = c("Variable", "Mean", "Min", "Max", "Source"),
-    ) %>% 
-  kable_styling(font_size = 8, latex_options = "HOLD_position")%>% 
-  add_header_above(c(" " = 1, "Distribution" = 3, " " = 1)) 
+    ) %>%
+  kable_styling(font_size = 8, latex_options = "HOLD_position")%>%
+  add_header_above(c(" " = 1, "Distribution" = 3, " " = 1))
 ```
 
 
@@ -138,7 +138,7 @@ include_graphics("outputs/gat_spiders.png")
 
 \newpage
 
-```{r boxes, fig.align='center', fig.cap='Raincloud plots for variables from Table 2. Upper panels (a) and (b) have log-scaled y axes for readability.', out.width="100%"}
+```{r boxes, fig.align='center', fig.cap='Raincloud plots for variables from Table 2. Upper panels (a) and (b) have logit-scaled y axes for readability.', out.width="100%"}
 include_graphics("outputs/gat_rainclouds.png")
 ```
 
@@ -152,13 +152,13 @@ include_graphics("outputs/map_terr_vills.png")
 
 \newpage
 
-# Item response modeling: Relation between self-reported governance processes and outcomes
+# Item response modeling: Association between self-reported governance processes and outcomes {#irt}
 
-This whole section is more or less completely drafted and open to discussion (e.g., what to add/leave out). Some things might need to be explained less technical then.
+This whole section is more or less completely drafted and open to discussion (e.g., what to add/leave out, what to explain better, what to do differently, ...).
 
 ## Motivation
 
-We now model the association between governance processes and governance outcomes as reported by communities. This is based on the data presented in Table \ref{tab:dfsum}. The workhorse of the analysis will be a Bayesian Item Response Model fit with `brms` [@burkner_bayesian_2021; @fox_bayesian_2010]. 
+We now model the association between governance processes and governance outcomes as reported by communities. This is based on the data presented in Table \ref{tab:dfsum}. The workhorse of the analysis will be a Bayesian Item Response Model fit with `brms` [@burkner_bayesian_2021; @fox_bayesian_2010].
 
 Item Response Theory (IRT) is a statistical modeling paradigm from psychology that aims to simultaneously assess respondent-level and item-level influences on test scores [@linden_handbook_1997]. It can be viewed as a form of statistical adjustment for item characteristics that allows inference about unobserved latent characteristics of respondents. In our research context, the "respondents" are communities and the items are coded responses from in-depth focus group discussions and interviews. Therefore, in the context of this analysis, we also refer to the third-tier DF variables in Table \ref{tab:dfsum} as items.
 
@@ -166,11 +166,11 @@ Based on the nature of our items, we a priori propose two underlying latent trai
 
 Variation in item responses between villages is assumed to partially reflect true variation in the underlying latent traits of villages, but also measurement error. At the same time, the IRT models will allow to model variation in responses between items due to item *easiness* (the characteristic of an item to produce higher responses by villages) and item *discrimination* (the characteristic of an item to produce responses that allow to distinguish better between villages of different governance process or outcome quality). Such variation is clearly suggested already by the raw data (see Table \ref{tab:dfsum}). Thus, IRT can provide a comprehensive picture of different sources of variation in item responses. Most importantly for our purpose, the model will allow to estimate the positioning of all villages on the two latent dimensions *Governance* and *Outcome*, as well as the correlation across dimensions.
 
-Fitting the IRT model in a Bayesian framework provides a natural way to induce regularization via prior distributions and to quantify and present uncertainty. Due to the rather small sample of villages and the inherent tendency of IRT models to have a high number of parameters to be estimated from data, these aspects are both important in the present analysis. Bayesian IRT models have been used before to infer latent traits of natural resource users [e.g., @pretelli_rates_2022]. 
+Fitting the IRT model in a Bayesian framework provides a natural way to induce regularization via prior distributions and to quantify and present uncertainty. Due to the rather small sample of villages and the inherent tendency of IRT models to have a high number of parameters to be estimated from data, these aspects are both important in the present analysis. Bayesian IRT models have been used before to infer latent traits of natural resource users [e.g., @pretelli_rates_2022].
 
 ## Formal model definition
 
-Response of village $j = 1,...,J$ on item $i = 1, ..., I$ shall be denoted as $Y_{i,j}$. Since these scores can take discrete values $k = 1,2,3$, we assume a multinomial distribution of item responses 
+Response of village $j = 1,...,J$ on item $i = 1, ..., I$ shall be denoted as $Y_{i,j}$. Since these scores can take discrete values $k = 1,2,3$, we assume a multinomial distribution of item responses
 
 $$Y_{i,j} \sim \text{Multinomial}(\pi_{1, i, j}, \pi_{2, i, j}, \pi_{3, i, j}),$$
 
@@ -179,7 +179,7 @@ where $\pi_{k, i, j}$ denotes the probability of village $j$ to choose response 
 Given the ordinal nature of the items responses, we use the cumulative logit link with common slopes, also known as proportional odds model.^[In IRT terminology, such models are known as "Graded Response Models" [@linden_handbook_1997, chapter 5].] Accordingly, the probability to give response $k$ or less can can be written as a function of a category-specific threshold parameter $\beta_k$ and a linear combination of village- and item-level characteristics $\eta_{i,j}$, which will ultimately be of substantive interest to us. Higher values of $\eta_{i,j}$ mean a higher expected response category. Further, an item-specific discrimination parameter $a_i$ is introduced. This leads to
 
 $$
-P(Y_{i,j} \leq k) = \text{logit}^{-1} \left(\text{exp}(\alpha + a_i) ( \beta_k - \eta_{i,j} ) \right), 
+P(Y_{i,j} \leq k) = \text{logit}^{-1} \left(\text{exp}(\alpha + a_i) ( \beta_k - \eta_{i,j} ) \right),
 $$
 
 where $\alpha$ is an intercept parameter for item discrimination, such that the $a_i$ represent deviations from mean discrimination for each item. Via including $a_i$, we allow that items do not have constant discrimination, i.e., that they may differ in how strongly changes in the latent trait of villages (a component of $\eta_{i,j}$, see below) affect response probabilities for that item. Unequal discrimination is a sensible assumption in the present setting particularly some of the items were originally scored on a dichotomous, others on a polytomous scale. In IRT terminology, the assumption of non-constant discrimination leads to the so-called "two-parameter model" [@linden_handbook_1997], since an additional item-level parameter besides item easiness (see below) is introduced.^[Due to the multiplicativeness of this relationship, the two-parameter model is no more linear in the parameters.] By exponentiating $(\alpha + a_i)$, discrimination is always positive. Put differently, discrimination is modeled on the log-scale, which is the default implementation in `brms` [@burkner_bayesian_2021].
@@ -203,13 +203,13 @@ where $\text{Gov}_i$ is an indicator that is 1 if item $i$ is of type *Governanc
 Finally, working in a Bayesian framework with varying parameters, we assume that item- and village-level parameters follow the distributions
 
 \begin{align*}
-(a_i, b_i)^{t} & \sim \text{Normal}(\bm{0}, D_1), \text{with} \\ 
+(a_i, b_i)^{t} & \sim \text{Normal}(\bm{0}, D_1), \text{with} \\
 & D_1 =
 \begin{pmatrix}
 \sigma^2_{a} & \sigma_{a,b}\\
 \sigma_{a,b} & \sigma^2_{b}
 \end{pmatrix}, \\ \\
-(\theta_j^{\text{Gov}}, \theta_j^{\text{Out}})^{t} & \sim \text{Normal}(\bm{0}, D_2), \text{with} \\ 
+(\theta_j^{\text{Gov}}, \theta_j^{\text{Out}})^{t} & \sim \text{Normal}(\bm{0}, D_2), \text{with} \\
 & D_2 =
 \begin{pmatrix}
 \sigma^2_{\text{Gov}} & \sigma_{\text{Gov},\text{Out}}\\
@@ -217,7 +217,7 @@ Finally, working in a Bayesian framework with varying parameters, we assume that
 \end{pmatrix}.
 \end{align*}
 
-This implies that the two item parameters $a_i$ and $b_i$ are allowed to covary. Accounting for within-item dependencies in this way is usually desirable in IRT modeling [@fox_bayesian_2010, p. 36-37]. Likewise, the two village-parameters $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$, follow a bivariate normal distribution with covariance $\sigma_{\text{Gov},\text{Out}}$. We can hence define our parameter of interest, the correlation between governance and outcome quality, based on the IRT model as 
+This implies that the two item parameters $a_i$ and $b_i$ are allowed to covary. Accounting for within-item dependencies in this way is usually desirable in IRT modeling [@fox_bayesian_2010, p. 36-37]. Likewise, the two village-parameters $\theta_j^{\text{Gov}}$ and $\theta_j^{\text{Out}}$, follow a bivariate normal distribution with covariance $\sigma_{\text{Gov},\text{Out}}$. We can hence define our parameter of interest, the correlation between governance and outcome quality, based on the IRT model as
 
 $$\rho_{\text{Gov},\text{Out}} = \frac{\sigma_{\text{Gov},\text{Out}}}{\sigma_{\text{Gov}} \sigma_{\text{Out}}}.$$
 
@@ -261,7 +261,7 @@ include_graphics("outputs/cor_itm_fit_irt_2par.png")
 Posterior distributions for all remaining model parameters not yet shown in above figures are reported in Table \ref{tab:postpar}.
 
 ```{r postpar}
-pars_tab %>% 
+pars_tab %>%
   kable(
     escape = FALSE,
      caption = "Summary of posterior distributions for further parameters in the IRT model.",
@@ -302,9 +302,9 @@ Note that Figure \ref{fig:dagbig} implies the plausible belief that participatio
 
 Taking the DAG in Figure \ref{fig:dagbig} as a foundation, it is not possible to adjust for all factors that bias a causal estimate of the effect of quality of governance processes on governance outcomes as inferred from Ostrom's social-ecological system diagnostic variables.^[As a further threat to causality, reverse causation could (partially) be at work. All items were measured simultaneously in focus groups and interviews, such that perceived commons outcomes could have biased retrospective judgments about commons governance processes.] Consequently, we refrain from making such an attempt. Instead, we have focused in this section on arriving at an estimate of the statistical association between these two latent traits within an IRT framework and an honest representation of its uncertainty.
 
-# Modeling remote sensing outcomes as a result of governance processes
+# Modeling remote sensing outcomes as a result of governance processes: bare ground cover
 
-This whole section is more or less completely drafted and open to discussion (e.g., what to add/leave out). Some things might need to be explained less technical then.
+This whole section is more or less completely drafted and open to discussion (e.g., what to add/leave out, what to explain better, what to do differently, ...).
 
 ## Motivation
 
@@ -322,7 +322,7 @@ include_graphics("outputs/dag2.png")
 
 Figure \ref{fig:dagbig2} highlights that, beside the already introduced irreducible confounding and selection problems (see Figure \ref{fig:dagbig} and nodes $U_{1}$, $U_{2}$ and $U_{3}$ therein) summarized by the single node $U_{123}$, we can expect further strong influences on the outcome by variables for which we have some observed data. First and most importantly, a village's bare ground cover in the post period depends to a large degree on how much bare ground there was already before the project, which we denote by $\text{Bare}_{\text{pre}}$. Second, vegetation cover is strongly influenced by seasonal rainfall intensity in the Tanzanian savannah [@wiethase_pathways_2023]. Third, invasive plant species, which are a major threat to grazing lands in the region [@wiethase_pathways_2023; @obiri_invasive_2011], can cover bare ground. Even though they lead to vegetated patches, as they tend to colonize bare ground quickly, they are often toxic or suppress the growth of palatable grasses. Hence, rangeland management aims to limit their spread.^[This is why an item on invasive species pressure was explicitly elicited from communities in our study as part of the *Outcomes (O)* category (Table \ref{tab:dfsum}).]
 
-In summary, variation in pre-period vegetation cover, in post-period rainfall and post-period pressure by invasive plant species should all be expected to influence the remote-sensing estimate of bare ground cover. Crucially, all of these variables can either directly or via further backdoor paths (depicted by $U_4$, $U_5$ and $U_6$, respectively) act as confounders for the effect of governance processes on outcomes. This is because the quality of governance that a village is able to establish after the onset of the NTRI project is not an exogenous variable. For example, a spurious relationship could arise due to associations between geography and ethnic composition in Northern Tanzania, where geography is associated with rainfall and ethnic composition of a village with governance attributes. These considerations lead us to adjust the analysis of $\text{Bare}_{\text{post}}$ for $\text{Bare}_{\text{pre}}$, post-period rainfall and post-period pressure by invasive plant species.^[Adding (plausible) paths from rainfall to governance or from rainfall to invasive species in Figure \ref{fig:dagbig2} would not affect the selected adjustment set. Note that due to the potential confounding influences running through $\text{Bare}_{\text{pre}}$, we avoid analyzing change scores in bare ground cover and instead follow the recommended "follow-up adjusted for baseline analysis" by @tennant_analyses_2022[p. 1609].] Pressure by invasive species could even be a direct consequence of the quality of governance processes (see the arrow from $\theta^{\text{Gov}}$ to invasives in Figure \ref{fig:dagbig2}). Still, the problem with this mediator variable would be that we expect it to *reduce* bare ground, but nevertheless make the common rangeland *less* suitable for grazing, indicating a *worse* commons outcome. We hence need to block the path from governance to $\text{Bare}_{\text{post}}$ via invasives to prevent that successful governance in limiting invasives would be reflected in a "worse" measure of bare ground. In this sense, our analysis of $\text{Bare}_{\text{post}}$ defines positive commons outcomes rather narrow compared the previous analysis (section XXX) of outcomes based on detailed community responses on a variety of items (e.g., about compliance with rules). Unlike those outcome measures, the remote-sending outcome is subject to strong idiosyncratic external forces like precipitation and hence requires to condition on such factors -- as far as they can be observed. 
+In summary, variation in pre-period vegetation cover, in post-period rainfall and post-period pressure by invasive plant species should all be expected to influence the remote-sensing estimate of bare ground cover. Crucially, all of these variables can either directly or via further backdoor paths (depicted by $U_4$, $U_5$ and $U_6$, respectively) act as confounders for the effect of governance processes on outcomes. This is because the quality of governance that a village is able to establish after the onset of the NTRI project is not an exogenous variable. For example, a spurious relationship could arise due to associations between geography and ethnic composition in Northern Tanzania, where geography is associated with rainfall and ethnic composition of a village with governance attributes. These considerations lead us to adjust the analysis of $\text{Bare}_{\text{post}}$ for $\text{Bare}_{\text{pre}}$, post-period rainfall and post-period pressure by invasive plant species.^[Adding (plausible) paths from rainfall to governance or from rainfall to invasive species in Figure \ref{fig:dagbig2} would not affect the selected adjustment set. Note that due to the potential confounding influences running through $\text{Bare}_{\text{pre}}$, we avoid analyzing change scores in bare ground cover and instead follow the recommended "follow-up adjusted for baseline analysis" by @tennant_analyses_2022[p. 1609].] Pressure by invasive species could even be a direct consequence of the quality of governance processes (see the arrow from $\theta^{\text{Gov}}$ to invasives in Figure \ref{fig:dagbig2}). Still, the problem with this mediator variable would be that we expect it to *reduce* bare ground, but nevertheless make the common rangeland *less* suitable for grazing, indicating a *worse* commons outcome. We hence need to block the path from governance to $\text{Bare}_{\text{post}}$ via invasives to prevent that successful governance in limiting invasives would be reflected in a "worse" measure of bare ground. In this sense, our analysis of $\text{Bare}_{\text{post}}$ defines positive commons outcomes rather narrow compared the previous analysis (section \@ref(irt)) of outcomes based on detailed community responses on a variety of items (e.g., about compliance with rules). Unlike those outcome measures, the remote-sending outcome is subject to strong idiosyncratic external forces like precipitation and hence requires to condition on such factors -- as far as they can be observed.
 
 <!-- The previous analysis did not require  -->
 <!-- In contrast, remote sensing outcomes assess a more narrow picture of  -->
@@ -338,11 +338,11 @@ Based on above considerations, we fit a Gaussian linear model of the form
 
 $$\text{logit}\left(\text{Bare}_{\text{post}_j}\right) = \gamma_0 + \gamma_1 \text{logit}\left(\text{Bare}_{\text{pre}_j}\right) + \gamma_2\text{Rainfall}_j + \gamma_3 \text{Invasives}_j + \gamma_4 \theta_j^{\text{Gov}} + \epsilon_j,$$
 
-with $\epsilon_j \sim N(0, \sigma)$. Of primary scientific interest here is the parameter $\gamma_4$ describing the effect of governance processes on bare ground cover, conditioned on the other predictors. Note, however, that $\theta_j^{\text{Gov}}$ is not data, but an unobserved characteristic of villages, as described in more detail in section XXX. We hence treat it as a predictor measured with error, which naturally fits into a Bayesian modeling framework. Posterior distributions for $\theta_j^{\text{Gov}}$ were obtained for each village $j$ via IRT modeling (Figure \ref{fig:riestims}) and we denote the obtained posterior mean by $\bar{\theta}_j^{\text{Gov}}$ and the posterior SD by $\bar{\sigma}_j^{\text{Gov}}$. Hence, we can above model equation is extended with the distributional assumption of the latent variable
+with $\epsilon_j \sim N(0, \sigma)$. Of primary scientific interest here is the parameter $\gamma_4$ describing the effect of governance processes on bare ground cover, conditioned on the other predictors. Note, however, that $\theta_j^{\text{Gov}}$ is not data, but an unobserved characteristic of villages, as described in more detail in section \@ref(irt). We hence treat it as a predictor with measurement error, which naturally fits into a Bayesian modeling framework [@mcelreath_statistical_2020, ch. 15.1]. Posterior distributions for $\theta_j^{\text{Gov}}$ were obtained for each village $j$ via IRT modeling (Figure \ref{fig:riestims}) and we denote the obtained posterior mean by $\bar{\theta}_j^{\text{Gov}}$ and the posterior SD by $\bar{\sigma}_j^{\text{Gov}}$. We can then treat $\bar{\theta}_j^{\text{Gov}}$ as our measurement of $\theta_j^{\text{Gov}}$, with measurement error $\bar{\sigma}_j^{\text{Gov}}$. Hence, above model equation is extended with the distributional assumption of the latent variable
 
-$$\theta_j^{\text{Gov}} \sim N(\bar{\theta}_j^{\text{Gov}}, \bar{\sigma}_j^{\text{Gov}}).$$
+$$\bar{\theta}_j^{\text{Gov}} \sim N(\theta_j^{\text{Gov}}, \bar{\sigma}_j^{\text{Gov}}).$$
 
-As data source for rainfall in the post period, we retrieve daily PERSIANN-CCS precipitation estimates [@nguyen_chrs_2019] and calculate mean annual precipitation for each village by averaging over the years 2016 to 2020 (data shown in Figure \ref{fig:boxes}). The values are standardized to have mean zero and SD of one prior to modeling. As measure of pressure by invasive plant species, we re-use the item *O2.3: Invasives* elicited from communities (data shown in Table \ref{tab:dfsum}). 
+As data source for rainfall in the post period, we retrieve daily PERSIANN-CCS precipitation estimates [@nguyen_chrs_2019] and calculate mean annual precipitation for each village by averaging over the years 2016 to 2020 (data shown in Figure \ref{fig:boxes}). The values are standardized to have mean zero and SD of one prior to modeling. As measure of pressure by invasive plant species, we re-use the item *O2.3: Invasives* elicited from communities (data shown in Table \ref{tab:dfsum}).
 As the two variables $\text{Bare}_{\text{post}}$ and $\text{Bare}_{\text{pre}}$ represent proportions of total village area bounded between zero and one, they are logit-transformed [e.g., @warton_arcsine_2011].
 
 We use weakly regularizing priors to ensure that the sampler converges despite the small number of only 12 observations and the presence of measurement error in the latent predictor of interest:
@@ -352,7 +352,7 @@ We use weakly regularizing priors to ensure that the sampler converges despite t
 \sigma & \sim \text{Exponential}(1).
 \end{align*}
 
-Further, since we fixed the scale of the latent village variables in the IRT model to a standard normal distribution, we know that their mean equals zero and their variance equals one (also shown in Table \ref{tab:postpar}). This is supplied as constants to the model. The models are again fit in `brms`, sampling `r summary(fit_bare)$chains * (summary(fit_bare)$iter - summary(fit_bare)$warmup)` posterior draws from `r summary(fit_bare)$chains` chains, after `r summary(fit_bare)$warmup` warm-up iterations per chain. There are no serious convergence issues and posterior predictive checks look fine (Figure \ref{fig:ppds2}).
+Further, since we fixed the scale of all latent village-level variables in the IRT model to a standard normal distribution, we know that the $\theta_j^{\text{Gov}}$ are distributed with mean zero and variance one (also shown in Table \ref{tab:postpar}). This is supplied as constant priors to the model. The model is again fit in `brms`, sampling `r summary(fit_bare)$chains * (summary(fit_bare)$iter - summary(fit_bare)$warmup)` posterior draws from `r summary(fit_bare)$chains` chains, after `r summary(fit_bare)$warmup` warm-up iterations per chain. There are no serious convergence issues and posterior predictive checks look fine (Figure \ref{fig:ppds2}).
 
 ```{r ppds2, fig.align='center', fig.cap='Density of posterior predictions vs. observed values for post-period bare ground cover (logit transformed). In dark blue empirical responses, in light blue predictions based on 50 posterior draws.', out.width="60%"}
 include_graphics("outputs/ppcs_fit_bare.png")
@@ -360,10 +360,10 @@ include_graphics("outputs/ppcs_fit_bare.png")
 
 ## Results
 
-Table \ref{tab:postpar2} shows posterior summaries. We can see that the posterior mean and median for $\gamma_1$ are close to one, which should be expected (post-period bare ground cover is closely related to pre-period bare ground cover). Posterior distributions for the coefficients of rainfall ($\gamma_2$) and governance ($\gamma_4$) mostly span negative values, implying that higher values are conditionally associated with less bare ground after the project, i.e., better commons outcomes.  The posterior distribution for the effect of invasive species ($\gamma_3$) is close to zero, with a slight positive tendency, which would plausibly imply that less successful containment of invasive plants comes with more vegetated area. We can read from the posterior summary that one SD increase in quality of governance processes $\bar{\theta}_j^{\text{Gov}}$ is associated with a reduction of approximately `r round(pars_tab2 %>% filter(varlabel == "$\\gamma_4$") %>% pull(mean) %>% as.numeric() %>% abs, 1)` in logit bare ground cover, holding constant rainfall, invasive species pressure and pre-period bare ground cover. Recall that due to further threats for causal identification which we encoded in our DAG (see Figure \ref{fig:dagbig2}), this cannot be interpreted as causal effect. We do, however, infer that we can reproduce the association between governance quality and commons outcomes found in section XXX using a remote-sending-based estimate for vegetation cover of village grazing lands.
+Table \ref{tab:postpar2} shows posterior summaries. We can see that the posterior mean and median for $\gamma_1$ are close to one, which should be expected (post-period bare ground cover is closely related to pre-period bare ground cover). Posterior distributions for the coefficients of rainfall ($\gamma_2$) and governance ($\gamma_4$) mostly span negative values, implying that higher values are conditionally associated with less bare ground after the project, i.e., better commons outcomes.  The posterior distribution for the effect of invasive species ($\gamma_3$) is close to zero, with a slight positive tendency, which would plausibly imply that less successful containment of invasive plants comes with more vegetated area. We can read from the posterior summary that one SD increase in quality of governance processes $\theta_j^{\text{Gov}}$ is associated with a reduction of approximately `r round(pars_tab2 %>% filter(varlabel == "$\\gamma_4$") %>% pull(mean) %>% as.numeric() %>% abs, 1)` in logit bare ground cover, holding constant rainfall, invasive species pressure and pre-period bare ground cover. Recall that due to further threats for causal identification which we encoded in our DAG (see Figure \ref{fig:dagbig2}), this cannot be interpreted as causal effect. We do, however, infer that we can reproduce the association between governance quality and commons outcomes found in section \@ref(irt) using a remote-sending-based estimate for vegetation cover of village grazing lands.
 
 ```{r postpar2}
-pars_tab2 %>% 
+pars_tab2 %>%
   kable(
     escape = FALSE,
      caption = "Summary of posterior distributions for parameters in the linear model for bare ground cover.",
@@ -377,7 +377,7 @@ pars_tab2 %>%
   footnote(general = "'P' refers to percentile.")
 ```
 
-For easier interpretation, we plot model-based predictions for post-period bare ground cover factor change for the 'median village' (all covariables held at their median) as a function of governance quality (Figure \ref{fig:predbare}). This curve is obtained by first back-transforming posterior predictions to the proportion scale and then dividing by pre-period bare ground cover. Judging from the plot, the model roughly predicts increases in bare ground for negative values of the latent variable and decreases in bare ground cover for positive values.
+For easier interpretation, we plot model-based predictions for post-period bare ground cover factor change for the 'median village' (all covariables held at their median) as a function of governance quality (Figure \ref{fig:predbare}). This curve is obtained by first back-transforming posterior predictions to the proportion scale and then dividing by pre-period bare ground cover. Judging from the plot, the model roughly predicts increases in bare ground for negative values of the latent variable and decreases in bare ground cover for positive values. But the uncertainty about the effect size remains vast (see credible intervals).
 
 ```{r predbare, fig.align='center', fig.cap='Model-based predictions of bare ground cover factor change for the median village for different values of quality of governace processes (posterior median and 90\\% equal-tailed credible interval). Upper panel shows the posterior densities of the respective latent trait for all 12 study villages (same color coding as previously).', out.width="80%"}
 include_graphics("outputs/pred_bareground.png")
@@ -405,72 +405,127 @@ The posterior distributions of the latent governance quality variable for the vi
 <!-- - maybe extend dag: "The DAG starting page 20 on bare ground looks pretty good to me, but I think we’d need a zoom session with Majory and Susan where you explain it, as they are more likely to think of additional paths/variables than I am." -->
 
 <!-- - Majory: Invasives können auch unter good governance gedeihen, v.a. als effekt von wenig rainfall: "One could also assume that invasives may have been increasing at a fast rate (as witnessed in some villages), colonizing bare areas, and thus reducing the bareground - this may happen even with good commons governance efforts, partly due to long droughts." -> additional arrow? -->
-    
-- auch was zu agricutlural conversion???
 
-- Majory agrees that good governacne implies negative effect on agricultural conversion: "I would expect conversion at a slower rate to imply better governance."
+\newpage
 
-- Agriculture threat BUT CROPLAND INDICATOR > POSITIVE CORRELATION WITH BAREGROUND PERCENT. Also ist beides ein indicator für schlechten boden. Brauche agriculture nicht im DAG.
+# Modeling remote sensing outcomes as a result of governance processes: cropland cover
 
-- For information on cropland cover, we rely on the global data set by @potapov_global_2022, who classified 30 m resolution Landsat satellite imagery into presence and absence of cropland. Their data set is split into epochs, two of which (2012–2015 and 2016–2019) well align with the periods before and after the start of the NTRI project. This allows to extract pre- and post-project estimates of cropland area separately for each village in the assessment (data shown in Figure \ref{fig:boxes}; in line with regional and global trends, cropland area increased over time in the studied villages).
+\color{teal}
+
+The previous section did not use the data on cropland cover shown in Figure \ref{fig:boxes} in any way (not as outcome, and not for adjustment, given that cropland and bare ground remote sensing signals are not mutually exclusive, but even correlate positively in the savannah region). To me it is not yet fully clear if we have a research question for which the cropland cover data gives direct insights.
+
+Of course, there is the possibility to do pretty much the same analysis as in the previous section with cropland as outcome rather than bare ground. But that would require (i) that we really think that cropland extent is a rangeland commons outcome and (ii) that we can add important / additional information for readers by analyzing both measures rather than only the one that is probably more directly related to grazing land quality (bare ground).
+
+A related question is: Is agricultural conversion really "bad" in the present context and should we frame it that way? I have not enough knowledge of the socio-economic and cultural context to build an opinion here. Majory once stated that good rangeland governance should imply a negative effect on agricultural conversion: *"I would expect conversion at a slower rate to imply better governance."* If we run an analysis under this premise, we should think about possible adjustment variables to close at least some backdoor paths for that outcome -- as in the previous section's DAG.
+
+In any case, here is a citation paragraph for the cropland data already:
+
+*For information on cropland cover, we rely on the global data set by @potapov_global_2022, who classified 30 m resolution Landsat satellite imagery into presence and absence of cropland. Their data set is split into epochs, two of which (2012–2015 and 2016–2019) well align with the periods before and after the start of the NTRI project. This allows to extract pre- and post-project estimates of cropland area separately for each village in the assessment (data shown in Figure \ref{fig:boxes}; in line with regional and global trends, cropland area increased over time in the studied villages).*
+
+
+\color{black}
 
 # Modeling wealth outcomes as a result of governance processes
 
-- wealth inequality from PCA as SD, for example @sharma_escalation_2023. But it REALLY strong correlation with mean/median Welath level from PCA (> 0.75). Just because the presence of rich people increases inequaluty and increases mean wealth. . . Could adjust for it, of course? Or acknowledge that we cannot separate it - but that is a bit shitty, because one is "good" (wealth) one is bad ("inequality") for villages ?!
+\color{teal}
 
-- Majory is against wealth outcome idea: "I thought the wealth inequality (economic heterogeneity) variable needs to be looked at as a predictor and not an outcome. I think assessing it as an outcome shifts the focus from the DF, although it probably makes sense if we're assessing the impact of the NTRI initiative, which I believe is not the focus."
+Monique once suggested to analyze economic inequality as a governance outcome on the village level:
 
-- "but I did think (again initially) it would be nice to have a measure of wealth (averaged across households) and inequality in wealth. I could think about this more if I wer to turn back to the original data, but now. But having wealth and inequality in wealth as an outcomes measure woud be kind of cool. I know its weak, as it is also something of a predictor variable f success (presumably), and without a longitudinal perspective inference is weak, but even with those prosvisos it might be worth including in the current modelling structure as a village level “outcome”."
+*"but I did think (again initially) it would be nice to have a measure of wealth (averaged across households) and inequality in wealth. I could think about this more if I wer to turn back to the original data, but now. But having wealth and inequality in wealth as an outcomes measure woud be kind of cool. I know its weak, as it is also something of a predictor variable f success (presumably), and without a longitudinal perspective inference is weak, but even with those prosvisos it might be worth including in the current modelling structure as a village level “outcome”."*
+
+That's why I show a measure -- very similarly constructed as in @sharma_escalation_2023 -- for economic inequality in Figure \ref{fig:boxes}. Indeed, there is some variation.
+
+These are my two concerns, however:
+
+- We only have one post-project measure of inequality from the household survey in 2020. Can we really learn something even about *potential* cause-and-effect relationships by correlating it against our governance scores, or would it all be too much speculation? Especially since one can think of economic heterogeneity both as cause and as consequence of governance quality. This relates to Majory's comment: "I thought the wealth inequality (economic heterogeneity) variable needs to be looked at as a predictor and not an outcome. I think assessing it as an outcome shifts the focus from the DF, although it probably makes sense if we're assessing the impact of the NTRI initiative, which I believe is not the focus."
+
+- Wealth inequality and mean or median wealth of a village correlate strongly (> 0.75). This is a scatter plot:
+
+\color{black}
+
+```{r wealth, fig.align='center', out.width="40%"}
+include_graphics("outputs/wealth_pca.png")
+```
+
+\color{teal}
+
+The relationship is positive because the presence of some high-wealth individuals in some villages shifts both the central tendency and the spread of wealth upwards. Any conclusions we make about wealth inequality would therefore also partially be conclusions about average wealth level. Separating them would be possible by residualizing/conditioning, but the question then whether enough signal-to-noise remains among the 12 villages for informative estimation and inference.
+
+In case we really want to model economic inequality as a function of $\theta_j^{\text{Gov}}$, it would probably be good to think of some strong predictors of wealth inequality that we can adjust for with the data we have (and potentially a DAG).
+
+\color{black}
 
 # Governance processes and outcomes under disturbances
 
-- Majory daraufhin: "My interpretation was that he would look a the various reported external threats I shared in a Table. We also have two variables asked in the household survey, ethnic composition and economic activities, but have only one data point."
+\color{teal}
 
-- "it would be good to look at interactins and/or mediations with disturbances, and I agree rainfall, ethnic/econ heterogeneity, and pop growth are all good candidates, if handled separately"
+Such an analysis has been among our plans from the beginning. For example, Monique mentioned that *"it would be good to look at interactinos and/or mediations with disturbances"*. I think we first would need to be very clear of the causal pathways and research question of interest. Options can be:
 
-- "external threats could be added to the disturbance analysis discussed earlier – worth doing, even if only ends up in SM so we can say in the the MS that we examined disturbances."
+1. Do disturbances affect the quality of governance processes (which then affects outcomes)? (= mediation via governance)
+2. Is the effect of good governance on outcomes different under disturbances? (= interaction / effect heterogeneity)
+3. Does good governance lead to some disturbances (i.e., potential *endogeneous* disturbances), which then affect outcomes? (= mediation via disturbance)
 
-- we have:
-"4.8.1.1 Rangeland threats: Drought
-4.8.1.2 Rangeland threats: Diseases
-4.8.1.3 Rangeland threats: Policy changes
-4.8.1.4 Rangeland threats: Invasive sp
-4.8.1.5 Rangeland threats: Floods
-4.8.1.6 Rangeland threats: Land conflicts
-4.8.1.7 Rangeland threats: Wildlife animals
-4.8.1.8 Rangeland threats: High Hpop
-4.8.1.9 Rangeland threats: Wildfires
-4.8.2.1 Rangeland threats: Solution, environ awareness
-4.8.2.2 Rangeland threats: Solution, rotational grazing
-4.8.2.3 Rangeland threats: Solution, alternative rangeland
-4.8.2.4 Rangeland threats: Solution, reduce # of livestock
-4.8.2.5 Rangeland threats: Solution, enact rules
-4.8.2.6 Rangeland threats: Solution, punish violators
-4.8.2.7 Rangeland threats: Solution, restrict wildlife
-4.8.3.1 Rangeland threats: Leadership challenge (lack of leader trust)
-4.8.3.2 Rangeland threats: Leadership challenge (Insects)
-4.8.3.3 Rangeland threats: Leadership challenge (Lack of cooperation)
-4.8.3.4 Rangeland threats: Leadership challenge (water shortage)
-4.8.4.1 Rangeland threats: Leadership opportunity (training)
-4.8.4.2 Rangeland threats: Leadership opportunity (take part in decision)"
-Analytical question: Please name and describe the major threats that are affecting this rangeland. A threat is a process/event that has the potential to severely damage an important function of a system. The governance activities within a social-ecological system can be undermined by threats and disturbances that occur. Source of data: Men and women FGD, VLG, Grazing related committees.
+These questions require different analyses. It should be clear that any of them will be statistically difficult with the small sample -- since reliably estimating indirect or interaction effects requires more information/variation than the total and main effects we estimated above. It would also ambitious from the viewpoint of interpretation, as probably not even the threats which we call *external* are fully *exogenous* in the econometric sense (e.g., rainfall is related to geolocation which is related to ethnic groups $\rightarrow$ see the previous discussion between Monique and Majory about the interpretation of the tendency of a negative relation between governance scores and precipitation we see in the raw data).
+
+Still, if we decide to run an analysis of the type 1, 2, or 3, in the next step we would need to select the disturbances we are interested in (and their operationalization). Majory mentioned: *"My interpretation was that he would look a the various reported external threats I shared in a Table. We also have two variables asked in the household survey, ethnic composition and economic activities, but have only one data point."* Monique mentioned: *"I agree rainfall, ethnic/econ heterogeneity, and pop growth are all good candidates, if handled separately"*
+
+This is my collection of possible village-level "threats data" that we have access to:
+
+- Population change between 2012 and 2020 based on those estimates Majory identified as most reliable for each village; a measure could be relative difference post- vs. pre-period population;
+- Mean annual rainfall from remote sensing (already used in analyses above) (constructing a measure of rainfall variability from the same data is also possible)
+- Economic inequality from household survey (SD of PC1, see comments in previous section)
+- A measure of diversity in occupations/livelihoods from household survey
+- A measure of ethnic diversity of villages from household survey
+- The "rangeland threats" elicited in the groups/interviews, coded as present/absent; the question was: "Please name and describe the major threats that are affecting this rangeland. A threat is a process/event that has the potential to severely damage an important function of a system."; the threat items are:
+
+     - 4.8.1.1 Rangeland threats: Drought
+     - 4.8.1.2 Rangeland threats: Diseases
+     - 4.8.1.3 Rangeland threats: Policy changes
+     - 4.8.1.4 Rangeland threats: Invasive sp
+     - 4.8.1.5 Rangeland threats: Floods
+     - 4.8.1.6 Rangeland threats: Land conflicts
+     - 4.8.1.7 Rangeland threats: Wildlife animals
+     - 4.8.1.8 Rangeland threats: High Hpop
+     - 4.8.1.9 Rangeland threats: Wildfires
+     - 4.8.2.1 Rangeland threats: Solution, environ awareness
+     - 4.8.2.2 Rangeland threats: Solution, rotational grazing
+     - 4.8.2.3 Rangeland threats: Solution, alternative rangeland
+     - 4.8.2.4 Rangeland threats: Solution, reduce # of livestock
+     - 4.8.2.5 Rangeland threats: Solution, enact rules
+     - 4.8.2.6 Rangeland threats: Solution, punish violators
+     - 4.8.2.7 Rangeland threats: Solution, restrict wildlife
+     - 4.8.3.1 Rangeland threats: Leadership challenge (lack of leader trust)
+     - 4.8.3.2 Rangeland threats: Leadership challenge (Insects)
+     - 4.8.3.3 Rangeland threats: Leadership challenge (Lack of cooperation)
+     - 4.8.3.4 Rangeland threats: Leadership challenge (water shortage)
+     - 4.8.4.1 Rangeland threats: Leadership opportunity (training)
+     - 4.8.4.2 Rangeland threats: Leadership opportunity (take part in decision)"
 
 
-- rainfall variability can also be used: "Pastoralist scholars are oftn mre concerned about rainfall unpredictabiilty and variability than mean amount, but under the current circumstances of increasing drought, this measure may be fine for us. I will keep my eyes open for how rainfall is being used in recent paper"
 
-- there is a hypothesis why rainfall might cause worse pastoralist governacne processes and outcomes: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing." and it could lead to discussion like: "'Is agriculture a feasible livelihood option?'. It might lead on from the finding (prelim pr page 12 descriptive analysis) that rainfall has neg effects on governance, on the logic that if PA institutions suffer in wetter areas, what is the logic for mving to agric. [Very politically un PC, but possibly worth investigating for the area]."
+<!-- - there is a hypothesis why rainfall might cause worse pastoralist governacne processes and outcomes: "I guess pastoralist (PA) institutions breakdown where rainfall makes agriculture and option, and possibly where rainfall makes outsiders beg for grazing." and it could lead to discussion like: "'Is agriculture a feasible livelihood option?'. It might lead on from the finding (prelim pr page 12 descriptive analysis) that rainfall has neg effects on governance, on the logic that if PA institutions suffer in wetter areas, what is the logic for mving to agric. [Very politically un PC, but possibly worth investigating for the area]." -->
 
-- Majory thinks that disturances are quantified by a delta, not by a level: "I think to stay within the framework, you have to look at the changes in demographics rather than its absolute composition. However, I also see that with the exception of population growth which we have as a continuous variable for pre and post, I'm not sure if we can rely on qualitative values of changes in ethnic composition and economic activities. I can see why it would make sense to look at how the absolute composition of the two contributes to governance and outcomes directly, and we can document the modifications. I also think this is where you could use survey data because they provide absolute responses which can even be weighted."
+<!-- - Majory thinks that disturances are quantified by a delta, not by a level: "I think to stay within the framework, you have to look at the changes in demographics rather than its absolute composition. However, I also see that with the exception of population growth which we have as a continuous variable for pre and post, I'm not sure if we can rely on qualitative values of changes in ethnic composition and economic activities. I can see why it would make sense to look at how the absolute composition of the two contributes to governance and outcomes directly, and we can document the modifications. I also think this is where you could use survey data because they provide absolute responses which can even be weighted." -->
+
+\color{black}
 
 # Comparing remote sensing outcomes with a control group
 
-- "might require some sort of “synthetic counterfactual”. Quite how we deal with the fact that NTRI presumably selected the villages for intervention on the basis of some criteria will take some thought. Initially Susan or Majory could help us here. I am not sure that our 12 villages comprise the full set of NTRI targets – this would help us enormously with developing controls for GIS."
+\color{teal}
 
-- Majory against this: "I wonder if its useful to address whether NTRI was a success considering this would be based solely on GIS data. I don't think we have to for this analysis, just a thought."
+Above analyses are so far not an "impact evaluation" in the classical sense. In principle, there are ways to approach / approximate such an evaluation quantiatively, however. The main difficulty here is that the NTRI project was never designed for that (for example, there have never been surveys or interviews in non-project villages). Detailed background information about the selection process of villages for the project and the assessment would be needed, and also a more clear definition of the intervention that the project introduced in the villages (compared to the villages where the project did not go). An impact evaluation without a standardized and precisely defined intervention is not of much value.
 
-- Monique: "Success/not success - a difficult decision to call. i think we keep OFF direct evaluation of their intervention, indeed they never provided us enough detail of what they did where."
+A way to go, nevertheless, could be to select appropriate control villages post hoc, for example based on geolocation and some educated guess about social, economic or cultural variables in those villages. The aim would be to have them similar to the project villages. Groups should also be matched on village size and bare ground cover in the pre-project period. Then the remote-sensing based analysis (post bare ground cover adjusted for pre bare ground cover) that was shown above could in a similar manner be done on a data set including control villages seleted in that manner, but with additionally estimating an intervention effect in the model. The approach would require a shape file with boundaries of all villages in the region, not just the assessment villages (TNC seems to possess such a file, obtained from official sources).
 
-- Majory on village selection for assessment: "During study design is when we decided it was first necessary to have at least an equal number of villages considered as "successful" and "not successful" purely based on GIS analysis performed by Colin and not whether the group was a treated or control. "
+There have been concerns among us regarding such an analysis:
+
+- Majory: *"I wonder if its useful to address whether NTRI was a success considering this would be based solely on GIS data. I don't think we have to for this analysis, just a thought."*
+- Monique: *"Success/not success - a difficult decision to call. i think we keep OFF direct evaluation of their intervention, indeed they never provided us enough detail of what they did where."*
+
+I generally agree. The effort of the analysis would be rather high, while still the credibility of the result might quite easily be called into question. Maybe the difficulty of running such an analyses in the present context, with the setup designed by the practitioners in the way it was, could instead be an interesting side story of the paper?
+
+
+\color{black}
 
 # References
 

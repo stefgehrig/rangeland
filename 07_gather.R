@@ -37,6 +37,11 @@ df <- name_the_tiers(df_codescores) %>%
   mutate(score = ifelse(grepl("binary", dimension_coding) & score == 2, 3, score)) %>% 
   mutate(score = factor(score, ordered = TRUE, levels = 1:3))
 
+
+# naming variables
+df_landuse_area <- df_landuse_area %>% 
+  mutate(period = str_to_title(period)) %>% 
+  mutate(period = factor(period, ordered = TRUE, levels = c("Pre", "Post")))
 ################################
 #### tables for description ####
 ################################
@@ -109,9 +114,11 @@ d_het <- df_codescores %>%
 
 # ... gis
 d_gis <- df_landuse_area %>% 
-  mutate(var = 
+  mutate(area_cover = area_ha / total_area,
+         var = 
            paste0(type, " ", period)) %>% 
-  select(village, var, val = area_ha)
+  select(village, var, val = area_cover)
+
 
 df_others <- bind_rows(
   d_rain,
@@ -120,29 +127,29 @@ df_others <- bind_rows(
 ) %>% 
   mutate(source = 
            case_when(
-             var == "bare pre" ~ "MODIS vegetation continuous fields (2015-2015)",
-             var == "bare post" ~ "MODIS vegetation continuous fields (2016-2021)",
-             var == "crop pre" ~ "Global cropland extent data set (2015)",
-             var == "crop post" ~ "Global cropland extent data set (2019)",
+             var == "bare Pre" ~ "MODIS vegetation continuous fields (2015-2015)",
+             var == "bare Post" ~ "MODIS vegetation continuous fields (2016-2021)",
+             var == "crop Pre" ~ "Global cropland extent data set (2015)",
+             var == "crop Post" ~ "Global cropland extent data set (2019)",
              var == "econ_het" ~ "Household survey",
              var == "rainfall" ~ "PERSIANN-CCS (2016-2020)",
            )) %>% 
   mutate(
     var = case_when( 
-      var == "bare pre"  ~ "Bare ground area Pre (ha)",
-      var == "bare post" ~ "Bare ground area Post (ha)",
-      var == "crop pre"  ~ "Cropland area Pre (ha)",
-      var == "crop post" ~ "Cropland area Post (ha)",
+      var == "bare Pre"  ~ "Bare ground area cover pre",
+      var == "bare Post" ~ "Bare ground area cover post",
+      var == "crop Pre"  ~ "Cropland area cover pre",
+      var == "crop Post" ~ "Cropland area cover post",
       var == "econ_het"  ~ "Economic inequality (SD of PC1 from household assets)",
       var == "rainfall"  ~ "Mean annual rainfall (mm)"
     )
   ) %>% 
   mutate(var = factor(var, ordered = TRUE,
                       levels = c(
-                        "Bare ground area Pre (ha)",
-                        "Bare ground area Post (ha)",
-                        "Cropland area Pre (ha)",
-                        "Cropland area Post (ha)",
+                        "Bare ground area cover pre",
+                        "Bare ground area cover post",
+                        "Cropland area cover pre",
+                        "Cropland area cover post",
                         "Mean annual rainfall (mm)",
                         "Economic inequality (SD of PC1 from household assets)"
                         
@@ -154,13 +161,9 @@ gat_tab2 <- df_others %>%
     across(val, .fns = list(mean=mean, min=min, max=max)),
     source = unique(source)
   )
-
+gat_tab2
 saveRDS(gat_tab2, "outputs/gat_tab2.rds")
 
-# naming variables
-df_landuse_area <- df_landuse_area %>% 
-  mutate(period = str_to_title(period)) %>% 
-  mutate(period = factor(period, ordered = TRUE, levels = c("Pre", "Post")))
 
 #################################
 #### figures for description ####
@@ -230,7 +233,7 @@ dev.off()
 #     c("Cropland area Pre (ha)",
 #       "Cropland area Post (ha)"),
 #     c("Mean annual rainfall (mm)",
-#       "Economic inequality (SD of PC1 from household assets)")
+#       "Economic inequality (SD of PC1 fromhousehold assets)")
 #   )
 # 
 # 
@@ -272,8 +275,10 @@ dev.off()
 
 # raincloud plots
 p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>% 
+  mutate(area_ha = area_ha / total_area) %>% 
   ggplot(aes(period, area_ha)) + 
-  geom_rain(rain.side = 'f1x1', id.long.var = "village", fill = "grey20", alpha = 0.2) + 
+  geom_rain(rain.side = 'f1x1', 
+            id.long.var = "village", fill = "grey20", alpha = 0.2) + 
   theme_bw(14) +
   theme(
     text = element_text(family = fontfam),
@@ -282,9 +287,10 @@ p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>%
     panel.grid.minor.y = element_blank()
   ) +
   labs(x = "Period",
-       y = "Bare ground area (ha)") + 
+       y = "Bare ground area cover") + 
   ggrepel::geom_text_repel(
-    data = df_landuse_area %>% filter(type == "bare") %>% filter(period == "Pre"),
+    data = df_landuse_area %>% filter(type == "bare") %>% filter(period == "Pre") %>% 
+      mutate(area_ha = area_ha / total_area),
     aes(x = period, 
         y = area_ha, 
         label = village),
@@ -294,11 +300,12 @@ p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>%
     segment.color = NA,
     box.padding = 0.02,
     max.overlaps = 10) +
-  scale_y_continuous(trans = "log", breaks = c(500,1000,2500,5000,10000,20000),
-                     limits = c(500,25000))
+   scale_y_continuous(trans = "logit", breaks = seq(0.1,0.5,0.1),
+                       limits = c(0.1, 0.5))
 
 
 p_rain_crop <- df_landuse_area %>% filter(type == "crop") %>% 
+  mutate(area_ha = area_ha / total_area) %>% 
   ggplot(aes(period, area_ha)) + 
   geom_rain(rain.side = 'f1x1', id.long.var = "village", fill = "grey20", alpha = 0.2) + 
   theme_bw(14) +
@@ -309,9 +316,10 @@ p_rain_crop <- df_landuse_area %>% filter(type == "crop") %>%
     panel.grid.minor.y = element_blank()
   ) +
   labs(x = "Period",
-       y = "Cropland area (ha)")+ 
+       y = "Cropland area cover")+ 
   ggrepel::geom_text_repel(
-    data = df_landuse_area %>% filter(type == "crop") %>% filter(period == "Pre"),
+    data = df_landuse_area %>% filter(type == "crop") %>% filter(period == "Pre")%>% 
+      mutate(area_ha = area_ha / total_area),
     aes(x = period, 
         y = area_ha, 
         label = village),
@@ -320,9 +328,10 @@ p_rain_crop <- df_landuse_area %>% filter(type == "crop") %>%
     hjust = -1/4,
     segment.color = NA,
     box.padding = 0.02,
-    max.overlaps = 10) +
-  scale_y_continuous(trans = "log", breaks = c(50,100,250,500,1000,2500,5000,10000,20000,30000),
-                     limits = c(50,35000))
+    max.overlaps = 10)+
+    scale_y_continuous(trans = "logit", breaks = c(0.001, 0.01, 0.05, 0.1,  seq(0.25,0.75,0.25)),
+                       limits = c(0.0005, 0.75))
+p_rain_crop
 
 p_rain_rain <- d_rain %>% 
   ggplot(aes(1, val)) + 
@@ -1317,7 +1326,7 @@ fit_bare <- brm(
 # summary(fit_bare)
 saveRDS(fit_bare, file = paste0("outputs/fit_bare.rds"))
 cat(stancode(fit_bare), file = "outputs/fit_bare.txt")
-# fit_bare <- readRDS("outputs/fit_bare.rds")
+fit_bare <- readRDS("outputs/fit_bare.rds")
 
 summary(fit_bare)
 prior_summary(fit_bare)
@@ -1423,7 +1432,7 @@ p_bare
 #             village = rep(dfgis$village, length(seq(-4,4,0.1))))
 
 dg <- datagrid(model = fit_bare,
-               govpostmean = seq(-4,4,0.1),
+               govpostmean = seq(-3,3,0.1),
                govpostsd = median(fit_bare$data$govpostsd),
                FUN_numeric = median)
 
@@ -1442,7 +1451,7 @@ preds_bare <- posterior_predict(
 preds_bare <- plogis(preds_bare) / plogis(unique(dg$Pre_bare))
 
 df_preds_bare <- as_tibble(preds_bare)
-names(df_preds_bare) <- as.character(seq(-4,4,0.1))
+names(df_preds_bare) <- as.character(seq(-3,3,0.1))
 
 df_preds_bare_grp <- df_preds_bare %>% 
   pivot_longer(cols = everything(), names_to = "x", values_to = "y") %>% 
@@ -1454,6 +1463,7 @@ df_preds_bare_grp <- df_preds_bare %>%
     upr = quantile(y, 0.95)
   )
 
+# predicted factor change plot
 p_pred <- df_preds_bare_grp %>% 
   ggplot() + 
   geom_hline(yintercept = 1, linetype = 2) +
@@ -1465,13 +1475,38 @@ p_pred <- df_preds_bare_grp %>%
         axis.title.x  = element_markdown()) + 
   scale_color_manual(values = gradcolors) + 
   scale_fill_manual(values =  gradcolors) + 
+  scale_y_continuous(breaks = seq(0.5,3, 0.5)) +
   #scale_y_continuous(limits = c(0,3)) +
   labs(y = "Predicted factor change in bare ground cover",
        x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
        fill = "Response\ncategory")
 
+# densities
+p_villdens <- spread_draws(fit_irt_2par,
+                       r_village[village, itemtype]) %>% 
+  group_by(village) %>% 
+  mutate(hjust_par = runif(1,0,1)) %>% 
+  filter(itemtype == "itemtypeGovernance") %>% 
+  ggplot() + 
+  geom_density(aes(x = r_village, fill = village), 
+               col = NA,
+               alpha = 0.2, 
+               show.legend = FALSE,
+  ) +
+  # geom_textdensity(aes(x = r_village, 
+  #                      label = village,
+  #                      fill = village)
+  #                  ) +
+  theme_void(14) +
+  theme(text = element_text(family = fontfam)) + 
+  scale_fill_manual(values = palcolors,
+                    labels = function(x) 
+                      str_replace_all(x, "\\.", " ")) + 
+  coord_cartesian(xlim = c(-4,4))
+
+
 png("outputs/pred_bareground.png", width = 2800, height = 1800, res = 360)
-p_pred
+p_villdens / p_pred + plot_layout(heights = c(1,4))
 dev.off()
 
 
