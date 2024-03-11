@@ -127,7 +127,7 @@ df_others <- bind_rows(
 ) %>% 
   mutate(source = 
            case_when(
-             var == "bare Pre" ~ "MODIS vegetation continuous fields (2015-2015)",
+             var == "bare Pre" ~ "MODIS vegetation continuous fields (2010-2015)",
              var == "bare Post" ~ "MODIS vegetation continuous fields (2016-2021)",
              var == "crop Pre" ~ "Global cropland extent data set (2015)",
              var == "crop Post" ~ "Global cropland extent data set (2019)",
@@ -203,10 +203,11 @@ spiderplots <- map(split(input_spec, seq(nrow(input_spec))),
     theme(
       text = element_text(family = fontfam),
       axis.text.y = element_blank(),
-      axis.text.x = element_text(size = 7.5),
+      axis.text.x = element_text(size = 10),
       panel.grid.minor = element_blank(),
       panel.grid.major.y = element_blank(),
-      strip.text = element_text(size= 7.5),
+      strip.text = element_text(size= 10),
+      plot.margin = unit(c(0,0,0,0), "cm"),
       legend.position = "none",
     ) +
     scale_y_continuous(
@@ -219,10 +220,18 @@ spiderplots <- map(split(input_spec, seq(nrow(input_spec))),
     scale_fill_manual(values =   c("grey20"))
 })
 
-png("outputs/gat_spiders.png", width = 2000, height = 4250, res = 225)
-wrap_plots(spiderplots,
-           ncol = 4,
-           nrow = 6)
+theme_border <- theme_gray() + 
+  theme(plot.background = element_rect(fill = NA, colour = 'black', size = 0.5))
+
+wrapped_spiders <- map(split(1:24, rep(1:12, each = 2)), function(x){
+  wrap_elements(spiderplots[[x[1]]] + spiderplots[[x[2]]]+ plot_annotation(theme = theme_border))
+})
+
+
+png("outputs/gat_spiders_pub.png", width = 3075, height = 3050, res = 200)
+wrap_plots(wrapped_spiders,
+           ncol = 3,
+           nrow = 4)
 dev.off()
 
 # # boxplots
@@ -278,7 +287,8 @@ p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>%
   mutate(area_ha = area_ha / total_area) %>% 
   ggplot(aes(period, area_ha)) + 
   geom_rain(rain.side = 'f1x1', 
-            id.long.var = "village", fill = "grey20", alpha = 0.2) + 
+            id.long.var = "village", fill = "grey20", alpha = 0.2
+            ) + 
   theme_bw(14) +
   theme(
     text = element_text(family = fontfam),
@@ -287,7 +297,7 @@ p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>%
     panel.grid.minor.y = element_blank()
   ) +
   labs(x = "Period",
-       y = "Bare ground area cover") + 
+       y = "Bare ground area cover\n(Proportion of total area)") + 
   ggrepel::geom_text_repel(
     data = df_landuse_area %>% filter(type == "bare") %>% filter(period == "Pre") %>% 
       mutate(area_ha = area_ha / total_area),
@@ -296,12 +306,13 @@ p_rain_bare <- df_landuse_area %>% filter(type == "bare") %>%
         label = village),
     size = 3, 
     family = fontfam, 
-    hjust = -1/4,
+    hjust = -1/3,
     segment.color = NA,
     box.padding = 0.02,
     max.overlaps = 10) +
    scale_y_continuous(trans = "logit", breaks = seq(0.1,0.5,0.1),
                        limits = c(0.1, 0.5))
+
 
 
 p_rain_crop <- df_landuse_area %>% filter(type == "crop") %>% 
@@ -344,7 +355,7 @@ p_rain_rain <- d_rain %>%
     axis.title.x = element_blank(), 
     axis.text.x = element_blank(), axis.ticks.x = element_blank()
   ) +
-  labs(y = "Mean annual rainfall (mm)")+ 
+  labs(y = "Mean annual precipitation (mm)")+ 
   ggrepel::geom_text_repel(
     aes(x = 1, 
         y = val, 
@@ -387,6 +398,12 @@ set.seed(123)
 png("outputs/gat_rainclouds.png", width = 2750, height = 3300, res = 300)
 (upr_patch / lwr_patch) + plot_layout(heights = c(3,2)) & plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
 dev.off()
+
+set.seed(123)
+png("outputs/gat_rainclouds_pub.png", width = 2650, height = 1450, res = 265)
+p_rain_bare + p_rain_rain + plot_layout(widths = c(2,1)) + plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
+dev.off()
+
 
 ###################
 #### IRT model ####
@@ -499,7 +516,7 @@ dev.off()
 # figure parameter estimates
 p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Governance")),
                          prob = 0.5, prob_outer = 0.9, point_est = "median") +
-  theme_classic(12) +
+  theme_classic(14) +
   labs(subtitle = "*&#952;<sub>j</sub><sup>Gov</sup>*") +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown()) + 
@@ -510,7 +527,7 @@ p_re1a <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & cont
 
 p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & contains("Outcome")),
                          prob = 0.5, prob_outer = 0.9, point_est = "median") +
-  theme_classic(12) +
+  theme_classic(14) +
   labs(subtitle = "*&#952;<sub>j</sub><sup>Out</sup>*") +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown())  + 
@@ -522,7 +539,7 @@ p_re1b <- mcmc_intervals(fit_irt_2par, pars = vars(contains("r_village[") & cont
 p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[",
                         prob = 0.5, prob_outer = 0.9, point_est = "median")+
   labs(subtitle = "*b<sub>i</sub>*") +
-  theme_classic(12) +
+  theme_classic(14) +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown()) + 
   scale_y_discrete(
@@ -532,7 +549,7 @@ p_re2 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3\\[",
 p_re3 <- mcmc_intervals(fit_irt_2par, regex_pars = "r_tier3__disc",
                         prob = 0.5, prob_outer = 0.9, point_est = "median")+
   labs(subtitle = "*a<sub>i</sub>*") +
-  theme_classic(12) +
+  theme_classic(14) +
   theme(text = element_text(family = fontfam),
         plot.subtitle = element_markdown()) + 
   scale_y_discrete(
@@ -549,7 +566,7 @@ p_cor1 <- mcmc_areas_ridges(fit_irt_2par, pars = vars(contains("cor_village")),
   geom_vline(xintercept = 0, lty = 2, lwd = 1) + theme_classic(14) + 
   theme(text = element_text(family = fontfam),
         axis.title.x = element_markdown()) +
-  labs(x = "Correlation of governance processes and<br>governance outcomes (*&#961;<sub>Gov, Out</sub>*)",
+  labs(x = "Correlation of governance processes<br>and governance outcomes (*&#961;<sub>Gov, Out</sub>*)",
        y = "Posterior density")+ 
   scale_y_discrete(
     labels = "",
@@ -576,8 +593,8 @@ p_cor2 <- gather_draws(fit_irt_2par, r_village[village, itemtype]) %>%
                      labels = function(x) 
                        str_replace_all(x, "\\.", " ")) + 
   coord_cartesian(xlim = c(-3,3), ylim = c(-3,3)) + 
-  labs(x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
-       y = "Quality of governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
+  labs(x = "Governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
+       y = "Governance outcomes (*&#952;<sub>j</sub><sup>Out</sup>*)",
        color = "Village")
 
 png("outputs/cor_itm_fit_irt_2par.png", width = 4500, height = 1800, res = 360)
@@ -829,14 +846,15 @@ library(ggdag)
 #### DAG 1 ####
 #-------------#
 dag <- dagify(gov ~ u1 + u2 + ntri,
-              out ~ u1 + u3 + gov,
+              out ~ u0 + ntri + u1 + u3 + gov,
               ass ~ u2 + u3 + ntri,
+              ntri ~ u0,
               exposure = "gov",
               outcome = "out",
-              latent = c("u1","u2","u3"),
+              latent = c("u0", "u1","u2","u3"),
               coords = list(
-                x = c(u1 = 4, u2 = 2, u3 = 3, gov = 3, out = 5, ass = 1, ntri = 1),
-                y = c(u1 = 3, u2 = 0, u3 = 0, gov = 2, out = 2, ass = 0.75, ntri = 2)
+                x = c(u0 = 3, u1 = 4, u2 = 2, u3 = 3, gov = 3, out = 5, ass = 1, ntri = 1),
+                y = c(u0 = 3, u1 = 3, u2 = 0, u3 = 0, gov = 2, out = 2, ass = 0.75, ntri = 2)
               )
 )
 
@@ -845,23 +863,30 @@ p_dag1 <- dag %>%
   arrange(name) %>% # sort them alphabetically
   mutate(type = 
            case_when(
-             name %in% c("u1", "u2", "u3") ~ "unobserved",
+             name %in% c("u0", "u1", "u2", "u3") ~ "unobserved",
              name %in% c("out", "gov") ~ "target",
              name %in% c("ntri", "ass") ~ "select"
            )) %>% 
   mutate(
     # adjust for boxes
-    xend_for_edges = ifelse(to == "ass" & name != "ntri", xend + 1/6, xend),
-    yend_for_edges = ifelse(to == "ass" & name == "ntri", yend + 1/5, yend),
-    y_for_edges    = ifelse(to == "ass" & name == "ntri", y - 1/6, y),
-    x_for_edges    = ifelse(to == "gov" & name == "ntri", x + 1/8, x)
+    xend_for_edges = ifelse(to == "ass" & name != "ntri", xend + 1/6, 
+                            ifelse(to == "ntri" & name == "u0", xend + 1/6, xend)),
+    yend_for_edges = ifelse(to == "ass" & name == "ntri", yend + 1/5, 
+                            ifelse(to == "out" & name == "ntri", y - 1/9, yend)),
+    y_for_edges    = ifelse(to == "ass" & name == "ntri", y - 1/6, 
+                            ifelse(to == "out" & name == "ntri", y - 1/9, y)),
+    x_for_edges    = ifelse(to == "gov" & name == "ntri", x + 1/8, 
+                            ifelse(to == "out" & name == "ntri", x + 1/8, x)),
+   # color edge
+   interest = ifelse(to == "out" & name == "gov", onecolor, "black")
   ) %>%
   ggplot(
     aes(
       x = x,
       y = y,
       xend = xend,
-      yend = yend
+      yend = yend,
+      color = interest
     )
   ) + 
   theme_dag_blank(14) + 
@@ -871,6 +896,7 @@ p_dag1 <- dag %>%
                  show.legend = FALSE) +
   geom_dag_edges(
     aes(
+      edge_color = interest,
       xend = xend_for_edges,
       yend = yend_for_edges,
       y = y_for_edges,
@@ -885,6 +911,7 @@ p_dag1 <- dag %>%
                gov  = expression(theta^'Gov'),
                ntri = expression(NTRI),
                out  = expression(theta^'Out'),
+               u0   = expression(italic(U[0])),
                u1   = expression(italic(U[1])),
                u2   = expression(italic(U[2])),
                u3   = expression(italic(U[3]))),
@@ -892,11 +919,11 @@ p_dag1 <- dag %>%
     show.legend = FALSE,
     family = fontfam
   ) +
-  scale_color_manual(values = c("black", onecolor)) + 
+  scale_color_manual(values = c("black", "black", "black", onecolor)) + 
   scale_shape_manual(values = c(0, NA, 1)) + 
   scale_size_manual(values = c(20, 30))
 
-png("outputs/dag1.png", width = 1800, height = 900, res = 235)
+png("outputs/dag1_pub.png", width = 1800, height = 900, res = 235)
 p_dag1 
 dev.off()
 
@@ -924,7 +951,10 @@ p_dag2 <- dag2 %>%
              name %in% c("u123", "u4", "u5", "u6") ~ "unobserved",
              name %in% c("gov", "barepost") ~ "target",
              name %in% c("inv", "rain", "barepre") ~ "observed"
-           )) %>% 
+           ),
+         # color edge
+         interest = ifelse(to == "barepost" & name == "gov", onecolor, "black")
+  ) %>%
   ggplot(
     aes(
       x = x,
@@ -937,6 +967,7 @@ p_dag2 <- dag2 %>%
   geom_dag_point(aes(shape = type),
                  show.legend = FALSE) +
   geom_dag_edges(
+    aes(edge_color = interest),
     edge_width = 1/2
   ) +
   geom_dag_text(
@@ -955,11 +986,15 @@ p_dag2 <- dag2 %>%
     show.legend = FALSE,
     family = fontfam
   ) +
-  scale_color_manual(values = c("black", onecolor)) + 
+  scale_color_manual(values = c( "black", onecolor, "black", onecolor)) + 
   scale_shape_manual(values = c(NA, NA, 1))
 
 png("outputs/dag2.png", width = 1800, height = 900, res = 235)
 p_dag2
+dev.off()
+
+png("outputs/dag1_dag2_pub.png", width = 3000, height = 1300, res = 255)
+p_dag1 + p_dag2 + plot_annotation(tag_level = "a") & theme(text = element_text(family = fontfam))
 dev.off()
 
 ######################
@@ -1019,7 +1054,8 @@ shp_border <- st_read("data/shapes_distr/ken_admbnda_adm0_iebc_20191031.shp")
 pm <- pm + 
   geom_sf(data = shp_border, inherit.aes = FALSE, fill = NA) + 
   geom_text(data = tibble(x=37.5, y = -2.4), aes(x = x,y = y, label = "Kenya"), size = 6, family = fontfam) + 
-  geom_text(data = tibble(x=35.75, y = -5.75), aes(x = x,y = y, label = "Tanzania"), size = 6, famipng("outputs/ppcs_fit_irt_2par.png", width = 4500, height = 6000, res = 380)
+  geom_text(data = tibble(x=35.75, y = -5.75), aes(x = x,y = y, label = "Tanzania"), size = 6, fami
+            png("outputs/ppcs_fit_irt_2par.png", width = 4500, height = 6000, res = 380)
             ppc1/ppc2 + plot_layout(heights = c(1,2/3)) +
               plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
             dev.off()ly = fontfam) + 
@@ -1324,7 +1360,8 @@ fit_bare <- brm(
 # export
 # prior_summary(fit_bare)
 # summary(fit_bare)
-saveRDS(fit_bare, file = paste0("outputs/fit_bare.rds"))
+#saveRDS(fit_bare, file = paste0("outputs/fit_bare.rds"))
+fit_bare <- readRDS("outputs/fit_bare.rds")
 cat(stancode(fit_bare), file = "outputs/fit_bare.txt")
 fit_bare <- readRDS("outputs/fit_bare.rds")
 
@@ -1477,8 +1514,8 @@ p_pred <- df_preds_bare_grp %>%
   scale_fill_manual(values =  gradcolors) + 
   scale_y_continuous(breaks = seq(0.5,3, 0.5)) +
   #scale_y_continuous(limits = c(0,3)) +
-  labs(y = "Predicted factor change in bare ground cover",
-       x = "Quality of governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
+  labs(y = "Factor change\nin bare ground cover",
+       x = "Governance processes (*&#952;<sub>j</sub><sup>Gov</sup>*)",
        fill = "Response\ncategory")
 
 # densities
@@ -1490,7 +1527,7 @@ p_villdens <- spread_draws(fit_irt_2par,
   ggplot() + 
   geom_density(aes(x = r_village, fill = village), 
                col = NA,
-               alpha = 0.2, 
+               alpha = 0.35, 
                show.legend = FALSE,
   ) +
   # geom_textdensity(aes(x = r_village, 
@@ -1498,11 +1535,14 @@ p_villdens <- spread_draws(fit_irt_2par,
   #                      fill = village)
   #                  ) +
   theme_void(14) +
-  theme(text = element_text(family = fontfam)) + 
+  theme(text = element_text(family = fontfam),
+        legend.position = "bottom") + 
   scale_fill_manual(values = palcolors,
                     labels = function(x) 
                       str_replace_all(x, "\\.", " ")) + 
-  coord_cartesian(xlim = c(-4,4))
+  coord_cartesian(xlim = c(-4,4)) + 
+  guides(fill = guide_legend(ncol = 6)) + 
+  labs(fill = "")
 
 
 png("outputs/pred_bareground.png", width = 2800, height = 1800, res = 360)
@@ -1511,11 +1551,16 @@ dev.off()
 
 
 
+#######################################
+# plot many outcomes together for pub #
+#######################################
+p_lowerpanel <- p_pred
+p_middlepanel <- p_cor1 + p_cor2 
+p_upperpanel <- p_re1a + p_re1b
 
-
-
-
-
+png("outputs/results_pub.png", width = 3500, height = 3500, res = 310)
+p_upperpanel / p_middlepanel / p_lowerpanel  & plot_annotation(tag_levels = "a") & theme(text = element_text(family = fontfam))
+dev.off()
 
 
 
