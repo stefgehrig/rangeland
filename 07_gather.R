@@ -978,7 +978,7 @@ p_dag2 <- dag2 %>%
                gov  = expression(theta^'Gov'),
                invasives = expression('Invasives'),
                rain = expression('Rainfall'),
-               u123   = expression(italic(U[123])),
+               u123   = expression(italic(U[123]^"*")),
                u4   = expression(italic(U[4])),
                u5   = expression(italic(U[5])),
                u6   = expression(italic(U[6]))),
@@ -993,7 +993,7 @@ png("outputs/dag2.png", width = 1800, height = 900, res = 235)
 p_dag2
 dev.off()
 
-png("outputs/dag1_dag2_pub.png", width = 3000, height = 1300, res = 255)
+png("outputs/dag1_dag2_pub.png", width = 3100, height = 1300, res = 250)
 p_dag1 + p_dag2 + plot_annotation(tag_level = "a") & theme(text = element_text(family = fontfam))
 dev.off()
 
